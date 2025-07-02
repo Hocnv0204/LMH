@@ -35,6 +35,9 @@ public class Language {
     @OneToMany(mappedBy = "language", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Topic> topics;
 
+    @OneToMany(mappedBy = "language", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Level> levels;
+
 
     public Language() {}
     
