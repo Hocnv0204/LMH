@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface LevelService {
     List<LevelResponse> getLevelsByLanguage(String languageName);
+    Level findByName(String name);
 }

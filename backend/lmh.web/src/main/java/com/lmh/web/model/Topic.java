@@ -1,5 +1,6 @@
 package com.lmh.web.model;
 
+import com.lmh.web.common.TypeTopic;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,9 +25,10 @@ public class Topic {
     
     @Column(name = "delete_flag")
     private Boolean deleteFlag;
-    
+
+    @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private String type;
+    private TypeTopic type;
     
     @Column(columnDefinition = "TEXT")
     private String note;
