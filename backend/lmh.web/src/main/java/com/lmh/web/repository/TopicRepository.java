@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, String> {
@@ -19,5 +21,8 @@ public interface TopicRepository extends JpaRepository<Topic, String> {
                                            @Param("type") String type,
                                            @Param("languageName") String languageName,
                                            Pageable pageable);
+
+    boolean existsByName(String name);
+    Optional<Topic> findByName(String name);
 
 }

@@ -16,9 +16,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TopicRequest {
     private String name;
-    private String type;
+    private String description;
     private UserRequest userRequest;
     private LanguageRequest languageRequest;
     private LevelRequest levelRequest;
-
 }
