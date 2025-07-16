@@ -1,5 +1,6 @@
 package com.lmh.web.model;
 
+import com.lmh.web.common.constant.TypeLesson;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,9 +34,10 @@ public class Lesson {
     
     @Column(name = "delete_flag")
     private Boolean deleteFlag;
-    
+
+    @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private String type;
+    private TypeLesson type;
     
     @Column(name = "last_practice")
     private LocalDateTime lastPractice;
@@ -49,6 +51,10 @@ public class Lesson {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
     private Topic topic;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<SuggestVocabulary> suggestVocabularies;
