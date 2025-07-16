@@ -15,13 +15,13 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "#",
+    title: "Dashboard",
+    url: "/admin/",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
+    title: "Manage Topics",
+    url: "/admin/topic/",
     icon: Inbox,
   },
   {
