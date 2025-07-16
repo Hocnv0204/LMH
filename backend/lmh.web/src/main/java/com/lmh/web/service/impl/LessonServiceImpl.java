@@ -110,6 +110,7 @@ public class LessonServiceImpl implements LessonService {
         return lessonMapper.toResponse(lessonRepository.save(lesson));
     }
 
+    @Override
     public Lesson findByName(String lessonName) {
         Optional<Lesson> lessonOptional = lessonRepository.findByName(lessonName);
         if (lessonOptional.isEmpty()) {
