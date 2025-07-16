@@ -16,11 +16,11 @@ public class History {
     
     @Column(columnDefinition = "TEXT")
     private String question;
-    
+
     @Column(columnDefinition = "TEXT")
     private String answer;
     
-    private Boolean result;
+    private String result;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
