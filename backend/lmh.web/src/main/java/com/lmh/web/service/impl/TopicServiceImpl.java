@@ -1,6 +1,6 @@
 package com.lmh.web.service.impl;
 
-import com.lmh.web.common.TypeTopic;
+import com.lmh.web.common.constant.TypeTopic;
 import com.lmh.web.common.exception.DataExistedException;
 import com.lmh.web.common.exception.InvalidDataException;
 import com.lmh.web.common.exception.NotFoundException;
@@ -13,7 +13,6 @@ import com.lmh.web.model.Level;
 import com.lmh.web.model.Topic;
 import com.lmh.web.model.User;
 import com.lmh.web.repository.TopicRepository;
-import com.lmh.web.repository.UserRepository;
 import com.lmh.web.service.LanguageService;
 import com.lmh.web.service.LevelService;
 import com.lmh.web.service.TopicService;
@@ -74,7 +73,7 @@ public class TopicServiceImpl implements TopicService {
     public void deleteTopicUser(String username, String topicName) {
         Topic topic = findByName(topicName);
         User user = userService.getUserByUsername(username);
-        if (topic.getType().equals(TypeTopic.USER_CREATION)){
+        if (topic.getType().equals(TypeTopic.DEFAULT)){
             throw new InvalidDataException("Cannot delete topic default");
         }
         if (user.equals(topic.getUser())){
@@ -86,6 +85,9 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public TopicResponse updateTopicUser(String username, UpdateTopicUser updateTopicUser) {
         Topic topic = findByName(updateTopicUser.getName());
+        if (topic.getType().equals(TypeTopic.DEFAULT)){
+            throw new InvalidDataException("Cannot update topic default");
+        }
         User user = userService.getUserByUsername(username);
         if (user.equals(topic.getUser())){
             throw new InvalidDataException("Topic not belong user - " + username + " - topic name - " + updateTopicUser.getName());

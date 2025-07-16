@@ -1,6 +1,6 @@
 package com.lmh.web.model;
 
-import com.lmh.web.common.TypeTopic;
+import com.lmh.web.common.constant.TypeTopic;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
