@@ -12,57 +12,114 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Topic {
-    
+
+
+    /**
+     * Khóa chính của topic, tự động tăng.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
+    /**
+     * Tên của chủ đề.
+     * Ví dụ: "Các thì trong tiếng Anh", "Từ vựng về gia đình".
+     */
     @Column(length = 100)
     private String name;
-    
+
+    /**
+     * Mô tả chi tiết về nội dung của chủ đề.
+     * Được lưu dưới dạng TEXT để không giới hạn độ dài.
+     */
     @Column(columnDefinition = "TEXT")
     private String description;
-    
+
+    /**
+     * Cờ đánh dấu xóa mềm.
+     * true: Topic đã bị xóa (ẩn đi).
+     * false: Topic đang hoạt động.
+     */
     @Column(name = "delete_flag")
     private Boolean deleteFlag;
 
+    /**
+     * Phân loại topic để phân biệt nguồn tạo.
+     * - DEFAULT: Topic mặc định do Admin tạo.
+     * - USER_CREATION: Topic do người dùng thông thường tạo.
+     * Được lưu dưới dạng chuỗi trong CSDL.
+     */
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
     private TypeTopic type;
-    
+
+    /**
+     * Ghi chú nội bộ cho quản trị viên.
+     */
     @Column(columnDefinition = "TEXT")
     private String note;
-    
+
+    /**
+     * Thời điểm topic được tạo.
+     */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
+
+    /**
+     * Đường dẫn URL đầy đủ đến ảnh đại diện của topic trên Cloudinary.
+     * Dùng để hiển thị ảnh ra bên ngoài.
+     */
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    /**
+     * Public ID của ảnh trên Cloudinary.
+     * Dùng để quản lý (xóa, sửa) ảnh thông qua API của Cloudinary.
+     */
+    @Column(name = "image_id")
+    private String imageId;
+
+    /**
+     * Mối quan hệ nhiều-một với User.
+     * Cho biết người dùng nào đã tạo ra topic này.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "level_id")
-    private Level level;
-    
+
+    /**
+     * Mối quan hệ nhiều-một với Language.
+     * Cho biết topic này thuộc về ngôn ngữ nào.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")
     private Language language;
 
+
+    /**
+     * Mối quan hệ một-nhiều với Lesson.
+     * Một topic có thể chứa nhiều bài học.
+     * Hành động trên Topic sẽ lan truyền xuống Lesson (ví dụ: xóa Topic sẽ xóa cả Lesson).
+     */
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Lesson> lessons;
-    
-    public Topic() {}
-    
+
+    public Topic() {
+    }
+
     @Override
     public String toString() {
         return "Topic{" +
-                "createdAt=" + createdAt +
-                ", note='" + note + '\'' +
-                ", type='" + type + '\'' +
-                ", deleteFlag=" + deleteFlag +
-                ", description='" + description + '\'' +
+                "id=" + id +
                 ", name='" + name + '\'' +
-                ", id=" + id +
+                ", description='" + description + '\'' +
+                ", deleteFlag=" + deleteFlag +
+                ", type=" + type +
+                ", note='" + note + '\'' +
+                ", createdAt=" + createdAt +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", imageId='" + imageId + '\'' +
                 '}';
     }
-} 
+}
+

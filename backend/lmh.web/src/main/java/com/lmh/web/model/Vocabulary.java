@@ -34,6 +34,7 @@ public class Vocabulary {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
     private CollectionVocab collection;
+
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
