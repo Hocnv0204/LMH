@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class Topic {
 
+
     /**
      * Khóa chính của topic, tự động tăng.
      */
@@ -94,6 +95,7 @@ public class Topic {
     @JoinColumn(name = "language_id")
     private Language language;
 
+
     /**
      * Mối quan hệ một-nhiều với Lesson.
      * Một topic có thể chứa nhiều bài học.
@@ -124,3 +126,4 @@ public class Topic {
                 '}';
     }
 }
+

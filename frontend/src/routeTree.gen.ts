@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+
 import { Route as AdminTopicIndexRouteImport } from './routes/admin/topic/index'
+
 
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
@@ -29,6 +31,7 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+
 const AdminTopicIndexRoute = AdminTopicIndexRouteImport.update({
   id: '/topic/',
   path: '/topic/',
@@ -39,11 +42,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+
   '/admin/topic': typeof AdminTopicIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminIndexRoute
+
   '/admin/topic': typeof AdminTopicIndexRoute
 }
 export interface FileRoutesById {
@@ -51,6 +56,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+
   '/admin/topic/': typeof AdminTopicIndexRoute
 }
 export interface FileRouteTypes {
@@ -59,6 +65,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/admin' | '/admin/topic'
   id: '__root__' | '/' | '/admin' | '/admin/' | '/admin/topic/'
+
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +96,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+
     '/admin/topic/': {
       id: '/admin/topic/'
       path: '/topic'
@@ -96,17 +104,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTopicIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+
   }
 }
 
 interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
+
   AdminTopicIndexRoute: typeof AdminTopicIndexRoute
+
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
+
   AdminTopicIndexRoute: AdminTopicIndexRoute,
+
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(

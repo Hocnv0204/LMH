@@ -28,10 +28,13 @@ public class Vocabulary {
     
     @Column(columnDefinition = "TEXT")
     private String example;
+    @Column
+    private String audioUrl ;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
-    private CollectionVoca collection;
+    private CollectionVocab collection;
+
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

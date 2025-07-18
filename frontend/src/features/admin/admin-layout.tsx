@@ -1,12 +1,16 @@
+
 import { Outlet } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AdminSidebar } from '@/features/admin/components/admin-sidebar'
 
+
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AdminSidebar />
+
+=======
       <div
         id='content'
         className={cn(
@@ -23,4 +27,5 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       </div>
     </SidebarProvider>
   )
+
 }
