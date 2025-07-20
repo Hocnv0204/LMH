@@ -1,93 +1,70 @@
-//package com.lmh.web.controller.topic;
-//
-//import com.lmh.web.common.TypeTopic;
-//import com.lmh.web.dto.request.topic.CreateTopicRequest;
-//import com.lmh.web.dto.response.topic.TopicDto;
-//import com.lmh.web.dto.request.topic.UpdateTopicRequest;
-//import com.lmh.web.service.topic.TopicService;
-//import jakarta.validation.Valid;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.data.domain.Sort;
-//import org.springframework.data.web.PageableDefault;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.io.IOException;
-//
-///**
-// * Admin controller for Topic management
-// * Accessible only by users with ADMIN role
-// */
-//@RestController
-//@RequestMapping("/api/admin/topics")
-//@RequiredArgsConstructor
-//@Slf4j
-//@PreAuthorize("hasRole('ADMIN')")
-//public class AdminTopicController {
-//
-//    private final TopicService topicService;
-//
-//    /**
-//     * Get paginated and sorted list of all topics with dynamic search
-//     */
-//    @GetMapping
-//    public ResponseEntity<Page<TopicDto>> getAllTopics(
-//            @RequestParam(required = false) String search,
-//            @RequestParam(required = false) String name,
-//            @RequestParam(required = false) String languageName,
-//            @RequestParam(required = false) TypeTopic type,
-//            @RequestParam(required = false) Boolean deleteFlag,
-//            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-//
-//        log.info("Admin getting all topics with filters");
-//        Page<TopicDto> topics = topicService.getTopicsForAdmin(search, name, languageName, type, deleteFlag, pageable);
-//        return ResponseEntity.ok(topics);
-//    }
-//
-//    /**
-//     * Get topic by ID
-//     */
-//    @GetMapping("/{id}")
-//    public ResponseEntity<TopicDto> getTopicById(@PathVariable Integer id) {
-//        log.info("Admin getting topic by id: {}", id);
-//        TopicDto topic = topicService.getTopicByIdForAdmin(id);
-//        return ResponseEntity.ok(topic);
-//    }
-//
-//    /**
-//     * Create new topic
-//     */
-//    @PostMapping
-//    public ResponseEntity<TopicDto> createTopic(@Valid @ModelAttribute CreateTopicRequest request) throws IOException {
-//        log.info("Admin creating new topic: {}", request.getName());
-//        TopicDto createdTopic = topicService.createTopicForAdmin(request);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(createdTopic);
-//    }
-//
-//    /**
-//     * Update topic by ID
-//     */
-//    @PutMapping("/{id}")
-//    public ResponseEntity<TopicDto> updateTopic(@PathVariable Integer id,
-//                                                @Valid @ModelAttribute UpdateTopicRequest request) throws IOException {
-//        log.info("Admin updating topic: {}", id);
-//        TopicDto updatedTopic = topicService.updateTopicForAdmin(id, request);
-//        return ResponseEntity.ok(updatedTopic);
-//    }
-//
-//    /**
-//     * Soft delete topic by ID
-//     */
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteTopic(@PathVariable Integer id) {
-//        log.info("Admin deleting topic: {}", id);
-//        topicService.deleteTopicForAdmin(id);
-//        return ResponseEntity.noContent().build();
-//    }
-//}
-//
+package com.lmh.web.controller.topic;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lmh.web.dto.request.topic.AdminCreateTopicRequest;
+import com.lmh.web.dto.request.topic.AdminUpdateTopicRequest;
+import com.lmh.web.dto.response.CustomResponse;
+import com.lmh.web.dto.response.topic.AdminTopicResponse;
+import com.lmh.web.service.topic.AdminTopicService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("/admin/topics")
+@RequiredArgsConstructor
+public class AdminTopicController {
+
+    private final AdminTopicService adminTopicService;
+    private final ObjectMapper objectMapper;
+
+    @GetMapping
+    public CustomResponse<Page<AdminTopicResponse>> getAllTopics(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) String languageName,
+            @RequestParam(required = false) Boolean isDeleted,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir
+    ) {
+        Page<AdminTopicResponse> topicPage = adminTopicService.getAllTopicsForAdmin(
+                searchTerm, languageName, isDeleted, page, size, sortBy, sortDir
+        );
+        return new CustomResponse<>(topicPage, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public CustomResponse<AdminTopicResponse> createTopic(
+            @RequestParam("request") String requestJson,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) throws JsonProcessingException {
+        // Do request là multipart/form-data, dữ liệu JSON sẽ được gửi dưới dạng chuỗi
+        // Chúng ta cần chuyển đổi chuỗi JSON này thành đối tượng AdminCreateTopicRequest
+        AdminCreateTopicRequest request = objectMapper.readValue(requestJson, AdminCreateTopicRequest.class);
+
+        AdminTopicResponse newTopic = adminTopicService.createTopicForAdmin(request, file);
+        return new CustomResponse<>(newTopic, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{topicId}")
+    public CustomResponse<AdminTopicResponse> updateTopic(
+            @PathVariable Integer topicId,
+            @RequestParam("request") String requestJson,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) throws JsonProcessingException {
+        AdminUpdateTopicRequest request = objectMapper.readValue(requestJson, AdminUpdateTopicRequest.class);
+        AdminTopicResponse updatedTopic = adminTopicService.updateTopicForAdmin(topicId, request, file);
+        return new CustomResponse<>(updatedTopic, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{topicId}")
+    public CustomResponse<String> deleteTopic(@PathVariable Integer topicId) {
+        adminTopicService.deleteTopicForAdmin(topicId);
+        // Trả về một thông báo thành công
+        return new CustomResponse<>("Xóa topic thành công", HttpStatus.OK);
+    }
+}

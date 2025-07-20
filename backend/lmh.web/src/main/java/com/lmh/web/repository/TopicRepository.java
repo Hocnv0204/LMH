@@ -28,17 +28,4 @@ public interface TopicRepository extends JpaRepository<Topic, Integer>, JpaSpeci
     boolean existsByName(String name);
     Optional<Topic> findByName(String name);
 
-    /**
-     * Find topic by ID and ensure it's not soft deleted
-     */
-    @Query("SELECT t FROM Topic t WHERE t.id = :id AND t.deleteFlag = false")
-    Optional<Topic> findByIdAndNotDeleted(@Param("id") Integer id);
-
-    /**
-     * Find topic by ID for a specific user (either owned by user or DEFAULT type)
-     */
-    @Query("SELECT t FROM Topic t WHERE t.id = :id AND t.deleteFlag = false AND " +
-            "(t.user.id = :userId OR t.type = 'DEFAULT')")
-    Optional<Topic> findByIdForUser(@Param("id") Integer id, @Param("userId") Integer userId);
-
 }

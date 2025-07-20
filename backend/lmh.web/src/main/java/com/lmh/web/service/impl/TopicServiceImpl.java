@@ -7,6 +7,7 @@ import com.lmh.web.common.exception.NotFoundException;
 import com.lmh.web.common.utils.PageableUtils;
 import com.lmh.web.dto.request.topic.TopicRequest;
 import com.lmh.web.dto.request.topic.UpdateTopicUser;
+import com.lmh.web.dto.response.topic.AdminTopicResponse;
 import com.lmh.web.dto.response.topic.TopicResponse;
 import com.lmh.web.model.Language;
 import com.lmh.web.model.Level;
@@ -22,8 +23,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
