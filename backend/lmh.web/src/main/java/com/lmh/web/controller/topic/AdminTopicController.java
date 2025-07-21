@@ -37,6 +37,12 @@ public class AdminTopicController {
         return new CustomResponse<>(topicPage, HttpStatus.OK);
     }
 
+    @GetMapping("/{topicId}")
+    public CustomResponse<AdminTopicResponse> getTopicDetails(@PathVariable Integer topicId) {
+        AdminTopicResponse topicDetails = adminTopicService.getTopicDetailsForAdmin(topicId);
+        return new CustomResponse<>(topicDetails, HttpStatus.OK);
+    }
+
     @PostMapping
     public CustomResponse<AdminTopicResponse> createTopic(
             @RequestParam("request") String requestJson,
@@ -66,5 +72,11 @@ public class AdminTopicController {
         adminTopicService.deleteTopicForAdmin(topicId);
         // Trả về một thông báo thành công
         return new CustomResponse<>("Xóa topic thành công", HttpStatus.OK);
+    }
+
+    @PostMapping("/{topicId}/restore")
+    public CustomResponse<String> restoreTopic(@PathVariable Integer topicId) {
+        adminTopicService.restoreTopicForAdmin(topicId);
+        return new CustomResponse<>("Khôi phục topic thành công", HttpStatus.OK);
     }
 }

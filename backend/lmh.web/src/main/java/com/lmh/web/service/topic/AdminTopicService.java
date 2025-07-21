@@ -30,4 +30,8 @@ public interface AdminTopicService {
     AdminTopicResponse updateTopicForAdmin(Integer topicId, AdminUpdateTopicRequest request, MultipartFile file);
 
     void deleteTopicForAdmin(Integer topicId);
+
+    AdminTopicResponse getTopicDetailsForAdmin(Integer topicId);
+
+    void restoreTopicForAdmin(Integer topicId);
 }

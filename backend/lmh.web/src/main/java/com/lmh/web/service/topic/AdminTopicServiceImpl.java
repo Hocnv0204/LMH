@@ -2,6 +2,7 @@ package com.lmh.web.service.topic;
 
 import com.lmh.web.common.constant.TypeTopic;
 import com.lmh.web.common.exception.DataExistedException;
+import com.lmh.web.common.exception.InvalidDataException;
 import com.lmh.web.common.exception.NotFoundException;
 import com.lmh.web.dto.request.topic.AdminCreateTopicRequest;
 import com.lmh.web.dto.request.topic.AdminUpdateTopicRequest;
@@ -190,6 +191,35 @@ public class AdminTopicServiceImpl implements AdminTopicService {
         topic.setDeleteFlag(true);
 
         // 3. Lưu lại
+        topicRepository.save(topic);
+    }
+
+    @Override
+    public AdminTopicResponse getTopicDetailsForAdmin(Integer topicId) {
+        // 1. Tìm topic bằng ID, nếu không có sẽ ném lỗi NotFoundException
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy topic với ID: " + topicId));
+
+        // 2. Dùng mapper để chuyển đổi sang DTO và trả về
+        return topicMapper.toAdminResponse(topic);
+    }
+
+    @Override
+    public void restoreTopicForAdmin(Integer topicId) {
+        // 1. Tìm topic bằng ID
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy topic với ID: " + topicId));
+
+        // 2. Kiểm tra xem topic có thực sự bị xóa không
+        if (!topic.getDeleteFlag()) {
+            // Có thể ném lỗi hoặc đơn giản là không làm gì cả
+            throw new InvalidDataException("Topic này chưa bị xóa.");
+        }
+
+        // 3. Đặt lại cờ xóa
+        topic.setDeleteFlag(false);
+
+        // 4. Lưu lại thay đổi
         topicRepository.save(topic);
     }
 }
