@@ -6,7 +6,8 @@ import com.lmh.web.model.User;
 
 import java.util.Optional;
 
-public interface UserService {
+public interface
+UserService {
     User getUserByUsername(String username);
     UserResponse getUserById(Integer id);
     UserResponse updateUser(Integer id, UserRequest userRequest);

@@ -9,8 +9,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AdminSidebar />
-
-=======
       <div
         id='content'
         className={cn(
