@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HistoryResponse {
+    private Integer id;
     private String question;
     private String result;
     private String answer;
