@@ -5,5 +5,9 @@
     <changeSet id="001_create_tables.sql" author="Minh" dbms="postgresql" onValidationFail="HALT" failOnError="true">
         <sqlFile path="db/changelog/001_create_tables.sql"/>
     </changeSet>
+    <changeSet id="002_add_enable_and_verification_token.sql" author="Hoc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/002_add_enable_column_and_verification_token.sql"/>
+    </changeSet>
+
 
 </databaseChangeLog>

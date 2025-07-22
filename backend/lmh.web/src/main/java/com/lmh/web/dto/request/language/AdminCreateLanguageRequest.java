@@ -11,5 +11,8 @@ public class AdminCreateLanguageRequest {
     @NotBlank(message = "Tên ngôn ngữ không được để trống")
     private String name;
 
+    @NotBlank(message = "Code không được để trống")
+    private String languageCode;
+
     private String note;
 }

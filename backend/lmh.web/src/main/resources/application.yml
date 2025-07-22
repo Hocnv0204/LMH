@@ -5,6 +5,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/lmh
     username: postgres
     password: 123456
+  data:
+    redis:
+      host: localhost
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: none
@@ -21,9 +25,48 @@ spring:
     enabled: true
     change-log: db/changelog/db-changelog.xml
     default-schema: public
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 35790031845-c8n8krgp3rs5464q0dt7tlj74ps79kmb.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - profile
+              - email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hocnguyen1102.work@gmail.com
+    password: khus plsi hvgh peqz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 # Cloudinary Configuration
 cloudinary:
   cloud_name: dzvxgyg88
   api_key: 281855212738654
-  api_secret: CBx98FIol43xihZJt0fX1AKgt9E 
+  api_secret: CBx98FIol43xihZJt0fX1AKgt9E
+jwt:
+  signerKey : "z8q/gnCQ3bJb4RWbC36UuznGJ0QNpnn1NSJuYO+nU0QWHPtgJE0y6BO3L2ZNZXnB"
+  valid-duration : 900
+  refreshable-duration : 604800
+  api_secret: CBx98FIol43xihZJt0fX1AKgt9E
+
+# GEMINI API CONFIGURATION
+gemini:
+  api:
+    key: AIzaSyA1tQwG9IdRqEXHU-kmlhX-YbOWyXUkQL4
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+
+app:
+  base-url: http://localhost:8080
+  verification:
+    token:
+      expiry: 86400000

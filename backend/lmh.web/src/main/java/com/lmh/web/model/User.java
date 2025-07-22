@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Set;
+
+import lombok.*;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class User {
     
     @Id
@@ -44,6 +47,8 @@ public class User {
     private Integer point;
     
     private Integer credit;
+
+    private boolean enable ;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
