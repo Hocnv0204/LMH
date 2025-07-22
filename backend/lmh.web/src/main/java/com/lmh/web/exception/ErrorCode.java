@@ -12,7 +12,9 @@ public enum ErrorCode {
     COLLECTION_IS_NOT_EXISTS(1003 , "Collection is not exists" , HttpStatus.BAD_REQUEST) ,
     IMAGE_UPLOAD_FAILED(1004 , "Image upload failed" , HttpStatus.INTERNAL_SERVER_ERROR) ,
     FLASHCARD_NOT_FOUND(1005 , "Flashcard not found" , HttpStatus.NOT_FOUND) ,
-    DELETE_FAILED(1006 , "Delete failed" , HttpStatus.INTERNAL_SERVER_ERROR)  ;
+    DELETE_FAILED(1006 , "Delete failed" , HttpStatus.INTERNAL_SERVER_ERROR)  ,
+    USER_NOT_EXISTS(1007,"User is not exists" , HttpStatus.NOT_FOUND) ,
+    UNAUTHORIZED(1008 , "Username or password is invalid" , HttpStatus.UNAUTHORIZED) ;
 
 
     private final int code ;
