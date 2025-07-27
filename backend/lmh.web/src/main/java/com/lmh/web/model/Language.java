@@ -30,7 +30,9 @@ public class Language {
     
     @Column(name = "delete_flag")
     private Boolean deleteFlag;
-    
+
+    @Column(name = "language_code", length = 10, unique = true)
+    private String languageCode; // Ví dụ: "en", "ja", "zh"
 
     @OneToMany(mappedBy = "language", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Topic> topics;
