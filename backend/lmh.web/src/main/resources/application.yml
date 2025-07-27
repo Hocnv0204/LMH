@@ -46,3 +46,10 @@ jwt:
   signerKey : "z8q/gnCQ3bJb4RWbC36UuznGJ0QNpnn1NSJuYO+nU0QWHPtgJE0y6BO3L2ZNZXnB"
   valid-duration : 900
   refreshable-duration : 604800
+  api_secret: CBx98FIol43xihZJt0fX1AKgt9E
+
+# GEMINI API CONFIGURATION
+gemini:
+  api:
+    key: AIzaSyA1tQwG9IdRqEXHU-kmlhX-YbOWyXUkQL4
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
