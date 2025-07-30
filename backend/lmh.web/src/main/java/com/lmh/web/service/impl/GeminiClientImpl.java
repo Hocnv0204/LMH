@@ -117,10 +117,10 @@ public class GeminiClientImpl implements GeminiClient {
             result.put("isValid", false);
             if (geminiResponse != null &&
                     !geminiResponse.getCandidates().isEmpty() &&
-                    geminiResponse.getCandidates().getFirst().getContent() != null &&
-                    !geminiResponse.getCandidates().getFirst().getContent().getParts().isEmpty()) {
+                    geminiResponse.getCandidates().get(0).getContent() != null &&
+                    !geminiResponse.getCandidates().get(0).getContent().getParts().isEmpty()) {
 
-                String text = geminiResponse.getCandidates().getFirst().getContent().getParts().getFirst().getText();
+                String text = geminiResponse.getCandidates().get(0).getContent().getParts().get(0).getText();
                 log.info(text);
                 result.put("isValid", true);
                 try {
