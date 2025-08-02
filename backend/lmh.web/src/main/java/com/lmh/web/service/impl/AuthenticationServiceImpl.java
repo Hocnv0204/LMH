@@ -1,26 +1,41 @@
 package com.lmh.web.service.impl;
 
+
 import com.lmh.web.common.Role;
 import com.lmh.web.common.constant.TypeToken;
 import com.lmh.web.dto.request.authentication.*;
+
+import com.lmh.web.dto.request.authentication.IntrospectRequest;
+import com.lmh.web.dto.request.authentication.LoginRequest;
+import com.lmh.web.dto.request.authentication.LogoutRequest;
+import com.lmh.web.dto.request.authentication.RefreshTokenRequest;
+
 import com.lmh.web.dto.response.AuthenticationResponse;
 import com.lmh.web.dto.response.user.IntrospectResponse;
 import com.lmh.web.exception.AppException;
 import com.lmh.web.exception.ErrorCode;
 import com.lmh.web.model.InvalidToken;
 import com.lmh.web.model.User;
+
 import com.lmh.web.model.VerificationToken;
 import com.lmh.web.repository.InvalidTokenRepository;
 import com.lmh.web.repository.UserRepository;
 import com.lmh.web.repository.VerificationTokenRepository;
 import com.lmh.web.service.AuthenticationService;
 import com.lmh.web.service.EmailService;
+
+import com.lmh.web.repository.InvalidTokenRepository;
+import com.lmh.web.repository.UserRepository;
+import com.lmh.web.service.AuthenticationService;
+
 import com.lmh.web.service.RedisService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import io.jsonwebtoken.JwsHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +46,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
@@ -58,9 +74,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final RedisService redisService ;
 
+
     private final EmailService emailService ;
 
     private final VerificationTokenRepository verificationTokenRepository ;
+
 
     @Override
     public AuthenticationResponse login(LoginRequest request) {
@@ -204,6 +222,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build() ;
     }
 
+
     @Override
     public void register (RegisterRequest request){
         if(userRepository.existsByUsernameIgnoreCase(request.getUsername())){
@@ -338,4 +357,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user) ;
         verificationTokenRepository.delete(verificationToken);
     }
+
 }

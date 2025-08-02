@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 import java.time.LocalDateTime;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,8 +26,10 @@ public class ApplicationInitConfiguration {
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .role(Role.ADMIN.name())
+
                         .enable(true)
                         .createdAt(LocalDateTime.now())
+
                         .build();
                 userRepository.save(user);
             }

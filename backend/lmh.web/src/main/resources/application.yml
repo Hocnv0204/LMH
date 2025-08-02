@@ -36,6 +36,7 @@ spring:
               - openid
               - profile
               - email
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -47,6 +48,7 @@ spring:
           auth: true
           starttls:
             enable: true
+
 
 # Cloudinary Configuration
 cloudinary:
@@ -63,6 +65,7 @@ jwt:
 gemini:
   api:
     key: AIzaSyA1tQwG9IdRqEXHU-kmlhX-YbOWyXUkQL4
+
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
 
 app:
