@@ -47,6 +47,8 @@ public class User {
     private Integer point;
     
     private Integer credit;
+
+    private boolean enable ;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;

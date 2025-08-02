@@ -16,6 +16,9 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+import java.time.LocalDateTime;
+
 import java.util.Optional;
 
 @Component
@@ -38,6 +41,10 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
                             .name(name)
                             .email(email)
                             .role(Role.USER.name())
+
+                            .enable(true)
+                            .createdAt(LocalDateTime.now())
+
                             .build();
                     return userRepository.save(newUser);
                 }
