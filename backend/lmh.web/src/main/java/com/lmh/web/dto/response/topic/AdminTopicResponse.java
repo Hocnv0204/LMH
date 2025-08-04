@@ -17,8 +17,7 @@ public class AdminTopicResponse {
     private String name;
     private String description;
     private LocalDateTime createdAt;
-    private String imageUrl;
     private Boolean deleteFlag;
-    private String languageName; // Tên ngôn ngữ để hiển thị
-    private long lessonCount; // Số lượng bài học trong topic
+    private String languageName;
+    private long lessonCount;
 }

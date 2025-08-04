@@ -23,13 +23,11 @@ public class SuggestVocabularyServiceImpl implements SuggestVocabularyService {
     private final SuggestVocabularyMapper suggestVocabularyMapper;
 
     @Override
-    public Page<SuggestVocabularyResponse> getSuggestVocabulariesByLessonAndUser(SuggestVocabularyRequest request, 
+    public Page<SuggestVocabularyResponse> getSuggestVocabulariesByLessonId(Integer lessonId,
                                                                                 int size, int page, String sortBy) {
         Pageable pageable = PageableUtils.createPageable(size, page, sortBy);
         Page<SuggestVocabulary> suggestVocabularyPage = suggestVocabularyRepository
-                .findSuggestVocabulariesByLessonAndUser(
-                        request.getLessonName(),
-                        request.getUserRequest().getId(),
+                .findSuggestVocabulariesByLessonId(lessonId,
                         pageable);
         return mapToPageResponse(suggestVocabularyPage);
     }

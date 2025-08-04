@@ -36,14 +36,14 @@ public class LessonServiceImpl implements LessonService {
     private final LessonMapper lessonMapper;
 
     @Override
-    public Page<LessonResponse> getLessonByUserLanguageLevelTopic(LessonRequest lessonRequest, 
-                                                                 int size, int page, String sortBy) {
+    public Page<LessonResponse> getLessonByUserLanguageLevelTopic(Integer userId, String levelName
+            , String languageName, String topicName, int size, int page, String sortBy) {
         Pageable pageable = PageableUtils.createPageable(size, page, sortBy);
         Page<Lesson> lessonPage = lessonRepository.findLessonsIncludingDefault(
-                lessonRequest.getUserRequest().getId(),
-                lessonRequest.getLevelRequest().getName(),
-                lessonRequest.getLanguageRequest().getName(),
-                lessonRequest.getTopicName(),
+                userId,
+                levelName,
+                languageName,
+                topicName,
                 pageable);
         return mapToPageResponse(lessonPage);
     }
@@ -78,7 +78,7 @@ public class LessonServiceImpl implements LessonService {
             throw new InvalidDataException("Cannot delete lesson default");
         }
         
-        if (!user.equals(lesson.getTopic().getUser())) {
+        if (!user.equals(lesson.getUser())) {
             throw new InvalidDataException("Lesson not belong user - " + username + " - lesson name - " + lessonName);
         }
         
@@ -89,11 +89,11 @@ public class LessonServiceImpl implements LessonService {
     public LessonResponse updateLessonUser(String username, UpdateLessonUser updateLessonUser) {
         Lesson lesson = findByName(updateLessonUser.getName());
         if (lesson.getType().equals(TypeLesson.DEFAULT)){
-            throw new InvalidDataException("Cannot update topic default");
+            throw new InvalidDataException("Cannot update lesson default");
         }
         User user = userService.getUserByUsername(username);
         
-        if (!user.equals(lesson.getTopic().getUser())) {
+        if (!user.equals(lesson.getUser())) {
             throw new InvalidDataException("Lesson not belong user - " + username + " - lesson name - " + updateLessonUser.getName());
         }
         
@@ -117,6 +117,19 @@ public class LessonServiceImpl implements LessonService {
             throw new NotFoundException("Not found lesson - " + lessonName);
         }
         return lessonOptional.get();
+    }
+
+    public Lesson findLessonById(Integer lessonId){
+        Optional<Lesson> lessonOptional = lessonRepository.findById(lessonId);
+        if (lessonOptional.isEmpty()) {
+            throw new NotFoundException("Not found lesson with id - " + lessonId);
+        }
+        return lessonOptional.get();
+    }
+
+    @Override
+    public LessonResponse findById(Integer lessonId) {
+        return lessonMapper.toResponse(findLessonById(lessonId));
     }
 
     public Page<LessonResponse> mapToPageResponse(Page<Lesson> lessonPage) {

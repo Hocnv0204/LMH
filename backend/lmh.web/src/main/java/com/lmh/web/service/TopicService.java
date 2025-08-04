@@ -11,7 +11,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface TopicService {
-    Page<TopicResponse> getTopicByUserAndLevel(TopicRequest topicRequest
+    Page<TopicResponse> getTopicByUserAndLevel(Integer userId, String languageName, String levelName
             , int size, int page, String sortBy);
     TopicResponse addTopicUser(String username, TopicRequest topicRequest);
     void deleteTopicUser(String username, String topicName);

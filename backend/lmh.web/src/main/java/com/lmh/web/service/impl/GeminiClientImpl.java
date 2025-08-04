@@ -10,6 +10,7 @@ import com.lmh.web.dto.response.history.HistoryResponse;
 import com.lmh.web.model.History;
 import com.lmh.web.model.Lesson;
 import com.lmh.web.model.User;
+import com.lmh.web.repository.HistoryRepository;
 import com.lmh.web.service.GeminiClient;
 import com.lmh.web.service.LessonService;
 import com.lmh.web.service.UserService;
@@ -40,7 +41,7 @@ public class GeminiClientImpl implements GeminiClient {
     private final ObjectMapper objectMapper;
 
 //    @Value("${gemini.api-key}")
-    private String geminiKey = "AIzaSyC0UKFEWcm59i__wvG83Sg1_EDujlNpUk0";
+    private String geminiKey = "AIzaSyD6xUo5Q1Kck023hOhXutwjmMKe8XJPUL4";
 
     private final ResourceLoader loader;
 
@@ -52,6 +53,8 @@ public class GeminiClientImpl implements GeminiClient {
 
     private final HistoryMapper historyMapper;
 
+    private final HistoryRepository historyRepository;
+
     @NotNull
     public String getPromptFromPath(String path) throws IOException {
         Resource resource = loader.getResource(path);
@@ -61,12 +64,12 @@ public class GeminiClientImpl implements GeminiClient {
     }
 
     @Override
-    public HistoryResponse getDataFromPrompt(GeminiRequest geminiRequest, String username, String lessonName) throws IOException {
+    public HistoryResponse getDataFromPrompt(GeminiRequest geminiRequest, String username, Integer lessonId) throws IOException {
         User user = userService.getUserByUsername(username);
         if (user.getCredit()<=0){
             throw new InvalidDataException("Don't enough credit! - " + username);
         }
-        Lesson lesson = lessonService.findByName(lessonName);
+        Lesson lesson = lessonService.findLessonById(lessonId);
         Map<String, Object> responseGemini = callGemini(geminiRequest);
         if (!(boolean) responseGemini.get("isValid")){
             throw new GeminiException("No generated text");
@@ -77,7 +80,7 @@ public class GeminiClientImpl implements GeminiClient {
         history.setQuestion(geminiRequest.getQuestion());
         history.setAnswer(geminiRequest.getAnswer());
         history.setResult((String) responseGemini.get("response"));
-        return historyMapper.toResponse(history);
+        return historyMapper.toResponse(historyRepository.save(history));
     }
 
     private Map<String, Object> callGemini(GeminiRequest geminiRequest) throws IOException {

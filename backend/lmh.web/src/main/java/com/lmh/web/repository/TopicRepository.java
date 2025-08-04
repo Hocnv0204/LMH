@@ -1,5 +1,6 @@
 package com.lmh.web.repository;
 
+import com.lmh.web.common.constant.TypeTopic;
 import com.lmh.web.model.Topic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ public interface TopicRepository extends JpaRepository<Topic, Integer>, JpaSpeci
             "AND ((t.user.id = :userId AND t.type = :type) OR t.type = 'DEFAULT')")
     Page<Topic> findTopicsIncludingDefault(@Param("userId") Integer userId,
                                            @Param("levelName") String levelName,
-                                           @Param("type") String type,
+                                           @Param("type")TypeTopic typeTopic,
                                            @Param("languageName") String languageName,
                                            Pageable pageable);
 

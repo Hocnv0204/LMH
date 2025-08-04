@@ -1,0 +1,199 @@
+import { useState, useCallback } from 'react';
+import { lessonApi } from '@/api/lesson';
+import { geminiApi } from '@/api/gemini';
+import { suggestVocabularyApi, SuggestVocabularyResponse } from '@/api/suggestVocabulary';
+import { historyApi, HistoryResponse, ParsedHistoryResult } from '@/api/history';
+
+interface LessonData {
+  id: number;
+  name: string;
+  description: string;
+  paragraph: string;
+}
+
+interface ValidationResult {
+  score: number;
+  status: 'perfect' | 'good' | 'needs_improvement';
+  message?: string;
+  comment?: string;
+  improvement_suggestions?: string;
+  correct_answer?: string;
+}
+
+export function useLessonPractice(lessonId: number, username: string) {
+  const [lesson, setLesson] = useState<LessonData | null>(null);
+  const [sentences, setSentences] = useState<string[]>([]);
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [isLoadingLesson, setIsLoadingLesson] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showParagraph, setShowParagraph] = useState(true);
+  const [paragraphPosition, setParagraphPosition] = useState<'left' | 'right'>('right');
+  const [suggestedVocabulary, setSuggestedVocabulary] = useState<SuggestVocabularyResponse[]>([]);
+  const [isLoadingVocabulary, setIsLoadingVocabulary] = useState(false);
+  const [showVocabulary, setShowVocabulary] = useState(false);
+  const [lessonHistory, setLessonHistory] = useState<HistoryResponse[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const splitIntoSentences = (paragraph: string): string[] => {
+    return paragraph
+      .split(/[.!?]+/)
+      .map(sentence => sentence.trim())
+      .filter(sentence => sentence.length > 0);
+  };
+
+  const fetchLesson = useCallback(async () => {
+    setIsLoadingLesson(true);
+    setError(null);
+    
+    try {
+      const response = await lessonApi.getLessonById(lessonId);
+      setLesson(response.data);
+      
+      const sentenceList = splitIntoSentences(response.data.paragraph);
+      setSentences(sentenceList);
+      setCurrentSentenceIndex(0);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Không thể tải bài học');
+    } finally {
+      setIsLoadingLesson(false);
+    }
+  }, [lessonId]);
+
+  const submitAnswer = useCallback(async () => {
+    if (!userAnswer.trim() || currentSentenceIndex >= sentences.length) return;
+    
+    setIsValidating(true);
+    setError(null);
+    
+    try {
+      const response = await geminiApi.askGemini(username, lessonId, {
+        question: sentences[currentSentenceIndex],
+        answer: userAnswer.trim()
+      });
+      
+      // Parse the nested JSON from the result field
+      const resultString = response.data.data.result;
+      
+      // Remove markdown code blocks and parse JSON
+      const cleanedResult = resultString.replace(/```json\n?|\n?```/g, '').trim();
+      const parsedValidation = JSON.parse(cleanedResult);
+      
+      setValidationResult(parsedValidation);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Có lỗi xảy ra khi kiểm tra câu trả lời');
+    } finally {
+      setIsValidating(false);
+    }
+  }, [userAnswer, currentSentenceIndex, sentences, username, lessonId]);
+
+  const nextSentence = useCallback(() => {
+    setValidationResult(null);
+    setUserAnswer('');
+    setCurrentSentenceIndex(prev => prev + 1);
+  }, []);
+
+  const previousSentence = useCallback(() => {
+    if (currentSentenceIndex > 0) {
+      setValidationResult(null);
+      setUserAnswer('');
+      setCurrentSentenceIndex(prev => prev - 1);
+    }
+  }, [currentSentenceIndex]);
+
+  const toggleParagraph = useCallback(() => {
+    setShowParagraph(prev => !prev);
+  }, []);
+
+  const toggleParagraphPosition = useCallback(() => {
+    setParagraphPosition(prev => prev === 'left' ? 'right' : 'left');
+  }, []);
+
+  const isCompleted = currentSentenceIndex >= sentences.length;
+
+  const fetchSuggestedVocabulary = useCallback(async () => {
+    setIsLoadingVocabulary(true);
+    setError(null);
+    
+    try {
+      const response = await suggestVocabularyApi.getSuggestVocabulariesByLesson(lessonId);
+      setSuggestedVocabulary(response.data.content || []);
+      setShowVocabulary(true); // Always show the card, even if empty
+    } catch (err: any) {
+      setError('Không thể tải từ vựng gợi ý');
+      setSuggestedVocabulary([]); // Set empty array on error
+      setShowVocabulary(true); // Still show the card to display error state
+    } finally {
+      setIsLoadingVocabulary(false);
+    }
+  }, [lessonId]);
+
+  const toggleVocabulary = useCallback(() => {
+    setShowVocabulary(prev => !prev);
+  }, []);
+
+  const fetchLessonHistory = useCallback(async () => {
+    setIsLoadingHistory(true);
+    setError(null);
+    
+    try {
+      const response = await historyApi.getHistoryByUserAndLesson(username, lessonId);
+      setLessonHistory(response.data.content);
+      setShowHistory(true);
+    } catch (err: any) {
+      setError('Không thể tải lịch sử bài học');
+      setLessonHistory([]);
+      setShowHistory(true);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, [username, lessonId]);
+
+  const toggleHistory = useCallback(() => {
+    setShowHistory(prev => !prev);
+  }, []);
+
+  return {
+    lesson,
+    sentences,
+    currentSentenceIndex,
+    userAnswer,
+    setUserAnswer,
+    validationResult,
+    setValidationResult,
+    isLoadingLesson,
+    isValidating,
+    error,
+    fetchLesson,
+    submitAnswer,
+    nextSentence,
+    previousSentence,
+    isCompleted,
+    showParagraph,
+    paragraphPosition,
+    toggleParagraph,
+    toggleParagraphPosition,
+    suggestedVocabulary,
+    isLoadingVocabulary,
+    showVocabulary,
+    fetchSuggestedVocabulary,
+    toggleVocabulary,
+    lessonHistory,
+    isLoadingHistory,
+    showHistory,
+    fetchLessonHistory,
+    toggleHistory
+  };
+}
+
+
+
+
+
+
+
+
+

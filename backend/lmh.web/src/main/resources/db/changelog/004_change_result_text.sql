@@ -1,0 +1,2 @@
+ALTER TABLE history
+ALTER COLUMN result TYPE TEXT;

@@ -20,6 +20,7 @@ import com.lmh.web.service.TopicService;
 import com.lmh.web.service.UserService;
 import com.lmh.web.utils.mapper.topic.TopicMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -47,13 +48,13 @@ public class TopicServiceImpl implements TopicService {
     private final TopicMapper topicMapper;
 
     @Override
-    public Page<TopicResponse> getTopicByUserAndLevel(TopicRequest topicRequest
+    public Page<TopicResponse> getTopicByUserAndLevel(Integer userId, String languageName, String levelName
             , int size, int page, String sortBy) {
         Pageable pageable = PageableUtils.createPageable(size, page, sortBy);
-        Page<Topic> topicPage = topicRepository.findTopicsIncludingDefault(topicRequest.getUserRequest().getId()
-                , topicRequest.getLevelRequest().getName()
-                , "USER_CREATION"
-                , topicRequest.getLanguageRequest().getName()
+        Page<Topic> topicPage = topicRepository.findTopicsIncludingDefault(userId
+                , levelName
+                , TypeTopic.USER_CREATION
+                , languageName
                 , pageable);
         return mapToPageResponse(topicPage);
     }
@@ -82,6 +83,7 @@ public class TopicServiceImpl implements TopicService {
         if (topic.getType().equals(TypeTopic.DEFAULT)){
             throw new InvalidDataException("Cannot delete topic default");
         }
+
         if (user.equals(topic.getUser())){
             throw new InvalidDataException("Topic not belong user - " + username + " - topic name - " + topicName);
         }
@@ -95,12 +97,11 @@ public class TopicServiceImpl implements TopicService {
             throw new InvalidDataException("Cannot update topic default");
         }
         User user = userService.getUserByUsername(username);
-        if (user.equals(topic.getUser())){
-            throw new InvalidDataException("Topic not belong user - " + username + " - topic name - " + updateTopicUser.getName());
+        if (!user.getEmail().equals(topic.getUser().getEmail())){
+            throw new InvalidDataException("Topic not belong user - " + username + " - topic name - " + updateTopicUser.getName() + " - " + topic.getUser().getName());
         }
+        topic.setName(updateTopicUser.getName());
         topic.setDescription(updateTopicUser.getDescription());
-        Level level = levelService.findByName(updateTopicUser.getName());
-        topic.setLevel(level);
         return topicMapper.toResponse(topicRepository.save(topic));
     }
 

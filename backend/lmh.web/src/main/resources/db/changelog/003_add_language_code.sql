@@ -1,0 +1,2 @@
+ALTER TABLE language
+ADD COLUMN language_code VARCHAR(20) UNIQUE;

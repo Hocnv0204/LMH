@@ -15,12 +15,8 @@ public class LessonResponse {
     private int id;
     private String name;
     private String paragraph;
-    private String note;
     private String description;
     private String status;
     private String type;
     private LocalDateTime lastPractice;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String topicName;
 } 

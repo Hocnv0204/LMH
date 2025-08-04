@@ -73,4 +73,6 @@ app:
   verification:
     token:
       expiry: 86400000
+server:
+  port: 8081
 

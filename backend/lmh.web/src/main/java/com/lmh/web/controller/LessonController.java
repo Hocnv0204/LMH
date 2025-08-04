@@ -22,9 +22,19 @@ public class LessonController {
     public CustomResponse<?> findLessonsByUserLanguageLevelTopic(@RequestParam(defaultValue = "10") int size,
                                                                  @RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "id") String sortBy,
-                                                                 @Valid @RequestBody LessonRequest lessonRequest){
-        Page<LessonResponse> lessons = lessonService.getLessonByUserLanguageLevelTopic(lessonRequest, size, page, sortBy);
+                                                                 @RequestParam Integer userId,
+                                                                 @RequestParam String levelName,
+                                                                 @RequestParam String languageName,
+                                                                 @RequestParam String topicName){
+        Page<LessonResponse> lessons = lessonService.getLessonByUserLanguageLevelTopic(userId,
+                levelName, languageName, topicName, size, page, sortBy);
         return new CustomResponse<>(lessons, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/lesson/{lessonId}")
+    public CustomResponse<?> getLesson(@PathVariable Integer lessonId){
+        LessonResponse lesson = lessonService.findById(lessonId);
+        return new CustomResponse<>(lesson, HttpStatus.OK);
     }
 
     @PostMapping("/user/lesson/{username}/add-lesson")

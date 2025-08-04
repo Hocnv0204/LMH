@@ -65,24 +65,6 @@ public class Topic {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    /**
-     * Đường dẫn URL đầy đủ đến ảnh đại diện của topic trên Cloudinary.
-     * Dùng để hiển thị ảnh ra bên ngoài.
-     */
-    @Column(name = "image_url")
-    private String imageUrl;
-
-    /**
-     * Public ID của ảnh trên Cloudinary.
-     * Dùng để quản lý (xóa, sửa) ảnh thông qua API của Cloudinary.
-     */
-    @Column(name = "image_id")
-    private String imageId;
-
-    /**
-     * Mối quan hệ nhiều-một với User.
-     * Cho biết người dùng nào đã tạo ra topic này.
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -121,8 +103,6 @@ public class Topic {
                 ", type=" + type +
                 ", note='" + note + '\'' +
                 ", createdAt=" + createdAt +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", imageId='" + imageId + '\'' +
                 '}';
     }
 }
