@@ -17,9 +17,9 @@ import java.io.IOException;
 public class GeminiController {
     private final GeminiClient geminiClient;
 
-    @PostMapping("/ask/{username}/{lesson_name}")
-    public CustomResponse<?> askGemini(@RequestBody GeminiRequest geminiRequest, @PathVariable String username, @PathVariable String lessonName) throws IOException {
-        HistoryResponse response = geminiClient.getDataFromPrompt(geminiRequest, username, lessonName);
+    @PostMapping("/ask/{username}/{lessonId}")
+    public CustomResponse<?> askGemini(@RequestBody GeminiRequest geminiRequest, @PathVariable String username, @PathVariable Integer lessonId) throws IOException {
+        HistoryResponse response = geminiClient.getDataFromPrompt(geminiRequest, username, lessonId);
         return new CustomResponse<>(response, HttpStatus.OK);
     }
 }

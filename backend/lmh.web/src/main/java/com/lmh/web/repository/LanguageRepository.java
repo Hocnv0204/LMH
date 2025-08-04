@@ -2,6 +2,8 @@ package com.lmh.web.repository;
 
 import com.lmh.web.model.Language;
 import com.lmh.web.model.Topic;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -24,4 +26,5 @@ public interface LanguageRepository extends JpaRepository<Language, Integer>, Jp
      * @return Optional chứa Language nếu tìm thấy.
      */
     Optional<Language> findByNameIgnoreCase(String name);
+
 }

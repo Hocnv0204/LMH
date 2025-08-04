@@ -9,11 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UserRouteRouteImport } from './routes/user/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as UserTopicsIndexRouteImport } from './routes/user/topics/index'
+import { Route as UserLevelIndexRouteImport } from './routes/user/level/index'
+import { Route as UserLessonsIndexRouteImport } from './routes/user/lessons/index'
 import { Route as AdminTopicIndexRouteImport } from './routes/admin/topic/index'
+import { Route as UserLessonPracticeLessonIdRouteImport } from './routes/user/lesson-practice/$lessonId'
 
+const UserRouteRoute = UserRouteRouteImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -29,45 +39,116 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const UserTopicsIndexRoute = UserTopicsIndexRouteImport.update({
+  id: '/topics/',
+  path: '/topics/',
+  getParentRoute: () => UserRouteRoute,
+} as any)
+const UserLevelIndexRoute = UserLevelIndexRouteImport.update({
+  id: '/level/',
+  path: '/level/',
+  getParentRoute: () => UserRouteRoute,
+} as any)
+const UserLessonsIndexRoute = UserLessonsIndexRouteImport.update({
+  id: '/lessons/',
+  path: '/lessons/',
+  getParentRoute: () => UserRouteRoute,
+} as any)
 const AdminTopicIndexRoute = AdminTopicIndexRouteImport.update({
   id: '/topic/',
   path: '/topic/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const UserLessonPracticeLessonIdRoute =
+  UserLessonPracticeLessonIdRouteImport.update({
+    id: '/lesson-practice/$lessonId',
+    path: '/lesson-practice/$lessonId',
+    getParentRoute: () => UserRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/user': typeof UserRouteRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/topic': typeof AdminTopicIndexRoute
+  '/user/lessons': typeof UserLessonsIndexRoute
+  '/user/level': typeof UserLevelIndexRoute
+  '/user/topics': typeof UserTopicsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/user': typeof UserRouteRouteWithChildren
   '/admin': typeof AdminIndexRoute
+  '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/topic': typeof AdminTopicIndexRoute
+  '/user/lessons': typeof UserLessonsIndexRoute
+  '/user/level': typeof UserLevelIndexRoute
+  '/user/topics': typeof UserTopicsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/user': typeof UserRouteRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/topic/': typeof AdminTopicIndexRoute
+  '/user/lessons/': typeof UserLessonsIndexRoute
+  '/user/level/': typeof UserLevelIndexRoute
+  '/user/topics/': typeof UserTopicsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/admin/' | '/admin/topic'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/user'
+    | '/admin/'
+    | '/user/lesson-practice/$lessonId'
+    | '/admin/topic'
+    | '/user/lessons'
+    | '/user/level'
+    | '/user/topics'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/admin/topic'
-  id: '__root__' | '/' | '/admin' | '/admin/' | '/admin/topic/'
+  to:
+    | '/'
+    | '/user'
+    | '/admin'
+    | '/user/lesson-practice/$lessonId'
+    | '/admin/topic'
+    | '/user/lessons'
+    | '/user/level'
+    | '/user/topics'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/user'
+    | '/admin/'
+    | '/user/lesson-practice/$lessonId'
+    | '/admin/topic/'
+    | '/user/lessons/'
+    | '/user/level/'
+    | '/user/topics/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  UserRouteRoute: typeof UserRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/user': {
+      id: '/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -89,12 +170,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/user/topics/': {
+      id: '/user/topics/'
+      path: '/topics'
+      fullPath: '/user/topics'
+      preLoaderRoute: typeof UserTopicsIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/user/level/': {
+      id: '/user/level/'
+      path: '/level'
+      fullPath: '/user/level'
+      preLoaderRoute: typeof UserLevelIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/user/lessons/': {
+      id: '/user/lessons/'
+      path: '/lessons'
+      fullPath: '/user/lessons'
+      preLoaderRoute: typeof UserLessonsIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
     '/admin/topic/': {
       id: '/admin/topic/'
       path: '/topic'
       fullPath: '/admin/topic'
       preLoaderRoute: typeof AdminTopicIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/user/lesson-practice/$lessonId': {
+      id: '/user/lesson-practice/$lessonId'
+      path: '/lesson-practice/$lessonId'
+      fullPath: '/user/lesson-practice/$lessonId'
+      preLoaderRoute: typeof UserLessonPracticeLessonIdRouteImport
+      parentRoute: typeof UserRouteRoute
     }
   }
 }
@@ -113,9 +222,28 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface UserRouteRouteChildren {
+  UserLessonPracticeLessonIdRoute: typeof UserLessonPracticeLessonIdRoute
+  UserLessonsIndexRoute: typeof UserLessonsIndexRoute
+  UserLevelIndexRoute: typeof UserLevelIndexRoute
+  UserTopicsIndexRoute: typeof UserTopicsIndexRoute
+}
+
+const UserRouteRouteChildren: UserRouteRouteChildren = {
+  UserLessonPracticeLessonIdRoute: UserLessonPracticeLessonIdRoute,
+  UserLessonsIndexRoute: UserLessonsIndexRoute,
+  UserLevelIndexRoute: UserLevelIndexRoute,
+  UserTopicsIndexRoute: UserTopicsIndexRoute,
+}
+
+const UserRouteRouteWithChildren = UserRouteRoute._addFileChildren(
+  UserRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  UserRouteRoute: UserRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -6,5 +6,5 @@ import com.lmh.web.dto.response.history.HistoryResponse;
 import java.io.IOException;
 
 public interface GeminiClient {
-    HistoryResponse getDataFromPrompt(GeminiRequest geminiRequest, String username, String lessonName) throws IOException;
+    HistoryResponse getDataFromPrompt(GeminiRequest geminiRequest, String username, Integer lessonId) throws IOException;
 }

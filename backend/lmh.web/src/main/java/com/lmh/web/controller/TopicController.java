@@ -5,6 +5,7 @@ import com.lmh.web.dto.request.topic.UpdateTopicUser;
 import com.lmh.web.dto.response.CustomResponse;
 import com.lmh.web.dto.response.topic.TopicResponse;
 import com.lmh.web.service.TopicService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,10 @@ public class TopicController {
     public CustomResponse<?> findByUserAndLevelName(@RequestParam(defaultValue = "10") int size,
                                                     @RequestParam(defaultValue = "0") int page,
                                                     @RequestParam(defaultValue = "id") String sortBy,
-                                                    @Valid @RequestBody TopicRequest topicRequest){
-        Page<TopicResponse> topic = topicService.getTopicByUserAndLevel(topicRequest, size, page, sortBy);
+                                                    @RequestParam Integer userId,
+                                                    @RequestParam String languageName,
+                                                    @RequestParam String levelName){
+        Page<TopicResponse> topic = topicService.getTopicByUserAndLevel(userId, languageName, levelName, size, page, sortBy);
         return new CustomResponse<>(topic, HttpStatus.OK);
     }
 

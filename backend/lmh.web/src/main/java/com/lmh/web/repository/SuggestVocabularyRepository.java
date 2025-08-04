@@ -13,10 +13,6 @@ public interface SuggestVocabularyRepository extends JpaRepository<SuggestVocabu
     
     @Query("SELECT sv FROM SuggestVocabulary sv " +
            "WHERE sv.deleteFlag = false " +
-           "AND sv.lesson.name = :lessonName " +
-           "AND (sv.lesson.type = 'DEFAULT' OR " +
-           "(sv.lesson.type = 'USER_CREATION' AND sv.lesson.topic.user.id = :userId))")
-    Page<SuggestVocabulary> findSuggestVocabulariesByLessonAndUser(@Param("lessonName") String lessonName,
-                                                                   @Param("userId") Integer userId,
-                                                                   Pageable pageable);
+           "AND sv.lesson.id = :lessonId")
+    Page<SuggestVocabulary> findSuggestVocabulariesByLessonId(@Param("lessonId") Integer lessonId, Pageable pageable);
 } 

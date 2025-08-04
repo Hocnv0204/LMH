@@ -5,6 +5,6 @@ import com.lmh.web.dto.response.suggest.SuggestVocabularyResponse;
 import org.springframework.data.domain.Page;
 
 public interface SuggestVocabularyService {
-    Page<SuggestVocabularyResponse> getSuggestVocabulariesByLessonAndUser(SuggestVocabularyRequest request, 
+    Page<SuggestVocabularyResponse> getSuggestVocabulariesByLessonId(Integer lessonId,
                                                                          int size, int page, String sortBy);
 } 

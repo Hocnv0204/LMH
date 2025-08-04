@@ -17,13 +17,13 @@ import jakarta.validation.Valid;
 public class SuggestVocabularyController {
     private final SuggestVocabularyService suggestVocabularyService;
 
-    @GetMapping("/user/suggest-vocabulary")
+    @GetMapping("/user/suggest-vocabulary/{lessonId}")
     public CustomResponse<?> getSuggestVocabulariesByLessonAndUser(@RequestParam(defaultValue = "10") int size,
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "id") String sortBy,
-                                                                   @Valid @RequestBody SuggestVocabularyRequest request){
+                                                                   @PathVariable Integer lessonId){
         Page<SuggestVocabularyResponse> suggestVocabularies = 
-                suggestVocabularyService.getSuggestVocabulariesByLessonAndUser(request, size, page, sortBy);
+                suggestVocabularyService.getSuggestVocabulariesByLessonId(lessonId, size, page, sortBy);
         return new CustomResponse<>(suggestVocabularies, HttpStatus.OK);
     }
 }

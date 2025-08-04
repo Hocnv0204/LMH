@@ -12,6 +12,16 @@ function Index() {
       </Link>{" "}
       <Link to="/admin" className="[&.active]:font-bold">
         Admin
+      </Link>{" "}
+      <Link to="/user/level" className="[&.active]:font-bold">
+        Choose Level
+      </Link>{" "}
+      <Link 
+        to="/user/lessons" 
+        search={{ levelId: 1, levelName: "Beginner", languageName: "English" }}
+        className="[&.active]:font-bold"
+      >
+        Lessons
       </Link>
     </div>
   );

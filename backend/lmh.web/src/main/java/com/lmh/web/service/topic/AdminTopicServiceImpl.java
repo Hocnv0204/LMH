@@ -109,8 +109,8 @@ public class AdminTopicServiceImpl implements AdminTopicService {
         if (file != null && !file.isEmpty()) {
             try {
                 Map<String, String> uploadResult = cloudinaryService.uploadFile(file);
-                topic.setImageUrl(uploadResult.get("url"));
-                topic.setImageId(uploadResult.get("public_id"));
+//                topic.setImageUrl(uploadResult.get("url"));
+//                topic.setImageId(uploadResult.get("public_id"));
             } catch (IOException e) {
                 // Có thể ném ra một exception tùy chỉnh ở đây
                 throw new RuntimeException("Lỗi khi upload ảnh", e);
@@ -157,22 +157,22 @@ public class AdminTopicServiceImpl implements AdminTopicService {
             topic.setLanguage(newLanguage);
         }
 
-        // 4. Xử lý upload ảnh mới (nếu có)
-        if (file != null && !file.isEmpty()) {
-            try {
-                // Xóa ảnh cũ trên Cloudinary nếu tồn tại
-                if (topic.getImageId() != null && !topic.getImageId().isBlank()) {
-                    cloudinaryService.deleteFile(topic.getImageId());
-                }
-
-                // Upload ảnh mới và cập nhật thông tin
-                Map<String, String> uploadResult = cloudinaryService.uploadFile(file);
-                topic.setImageUrl(uploadResult.get("url"));
-                topic.setImageId(uploadResult.get("public_id"));
-            } catch (IOException e) {
-                throw new RuntimeException("Lỗi khi cập nhật ảnh", e);
-            }
-        }
+//        // 4. Xử lý upload ảnh mới (nếu có)
+//        if (file != null && !file.isEmpty()) {
+//            try {
+//                // Xóa ảnh cũ trên Cloudinary nếu tồn tại
+//                if (topic.getImageId() != null && !topic.getImageId().isBlank()) {
+//                    cloudinaryService.deleteFile(topic.getImageId());
+//                }
+//
+//                // Upload ảnh mới và cập nhật thông tin
+//                Map<String, String> uploadResult = cloudinaryService.uploadFile(file);
+//                topic.setImageUrl(uploadResult.get("url"));
+//                topic.setImageId(uploadResult.get("public_id"));
+//            } catch (IOException e) {
+//                throw new RuntimeException("Lỗi khi cập nhật ảnh", e);
+//            }
+//        }
 
         // 5. Lưu lại topic đã cập nhật
         Topic updatedTopic = topicRepository.save(topic);
