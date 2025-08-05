@@ -107,7 +107,7 @@ export default function TopicsPage({ levelId, levelName, languageName }: TopicsP
     );
     
     if (nameExists) {
-      setError(`Tên chủ đề "${formData.name}" đã tồn tại. Vui lòng chọn tên khác.`);
+      setFormError(`Tên chủ đề "${formData.name}" đã tồn tại. Vui lòng chọn tên khác.`);
       return;
     }
     
@@ -120,7 +120,7 @@ export default function TopicsPage({ levelId, levelName, languageName }: TopicsP
       });
       setIsEditDialogOpen(false);
       setEditingTopic(null);
-      setError(null);
+      setFormError(null);
       
       // Refresh the topics list to ensure we have the latest data
       await fetchTopics({
@@ -130,7 +130,7 @@ export default function TopicsPage({ levelId, levelName, languageName }: TopicsP
       });
     } catch (error) {
       console.error('Failed to update topic:', error);
-      setError('Không thể cập nhật chủ đề. Vui lòng thử lại.');
+      setFormError('Không thể cập nhật chủ đề. Vui lòng thử lại.');
     }
   };
 
@@ -292,8 +292,6 @@ export default function TopicsPage({ levelId, levelName, languageName }: TopicsP
                     <Badge variant={topic.type === 'DEFAULT' ? 'secondary' : 'default'}>
                       {topic.type === 'DEFAULT' ? 'Mặc định' : 'Tự tạo'}
                     </Badge>
-                    {/* Debug: Always show the dropdown for testing */}
-                    {console.log('Rendering dropdown for topic:', topic.name, 'canModify:', canModifyTopic(topic))}
                     {canModifyTopic(topic) && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -383,7 +381,7 @@ export default function TopicsPage({ levelId, levelName, languageName }: TopicsP
                 variant="outline" 
                 onClick={() => {
                   setIsEditDialogOpen(false);
-                  setError(null); // Clear errors when closing
+                  setFormError(null); // Clear errors when closing
                 }}
               >
                 Hủy

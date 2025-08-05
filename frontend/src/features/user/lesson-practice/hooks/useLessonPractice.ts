@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { lessonApi } from '@/api/lesson';
 import { geminiApi } from '@/api/gemini';
-import { suggestVocabularyApi, SuggestVocabularyResponse } from '@/api/suggestVocabulary';
+import { suggestVocabularyApi, SuggestVocabularyResponse, VocabularyItem } from '@/api/suggestVocabulary';
 import { historyApi, HistoryResponse, ParsedHistoryResult } from '@/api/history';
 
 interface LessonData {
@@ -31,7 +31,7 @@ export function useLessonPractice(lessonId: number, username: string) {
   const [error, setError] = useState<string | null>(null);
   const [showParagraph, setShowParagraph] = useState(true);
   const [paragraphPosition, setParagraphPosition] = useState<'left' | 'right'>('right');
-  const [suggestedVocabulary, setSuggestedVocabulary] = useState<SuggestVocabularyResponse[]>([]);
+  const [suggestedVocabulary, setSuggestedVocabulary] = useState<VocabularyItem[]>([]);
   const [isLoadingVocabulary, setIsLoadingVocabulary] = useState(false);
   const [showVocabulary, setShowVocabulary] = useState(false);
   const [lessonHistory, setLessonHistory] = useState<HistoryResponse[]>([]);
@@ -75,14 +75,7 @@ export function useLessonPractice(lessonId: number, username: string) {
         answer: userAnswer.trim()
       });
       
-      // Parse the nested JSON from the result field
-      const resultString = response.data.data.result;
-      
-      // Remove markdown code blocks and parse JSON
-      const cleanedResult = resultString.replace(/```json\n?|\n?```/g, '').trim();
-      const parsedValidation = JSON.parse(cleanedResult);
-      
-      setValidationResult(parsedValidation);
+      setValidationResult(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi kiểm tra câu trả lời');
     } finally {
@@ -121,11 +114,11 @@ export function useLessonPractice(lessonId: number, username: string) {
     try {
       const response = await suggestVocabularyApi.getSuggestVocabulariesByLesson(lessonId);
       setSuggestedVocabulary(response.data.content || []);
-      setShowVocabulary(true); // Always show the card, even if empty
+      setShowVocabulary(true);
     } catch (err: any) {
       setError('Không thể tải từ vựng gợi ý');
-      setSuggestedVocabulary([]); // Set empty array on error
-      setShowVocabulary(true); // Still show the card to display error state
+      setSuggestedVocabulary([]);
+      setShowVocabulary(true);
     } finally {
       setIsLoadingVocabulary(false);
     }
