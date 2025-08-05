@@ -147,7 +147,14 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
       });
     } else {
       // Fallback to lessons page without search params
-      navigate({ to: '/user/lessons' });
+      navigate({ 
+        to: '/user/lessons',
+        search: {
+          levelId: 1,
+          levelName: '',
+          languageName: ''
+        }
+      });
     }
   };
 
