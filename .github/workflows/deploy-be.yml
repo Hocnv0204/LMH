@@ -63,7 +63,7 @@ jobs:
                 depends_on:
                   - lmh-writting-practice-postgres
                 ports:
-                  - "8090:8080"
+                  - "8090:8081"
                 environment:
                   SPRING_DATASOURCE_URL: jdbc:postgresql://lmh-writting-practice-postgres:5432/lmh-writting-practice
                   SPRING_DATASOURCE_USERNAME: postgres

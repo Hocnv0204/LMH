@@ -32,6 +32,11 @@ import java.text.ParseException;
 public class AuthenticationController {
     private final AuthenticationService authenticationService ;
 
+    @GetMapping("/welcome")
+	public String welcome(){
+		return "Welcome to spring boot!";
+	}  
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginRequest request){
         AuthenticationResponse response = authenticationService.login(request) ;
