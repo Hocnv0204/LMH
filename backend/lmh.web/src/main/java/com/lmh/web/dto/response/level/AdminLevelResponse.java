@@ -20,5 +20,4 @@ public class AdminLevelResponse {
     private LocalDateTime updatedAt;
     private Boolean deleteFlag;
     private String languageName; // Tên ngôn ngữ mà Level này thuộc về
-    private Integer languageId;  // ID của ngôn ngữ để tiện cho việc xử lý ở frontend
 }

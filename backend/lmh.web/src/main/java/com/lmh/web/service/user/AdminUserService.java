@@ -14,7 +14,7 @@ public interface AdminUserService {
 
     AdminUserDetailResponse getUserDetailsForAdmin(Integer userId);
 
-    AdminUserDetailResponse updateUserForAdmin(Integer userId, AdminUpdateUserRequest request);
+    void updateUserForAdmin(Integer userId, AdminUpdateUserRequest request);
 
     void deleteUserForAdmin(Integer userId);
 

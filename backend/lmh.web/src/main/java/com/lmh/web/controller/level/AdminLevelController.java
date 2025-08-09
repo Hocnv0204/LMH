@@ -21,13 +21,14 @@ public class AdminLevelController {
     @GetMapping
     public CustomResponse<Page<AdminLevelResponse>> getAllLevels(
             @RequestParam(required = false) String searchTerm,
-            @RequestParam(required = false) Integer languageId, // Thêm bộ lọc theo ngôn ngữ
+            @RequestParam(required = false) Integer languageId,
+            @RequestParam(required = false) Boolean isDeleted,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir
     ) {
-        Page<AdminLevelResponse> levelPage = adminLevelService.getAllLevelsForAdmin(searchTerm, languageId, page, size, sortBy, sortDir);
+        Page<AdminLevelResponse> levelPage = adminLevelService.getAllLevelsForAdmin(searchTerm, languageId, isDeleted, page, size, sortBy, sortDir);
         return new CustomResponse<>(levelPage, HttpStatus.OK);
     }
 

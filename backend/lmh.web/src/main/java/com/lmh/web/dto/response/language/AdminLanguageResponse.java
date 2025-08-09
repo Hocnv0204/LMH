@@ -15,6 +15,7 @@ public class AdminLanguageResponse {
 
     private Integer id;
     private String name;
+    private String languageCode;
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
