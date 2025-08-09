@@ -48,8 +48,9 @@ spring:
           auth: true
           starttls:
             enable: true
-  profiles:
-    active: local
+  spring:
+    profiles:
+      active: deploy
 
 
 # Cloudinary Configuration
