@@ -47,8 +47,6 @@ spring:
           auth: true
           starttls:
             enable: true
-  profiles:
-    active: deploy
 
 LOG_FILE: /var/log/springboot/app.log
 
@@ -68,13 +66,13 @@ gemini:
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
 
 app:
-  base-url: http://localhost:8080
+  base-url: http://localhost:8081
   verification:
     token:
       expiry: 86400000
 
 server:
-  port: 8080
+  port: 8081
 logging:
   file:
     name: /var/log/springboot/app.log
