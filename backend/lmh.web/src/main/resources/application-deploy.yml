@@ -47,8 +47,6 @@ spring:
           auth: true
           starttls:
             enable: true
-  profiles:
-    active: deploy
 
 LOG_FILE: /var/log/springboot/app.log
 
