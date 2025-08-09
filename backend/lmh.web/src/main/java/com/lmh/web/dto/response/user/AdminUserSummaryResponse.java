@@ -9,12 +9,23 @@ import java.time.LocalDateTime;
 @Setter
 public class AdminUserSummaryResponse {
     private Integer id;
-    private String name;
     private String username;
     private String email;
-    private String role;
     private Integer credit;
     private LocalDateTime createdAt;
-    private LocalDateTime lastLogin;
     private Boolean deleteFlag;
+    // Đếm số lượng các thực thể liên quan, rất hữu ích cho admin
+    private long topicCount;
+    private long lessonCount;
+
+    public AdminUserSummaryResponse(Integer id, String username, String email, Integer credit, LocalDateTime createdAt, Boolean deleteFlag, long topicCount, long lessonCount) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.credit = credit;
+        this.createdAt = createdAt;
+        this.deleteFlag = deleteFlag;
+        this.topicCount = topicCount;
+        this.lessonCount = lessonCount;
+    }
 }

@@ -28,5 +28,6 @@ public interface TopicRepository extends JpaRepository<Topic, Integer>, JpaSpeci
 
     boolean existsByName(String name);
     Optional<Topic> findByName(String name);
+    
 
 }

@@ -12,6 +12,7 @@ import com.lmh.web.repository.LevelRepository;
 import com.lmh.web.utils.mapper.level.LevelMapper;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminLevelServiceImpl implements AdminLevelService {
@@ -33,13 +35,12 @@ public class AdminLevelServiceImpl implements AdminLevelService {
     private final LevelMapper levelMapper;
 
     @Override
-    public Page<AdminLevelResponse> getAllLevelsForAdmin(String searchTerm, Integer languageId, int page, int size, String sortBy, String sortDir) {
+    public Page<AdminLevelResponse> getAllLevelsForAdmin(String searchTerm, Integer languageId, Boolean isDeleted, int page, int size, String sortBy, String sortDir) {
         Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Specification<Level> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("deleteFlag"), false)); // Mặc định chỉ lấy level chưa xóa
 
             if (StringUtils.hasText(searchTerm)) {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + searchTerm.toLowerCase() + "%"));
@@ -47,6 +48,12 @@ public class AdminLevelServiceImpl implements AdminLevelService {
 
             if (languageId != null) {
                 predicates.add(cb.equal(root.get("language").get("id"), languageId));
+            }
+
+            // Điều kiện ĐỘNG: Lọc theo trạng thái xóa
+            if (isDeleted != null) {
+
+                predicates.add(cb.equal(root.get("deleteFlag"), isDeleted));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

@@ -9,6 +9,7 @@ import com.lmh.web.dto.request.topic.AdminUpdateTopicRequest;
 import com.lmh.web.dto.response.topic.AdminTopicResponse;
 import com.lmh.web.model.Language;
 import com.lmh.web.model.Topic;
+import com.lmh.web.repository.LanguageRepository;
 import com.lmh.web.repository.TopicRepository;
 import com.lmh.web.service.LanguageService;
 import com.lmh.web.service.cloudinary.CloudinaryService;
@@ -39,7 +40,7 @@ public class AdminTopicServiceImpl implements AdminTopicService {
 
     private final CloudinaryService cloudinaryService;
 
-    private final LanguageService languageService;
+    private final LanguageRepository languageRepository;
 
     @Override
     public Page<AdminTopicResponse> getAllTopicsForAdmin(
@@ -99,12 +100,13 @@ public class AdminTopicServiceImpl implements AdminTopicService {
         }
 
         // 2. Tìm kiếm thực thể Language
-        Language language = languageService.findByName(request.getLanguageRequest().getName());
+        String languageName = request.getLanguageRequest().getName();
+        Language language = languageRepository.findByName(languageName)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy ngôn ngữ với tên: " + languageName));
 
         // 3. Chuyển đổi DTO sang Entity
         Topic topic = topicMapper.toEntity(request);
 
-        // --- PHẦN LOGIC UPLOAD MỚI ---
         // 4. Nếu có file đính kèm, upload lên Cloudinary
         if (file != null && !file.isEmpty()) {
             try {
@@ -152,8 +154,10 @@ public class AdminTopicServiceImpl implements AdminTopicService {
         }
 
         // 3. Cập nhật ngôn ngữ nếu được cung cấp
-        if (request.getLanguageRequest() != null && request.getLanguageRequest().getName() != null) {
-            Language newLanguage = languageService.findByName(request.getLanguageRequest().getName());
+        if (request.getLanguageRequest() != null && request.getLanguageRequest().getId() != null) {
+            String languageName = request.getLanguageRequest().getName();
+            Language newLanguage = languageRepository.findByName(languageName)
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy ngôn ngữ với tên: " + languageName));
             topic.setLanguage(newLanguage);
         }
 
