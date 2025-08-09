@@ -1,5 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-
+import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -10,42 +9,41 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar'
 
 // Menu items.
 const items = [
   {
-
-    title: "Dashboard",
-    url: "/admin/",
+    title: 'Dashboard',
+    url: '/admin/',
     icon: Home,
   },
   {
-    title: "Manage Topics",
-    url: "/admin/topic/",
+    title: 'Manage Topics',
+    url: '/admin/topic/',
 
     icon: Inbox,
   },
   {
-    title: "Calendar",
-    url: "#",
+    title: 'Manage Languages',
+    url: '/admin/language/',
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "#",
+    title: 'Manage Levels',
+    url: '/admin/level/',
     icon: Search,
   },
   {
-    title: "Settings",
-    url: "#",
+    title: 'Manage Users',
+    url: '/admin/user/',
     icon: Settings,
   },
-];
+]
 
 export function AdminSidebar() {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible='icon'>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -69,7 +67,7 @@ export function AdminSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="/">
+              <a href='/'>
                 <Home />
                 <span>Return Home Page</span>
               </a>
@@ -78,5 +76,5 @@ export function AdminSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

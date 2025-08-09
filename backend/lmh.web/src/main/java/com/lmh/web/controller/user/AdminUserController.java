@@ -41,12 +41,12 @@ public class AdminUserController {
     }
 
     @PutMapping("/{userId}")
-    public CustomResponse<AdminUserDetailResponse> updateUser(
+    public CustomResponse<String> updateUser(
             @PathVariable Integer userId,
             @Valid @RequestBody AdminUpdateUserRequest request
     ) {
-        AdminUserDetailResponse updatedUser = adminUserService.updateUserForAdmin(userId, request);
-        return new CustomResponse<>(updatedUser, HttpStatus.OK);
+        adminUserService.updateUserForAdmin(userId, request);
+        return new CustomResponse<>("Cập nhật người dùng thành công", HttpStatus.OK);
     }
 
     @DeleteMapping("/{userId}")

@@ -12,5 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LanguageRequest {
+    private Integer id;
     private String name;
 }

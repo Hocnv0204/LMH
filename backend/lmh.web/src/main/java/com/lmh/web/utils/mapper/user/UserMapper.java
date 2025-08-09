@@ -16,8 +16,6 @@ public interface UserMapper {
 
     AdminUserSummaryResponse toAdminSummaryResponse(User user);
 
-    @Mapping(target = "topicCount", expression = "java(user.getTopics() != null ? (long) user.getTopics().size() : 0L)")
-    @Mapping(target = "lessonCount", expression = "java(user.getLessons() != null ? (long) user.getLessons().size() : 0L)")
     AdminUserDetailResponse toAdminDetailResponse(User user);
 
     void updateEntityFromRequest(AdminUpdateUserRequest request, @MappingTarget User user);

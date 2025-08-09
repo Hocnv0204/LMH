@@ -16,7 +16,10 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UserTopicsIndexRouteImport } from './routes/user/topics/index'
 import { Route as UserLevelIndexRouteImport } from './routes/user/level/index'
 import { Route as UserLessonsIndexRouteImport } from './routes/user/lessons/index'
+import { Route as AdminUserIndexRouteImport } from './routes/admin/user/index'
 import { Route as AdminTopicIndexRouteImport } from './routes/admin/topic/index'
+import { Route as AdminLevelIndexRouteImport } from './routes/admin/level/index'
+import { Route as AdminLanguageIndexRouteImport } from './routes/admin/language/index'
 import { Route as UserLessonPracticeLessonIdRouteImport } from './routes/user/lesson-practice/$lessonId'
 
 const UserRouteRoute = UserRouteRouteImport.update({
@@ -54,9 +57,24 @@ const UserLessonsIndexRoute = UserLessonsIndexRouteImport.update({
   path: '/lessons/',
   getParentRoute: () => UserRouteRoute,
 } as any)
+const AdminUserIndexRoute = AdminUserIndexRouteImport.update({
+  id: '/user/',
+  path: '/user/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminTopicIndexRoute = AdminTopicIndexRouteImport.update({
   id: '/topic/',
   path: '/topic/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLevelIndexRoute = AdminLevelIndexRouteImport.update({
+  id: '/level/',
+  path: '/level/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLanguageIndexRoute = AdminLanguageIndexRouteImport.update({
+  id: '/language/',
+  path: '/language/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const UserLessonPracticeLessonIdRoute =
@@ -72,7 +90,10 @@ export interface FileRoutesByFullPath {
   '/user': typeof UserRouteRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
+  '/admin/language': typeof AdminLanguageIndexRoute
+  '/admin/level': typeof AdminLevelIndexRoute
   '/admin/topic': typeof AdminTopicIndexRoute
+  '/admin/user': typeof AdminUserIndexRoute
   '/user/lessons': typeof UserLessonsIndexRoute
   '/user/level': typeof UserLevelIndexRoute
   '/user/topics': typeof UserTopicsIndexRoute
@@ -82,7 +103,10 @@ export interface FileRoutesByTo {
   '/user': typeof UserRouteRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
+  '/admin/language': typeof AdminLanguageIndexRoute
+  '/admin/level': typeof AdminLevelIndexRoute
   '/admin/topic': typeof AdminTopicIndexRoute
+  '/admin/user': typeof AdminUserIndexRoute
   '/user/lessons': typeof UserLessonsIndexRoute
   '/user/level': typeof UserLevelIndexRoute
   '/user/topics': typeof UserTopicsIndexRoute
@@ -94,7 +118,10 @@ export interface FileRoutesById {
   '/user': typeof UserRouteRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
+  '/admin/language/': typeof AdminLanguageIndexRoute
+  '/admin/level/': typeof AdminLevelIndexRoute
   '/admin/topic/': typeof AdminTopicIndexRoute
+  '/admin/user/': typeof AdminUserIndexRoute
   '/user/lessons/': typeof UserLessonsIndexRoute
   '/user/level/': typeof UserLevelIndexRoute
   '/user/topics/': typeof UserTopicsIndexRoute
@@ -107,7 +134,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/admin/'
     | '/user/lesson-practice/$lessonId'
+    | '/admin/language'
+    | '/admin/level'
     | '/admin/topic'
+    | '/admin/user'
     | '/user/lessons'
     | '/user/level'
     | '/user/topics'
@@ -117,7 +147,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/admin'
     | '/user/lesson-practice/$lessonId'
+    | '/admin/language'
+    | '/admin/level'
     | '/admin/topic'
+    | '/admin/user'
     | '/user/lessons'
     | '/user/level'
     | '/user/topics'
@@ -128,7 +161,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/admin/'
     | '/user/lesson-practice/$lessonId'
+    | '/admin/language/'
+    | '/admin/level/'
     | '/admin/topic/'
+    | '/admin/user/'
     | '/user/lessons/'
     | '/user/level/'
     | '/user/topics/'
@@ -191,11 +227,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserLessonsIndexRouteImport
       parentRoute: typeof UserRouteRoute
     }
+    '/admin/user/': {
+      id: '/admin/user/'
+      path: '/user'
+      fullPath: '/admin/user'
+      preLoaderRoute: typeof AdminUserIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/topic/': {
       id: '/admin/topic/'
       path: '/topic'
       fullPath: '/admin/topic'
       preLoaderRoute: typeof AdminTopicIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/level/': {
+      id: '/admin/level/'
+      path: '/level'
+      fullPath: '/admin/level'
+      preLoaderRoute: typeof AdminLevelIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/language/': {
+      id: '/admin/language/'
+      path: '/language'
+      fullPath: '/admin/language'
+      preLoaderRoute: typeof AdminLanguageIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/user/lesson-practice/$lessonId': {
@@ -210,12 +267,18 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminLanguageIndexRoute: typeof AdminLanguageIndexRoute
+  AdminLevelIndexRoute: typeof AdminLevelIndexRoute
   AdminTopicIndexRoute: typeof AdminTopicIndexRoute
+  AdminUserIndexRoute: typeof AdminUserIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
+  AdminLanguageIndexRoute: AdminLanguageIndexRoute,
+  AdminLevelIndexRoute: AdminLevelIndexRoute,
   AdminTopicIndexRoute: AdminTopicIndexRoute,
+  AdminUserIndexRoute: AdminUserIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(

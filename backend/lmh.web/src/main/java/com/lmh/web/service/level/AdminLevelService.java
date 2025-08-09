@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 
 public interface AdminLevelService {
 
-    Page<AdminLevelResponse> getAllLevelsForAdmin(String searchTerm, Integer languageId, int page, int size, String sortBy, String sortDir);
+    Page<AdminLevelResponse> getAllLevelsForAdmin(String searchTerm, Integer languageId, Boolean isDeleted, int page, int size, String sortBy, String sortDir);
 
     AdminLevelResponse getLevelByIdForAdmin(Integer levelId);
 

@@ -1,283 +1,250 @@
+'use client'
+
 import { useState } from 'react'
-import { MoreHorizontal, Plus } from 'lucide-react'
+import type {
+  TopicFilters,
+  AdminTopicResponse,
+  AdminCreateTopicRequest,
+  AdminUpdateTopicRequest,
+} from '@/types/topic'
+import { Plus, Search } from 'lucide-react'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+  useTopicsAdmin,
+  useCreateTopic,
+  useUpdateTopic,
+} from '@/hooks/admin/use-topics-admin.ts'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Header } from '@/components/layout/header'
-import { ThemeSwitch } from '@/components/theme-switch'
 import { TopicForm } from './topic-form'
+import { TopicsPagination } from './topics-pagination'
+import { TopicsTable } from './topics-table'
 
-type Topic = {
-  id: string
-  name: string
-  description: string
-  imageUrl?: string
-  lessonCount: number
-  displayOrder: 'high' | 'medium' | 'low'
-  status: 'active' | 'inactive'
-  createdAt: Date
-}
+const languages = ['All Languages', 'Tiếng Anh', 'Tiếng Nhật', 'Tiếng Hàn']
 
-const initialTopics: Topic[] = [
-  {
-    id: 'topic-1',
-    name: 'Thời tiết',
-    description:
-      'Các bài học về từ vựng và mẫu câu liên quan đến chủ đề thời tiết, khí hậu.',
-    imageUrl: '/placeholder.svg?height=64&width=64',
-    lessonCount: 12,
-    displayOrder: 'low',
-    status: 'active',
-    createdAt: new Date('2024-10-15'),
-  },
-  {
-    id: 'topic-2',
-    name: 'Giao thông',
-    description:
-      'Học về các phương tiện giao thông, luật lệ và cách hỏi đường.',
-    imageUrl: '/placeholder.svg?height=64&width=64',
-    lessonCount: 8,
-    displayOrder: 'high',
-    status: 'active',
-    createdAt: new Date('2024-09-28'),
-  },
-  {
-    id: 'topic-3',
-    name: 'Mua sắm',
-    description:
-      'Từ vựng và hội thoại khi đi mua sắm quần áo, thực phẩm và các mặt hàng khác.',
-    imageUrl: '/placeholder.svg?height=64&width=64',
-    lessonCount: 15,
-    displayOrder: 'medium',
-    status: 'inactive',
-    createdAt: new Date('2024-08-01'),
-  },
-]
+export default function TopicsManagementPage() {
+  const [filters, setFilters] = useState<TopicFilters>({
+    searchTerm: '',
+    languageName: 'Tiếng Anh',
+    isDeleted: undefined,
+    page: 0,
+    size: 10,
+    sortBy: 'createdAt',
+    sortDir: 'DESC',
+  })
 
-export default function TopicManagementPage() {
-  const [topics, setTopics] = useState<Topic[]>(initialTopics)
-  const [editingTopic, setEditingTopic] = useState<Topic | null>(null)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [deletingTopic, setDeletingTopic] = useState<Topic | null>(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingTopic, setEditingTopic] = useState<AdminTopicResponse | null>(
+    null
+  )
 
-  const handleAddTopic = (data: Omit<Topic, 'id' | 'createdAt'>) => {
-    const newTopic: Topic = {
-      ...data,
-      id: `topic-${Date.now()}`,
-      createdAt: new Date(),
-    }
-    setTopics((prev) => [...prev, newTopic])
-    setIsAddDialogOpen(false)
+  const { data } = useTopicsAdmin(filters)
+  const createMutation = useCreateTopic()
+  const updateMutation = useUpdateTopic()
+
+  const handleFiltersChange = (newFilters: Partial<TopicFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters, page: 0 }))
   }
 
-  const handleEditTopic = (data: Omit<Topic, 'id' | 'createdAt'>) => {
+  const handleSearch = () => {
+    setFilters((prev) => ({ ...prev, searchTerm: searchInput, page: 0 }))
+  }
+
+  const handleLanguageChange = (language: string) => {
+    const languageName = language === 'All Languages' ? undefined : language
+    setFilters((prev) => ({ ...prev, languageName, page: 0 }))
+  }
+
+  const handleStatusChange = (status: string) => {
+    let isDeleted: boolean | undefined
+    if (status === 'active') isDeleted = false
+    else if (status === 'deleted') isDeleted = true
+    else isDeleted = undefined
+
+    setFilters((prev) => ({ ...prev, isDeleted, page: 0 }))
+  }
+
+  const handleCreateTopic = (request: AdminCreateTopicRequest, file?: File) => {
+    createMutation.mutate(
+      { request, file },
+      {
+        onSuccess: () => {
+          setCreateModalOpen(false)
+        },
+      }
+    )
+  }
+
+  const handleUpdateTopic = (request: AdminUpdateTopicRequest, file?: File) => {
     if (!editingTopic) return
 
-    setTopics((prev) =>
-      prev.map((topic) =>
-        topic.id === editingTopic.id ? { ...topic, ...data } : topic
-      )
-    )
-    setEditingTopic(null)
-  }
-
-  const handleDeleteTopic = () => {
-    if (!deletingTopic) return
-
-    setTopics((prev) => prev.filter((topic) => topic.id !== deletingTopic.id))
-    setDeletingTopic(null)
-  }
-
-  const handleToggleStatus = (topic: Topic) => {
-    setTopics((prev) =>
-      prev.map((t) =>
-        t.id === topic.id
-          ? { ...t, status: t.status === 'active' ? 'inactive' : 'active' }
-          : t
-      )
+    updateMutation.mutate(
+      { topicId: editingTopic.id, request, file },
+      {
+        onSuccess: () => {
+          setEditModalOpen(false)
+          setEditingTopic(null)
+        },
+      }
     )
   }
 
-  const truncateText = (text: string, maxLength = 50) => {
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
-  }
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('vi-VN')
+  const handleEditTopic = (topic: AdminTopicResponse) => {
+    setEditingTopic(topic)
+    setEditModalOpen(true)
   }
 
   return (
-    <div className='container mx-auto space-y-6'>
-      {/* Header */}
-      <Header>
-        <div>
-          <h1 className='text-xl font-bold'>Manage Topic</h1>
-        </div>
-        <div className='ml-auto flex items-center gap-4'>
-          <ThemeSwitch />
+    <div className='container mx-auto space-y-4 pb-10'>
+      <Header className='sticky top-0 z-10'>
+        <div className='flex flex-1 items-center justify-between'>
+          <h1 className='text-3xl font-bold'>Topic Management</h1>
+          <Button onClick={() => setCreateModalOpen(true)}>
+            <Plus className='mr-2 h-4 w-4' />
+            Create Topic
+          </Button>
         </div>
       </Header>
-      <div className='flex items-center justify-between px-4'>
-        <h1 className='text-3xl font-bold'>List Topic</h1>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className='mr-2 h-4 w-4' />
-              New Topic
-            </Button>
-          </DialogTrigger>
-          <DialogContent className='max-w-2xl'>
-            <DialogHeader>
-              <DialogTitle>New Topic</DialogTitle>
-            </DialogHeader>
-            <TopicForm onSubmit={handleAddTopic} />
-          </DialogContent>
-        </Dialog>
-      </div>
+
+      {/* Global Language Filter */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Language Filter</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select
+            value={filters.languageName || 'All Languages'}
+            onValueChange={handleLanguageChange}
+          >
+            <SelectTrigger className='w-[200px]'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {languages.map((lang) => (
+                <SelectItem key={lang} value={lang}>
+                  {lang}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Status and Search */}
+      <Card>
+        <CardContent className='pt-2'>
+          <div className='flex flex-col gap-4 sm:flex-row'>
+            <div className='flex flex-1 gap-2'>
+              <Input
+                placeholder='Search topics...'
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <Button onClick={handleSearch} size='icon'>
+                <Search className='h-4 w-4' />
+              </Button>
+            </div>
+
+            <Select
+              value={
+                filters.isDeleted === undefined
+                  ? 'all'
+                  : filters.isDeleted
+                    ? 'deleted'
+                    : 'active'
+              }
+              onValueChange={handleStatusChange}
+            >
+              <SelectTrigger className='w-[150px]'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Status</SelectItem>
+                <SelectItem value='active'>Active</SelectItem>
+                <SelectItem value='deleted'>Deleted</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Topics Table */}
-      <div className='mx-4 rounded-lg border'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ảnh</TableHead>
-              <TableHead>Tên Chủ đề</TableHead>
-              <TableHead>Mô tả</TableHead>
-              <TableHead>Số bài học</TableHead>
-              <TableHead>Ngày tạo</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead className='w-[70px]'>Hành động</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {topics.map((topic) => (
-              <TableRow key={topic.id}>
-                <TableCell>
-                  <Avatar className='h-10 w-10'>
-                    <AvatarImage
-                      src={topic.imageUrl || '/placeholder.svg'}
-                      alt={topic.name}
-                    />
-                    <AvatarFallback>{topic.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </TableCell>
-                <TableCell className='font-medium'>{topic.name}</TableCell>
-                <TableCell>{truncateText(topic.description)}</TableCell>
-                <TableCell>{topic.lessonCount}</TableCell>
-                <TableCell>{formatDate(topic.createdAt)}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      topic.status === 'active' ? 'default' : 'secondary'
-                    }
-                  >
-                    {topic.status === 'active'
-                      ? 'Đang hoạt động'
-                      : 'Không hoạt động'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='ghost' className='h-8 w-8 p-0'>
-                        <MoreHorizontal className='h-4 w-4' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem onClick={() => setEditingTopic(topic)}>
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleToggleStatus(topic)}
-                      >
-                        {topic.status === 'active'
-                          ? 'Vô hiệu hóa'
-                          : 'Kích hoạt'}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className='text-red-600'
-                        onClick={() => setDeletingTopic(topic)}
-                      >
-                        Xóa
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <Card>
+        <CardContent className='pt-6'>
+          <TopicsTable
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onEditTopic={handleEditTopic}
+          />
 
-      {/* Edit Topic Dialog */}
-      <Dialog
-        open={!!editingTopic}
-        onOpenChange={(open) => !open && setEditingTopic(null)}
-      >
+          {data?.data && (
+            <div className='mt-4'>
+              <TopicsPagination
+                pageData={data.data}
+                currentPage={filters.page}
+                pageSize={filters.size}
+                onPageChange={(page) =>
+                  setFilters((prev) => ({ ...prev, page }))
+                }
+                onPageSizeChange={(size) =>
+                  setFilters((prev) => ({ ...prev, size, page: 0 }))
+                }
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create Topic Modal */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
         <DialogContent className='max-w-2xl'>
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa Chủ đề: {editingTopic?.name}</DialogTitle>
+            <DialogTitle>Create New Topic</DialogTitle>
           </DialogHeader>
-          {editingTopic && (
-            <TopicForm initialData={editingTopic} onSubmit={handleEditTopic} />
-          )}
+          <TopicForm
+            onSubmit={(data, file) => {
+              handleCreateTopic(data as AdminCreateTopicRequest, file)
+            }}
+            onCancel={() => setCreateModalOpen(false)}
+            isLoading={createMutation.isPending}
+          />
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={!!deletingTopic}
-        onOpenChange={(open) => !open && setDeletingTopic(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Hành động này không thể hoàn tác. Chủ đề này sẽ bị xóa vĩnh viễn.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteTopic}
-              className='bg-red-600 hover:bg-red-700'
-            >
-              Xóa
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Edit Topic Modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className='max-w-2xl'>
+          <DialogHeader>
+            <DialogTitle>Update Topic</DialogTitle>
+          </DialogHeader>
+          <TopicForm
+            topic={editingTopic || undefined}
+            onSubmit={handleUpdateTopic}
+            onCancel={() => {
+              setEditModalOpen(false)
+              setEditingTopic(null)
+            }}
+            isLoading={updateMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

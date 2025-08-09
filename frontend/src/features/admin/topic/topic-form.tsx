@@ -2,8 +2,14 @@
 
 import type React from 'react'
 import { useState } from 'react'
-import { X } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import * as z from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type {
+  AdminTopicResponse,
+  AdminCreateTopicRequest,
+  AdminUpdateTopicRequest,
+} from '@/types/topic'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,37 +22,56 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
-type Topic = {
-  id: string
-  name: string
-  description: string
-  imageUrl?: string
-  lessonCount: number
-  displayOrder: 'high' | 'medium' | 'low'
-  status: 'active' | 'inactive'
-  createdAt: Date
-}
+const topicSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().optional(),
+  note: z.string().optional(),
+  languageName: z.string().min(1, 'Language is required'),
+})
+
+type TopicFormData = z.infer<typeof topicSchema>
 
 interface TopicFormProps {
-  initialData?: Topic
-  onSubmit: (data: Omit<Topic, 'id' | 'createdAt'>) => void
+  topic?: AdminTopicResponse
+  onSubmit: (
+    data: AdminCreateTopicRequest | AdminUpdateTopicRequest,
+    file?: File
+  ) => void
+  onCancel: () => void
+  isLoading?: boolean
 }
 
-export function TopicForm({ initialData, onSubmit }: TopicFormProps) {
-  const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    imageUrl: initialData?.imageUrl || '',
-    lessonCount: initialData?.lessonCount || 0,
-    displayOrder: initialData?.displayOrder || ('high' as const),
-    status: initialData?.status || ('active' as const),
+const languages = ['Tiếng Anh', 'Tiếng Nhật', 'Tiếng Hàn']
+
+export function TopicForm({
+  topic,
+  onSubmit,
+  onCancel,
+  isLoading,
+}: TopicFormProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    topic?.imageUrl || null
+  )
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<TopicFormData>({
+    resolver: zodResolver(topicSchema),
+    defaultValues: {
+      name: topic?.name || '',
+      description: topic?.description || '',
+      note: '',
+      languageName: topic?.languageName || '',
+    },
   })
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
     if (file) {
       setSelectedFile(file)
       const url = URL.createObjectURL(file)
@@ -54,148 +79,98 @@ export function TopicForm({ initialData, onSubmit }: TopicFormProps) {
     }
   }
 
-  const handleRemoveImage = () => {
-    setFormData((prev) => ({ ...prev, imageUrl: '' }))
-    setSelectedFile(null)
-    setPreviewUrl(null)
+  const onFormSubmit = (data: TopicFormData) => {
+    const request = {
+      name: data.name,
+      description: data.description,
+      note: data.note,
+      languageRequest: {
+        name: data.languageName,
+      },
+    }
+
+    onSubmit(request, selectedFile || undefined)
   }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // In a real app, you would upload the file here and get the URL
-    const finalImageUrl = previewUrl || formData.imageUrl
-
-    onSubmit({
-      ...formData,
-      imageUrl: finalImageUrl,
-    })
-  }
-
-  const isEditMode = !!initialData
-  const currentImageUrl = previewUrl || formData.imageUrl
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
+    <form onSubmit={handleSubmit(onFormSubmit)} className='space-y-4'>
       <div className='space-y-2'>
-        <Label htmlFor='name'>Tên Chủ đề *</Label>
-        <Input
-          id='name'
-          value={formData.name}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
-          }
-          required
-          placeholder='Nhập tên chủ đề'
-        />
+        <Label htmlFor='name'>Name *</Label>
+        <Input id='name' {...register('name')} placeholder='Enter topic name' />
+        {errors.name && (
+          <p className='text-sm text-red-500'>{errors.name.message}</p>
+        )}
       </div>
 
-      <div className='max-w-full space-y-2'>
-        <Label htmlFor='description'>Mô tả Chủ đề</Label>
+      <div className='space-y-2'>
+        <Label htmlFor='description'>Description</Label>
         <Textarea
           id='description'
-          value={formData.description}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, description: e.target.value }))
-          }
-          placeholder='Nhập mô tả chủ đề'
+          {...register('description')}
+          placeholder='Enter topic description'
           rows={3}
-          className='max-h-48 overflow-hidden break-words'
         />
       </div>
 
       <div className='space-y-2'>
-        <Label>Ảnh chủ đề</Label>
-        <div className='space-y-3'>
-          {currentImageUrl && (
-            <div className='flex items-center gap-3'>
-              <Avatar className='h-16 w-16'>
-                <AvatarImage
-                  src={currentImageUrl || '/placeholder.svg'}
-                  alt='Topic avatar'
-                />
-                <AvatarFallback>IMG</AvatarFallback>
-              </Avatar>
-              <Button
-                type='button'
-                variant='destructive'
-                size='sm'
-                onClick={handleRemoveImage}
-              >
-                <X className='mr-1 h-4 w-4' />
-                Xóa ảnh
-              </Button>
-            </div>
-          )}
-          <Input
-            type='file'
-            accept='image/png,image/jpeg,image/jpg'
-            onChange={handleFileChange}
-          />
-          <p className='text-muted-foreground text-sm'>
-            Gợi ý: Ảnh vuông, PNG/JPG, dưới 2MB.
-          </p>
-        </div>
-      </div>
-
-      {/* <div className='grid grid-cols-2 gap-4'>
-        <div className='space-y-2'>
-          <Label htmlFor='displayOrder'>Thứ tự hiển thị</Label>
-          <Input
-            id='displayOrder'
-            type='number'
-            min='1'
-            value={formData.displayOrder}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                displayOrder: Number.parseInt(e.target.value) || 1,
-              }))
-            }
-          />
-        </div>
-      </div> */}
-
-      <div className='space-y-2'>
-        <Label>Thứ tự hiển thị</Label>
-        <Select
-          value={formData.displayOrder}
-          onValueChange={(value: 'high' | 'medium' | 'low') =>
-            setFormData((prev) => ({ ...prev, displayOrder: value }))
-          }
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='high'>Cao</SelectItem>
-            <SelectItem value='medium'>Trung bình</SelectItem>
-            <SelectItem value='low'>Thấp</SelectItem>
-          </SelectContent>
-        </Select>
+        <Label htmlFor='note'>Note</Label>
+        <Textarea
+          id='note'
+          {...register('note')}
+          placeholder='Enter additional notes'
+          rows={2}
+        />
       </div>
 
       <div className='space-y-2'>
-        <Label>Trạng thái</Label>
+        <Label htmlFor='language'>Language *</Label>
         <Select
-          value={formData.status}
-          onValueChange={(value: 'active' | 'inactive') =>
-            setFormData((prev) => ({ ...prev, status: value }))
-          }
+          value={watch('languageName')}
+          onValueChange={(value) => setValue('languageName', value)}
         >
           <SelectTrigger>
-            <SelectValue />
+            <SelectValue placeholder='Select a language' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='active'>Đang hoạt động</SelectItem>
-            <SelectItem value='inactive'>Không hoạt động</SelectItem>
+            {languages.map((lang) => (
+              <SelectItem key={lang} value={lang}>
+                {lang}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
+        {errors.languageName && (
+          <p className='text-sm text-red-500'>{errors.languageName.message}</p>
+        )}
       </div>
 
-      <Button type='submit' className='w-full'>
-        {isEditMode ? 'Lưu thay đổi' : 'Tạo Chủ đề'}
-      </Button>
+      <div className='space-y-2'>
+        <Label htmlFor='image'>Image</Label>
+        <Input
+          id='image'
+          type='file'
+          accept='image/*'
+          onChange={handleFileChange}
+        />
+        {previewUrl && (
+          <div className='mt-2'>
+            <img
+              src={previewUrl || '/placeholder.svg'}
+              alt='Preview'
+              className='h-32 w-32 rounded-md border object-cover'
+            />
+          </div>
+        )}
+      </div>
+
+      <div className='flex justify-end space-x-2 pt-4'>
+        <Button type='button' variant='outline' onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type='submit' disabled={isLoading}>
+          {isLoading ? 'Saving...' : topic ? 'Update Topic' : 'Create Topic'}
+        </Button>
+      </div>
     </form>
   )
 }

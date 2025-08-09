@@ -21,7 +21,6 @@ public interface LevelMapper {
      * Chuyển đổi từ Level Entity sang AdminLevelResponse DTO.
      */
     @Mapping(target = "languageName", source = "language.name")
-    @Mapping(target = "languageId", source = "language.id")
     AdminLevelResponse toAdminResponse(Level level);
 
     /**

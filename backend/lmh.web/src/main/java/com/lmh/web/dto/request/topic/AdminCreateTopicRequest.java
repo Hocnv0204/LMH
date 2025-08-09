@@ -17,10 +17,6 @@ public class AdminCreateTopicRequest {
 
     private String note;
 
-    // Admin có thể cung cấp ảnh ngay khi tạo
-    private String imageUrl;
-    private String imageId;
-
     @NotNull(message = "Ngôn ngữ không được để trống")
     private LanguageRequest languageRequest; // Kế thừa cấu trúc đã có
 }
