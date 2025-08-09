@@ -69,7 +69,7 @@ jobs:
                   SPRING_DATASOURCE_USERNAME: postgres
                   SPRING_DATASOURCE_PASSWORD: 123456
                 volumes:
-                  - ./logs:/app/logs
+                  - /var/log/springboot:/var/log/springboot
 
               lmh-writting-practice-postgres:
                 image: pgvector/pgvector:pg16

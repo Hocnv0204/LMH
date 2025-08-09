@@ -75,3 +75,6 @@ app:
 
 server:
   port: 8080
+logging:
+  file:
+    name: /var/log/springboot/app.log
