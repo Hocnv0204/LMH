@@ -65,6 +65,7 @@ jobs:
                 ports:
                   - "8090:8081"
                 environment:
+                  SPRING_PROFILES_ACTIVE: deploy
                   SPRING_DATASOURCE_URL: jdbc:postgresql://lmh-writting-practice-postgres:5432/lmh-writting-practice
                   SPRING_DATASOURCE_USERNAME: postgres
                   SPRING_DATASOURCE_PASSWORD: 123456
