@@ -1,0 +1,2 @@
+INSERT INTO language (created_at, delete_flag, name, note, updated_at, language_code)
+VALUES (NOW(), false, 'English', 'Test language', NOW(), 'en');

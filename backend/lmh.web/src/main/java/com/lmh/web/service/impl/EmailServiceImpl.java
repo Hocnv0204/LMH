@@ -18,18 +18,22 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender ;
     @Override
     public void sendVerificationEmail(String toEmail , String token){
-        SimpleMailMessage message = new SimpleMailMessage() ;
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject("Verification Email");
-        String verificationUrl = baseUrl + "/authentication/verify?token=" + token ;
-        message.setText("Chào bạn,\n\n" +
-                "Cảm ơn bạn đã đăng ký tài khoản. " +
-                "Vui lòng click vào link sau để xác nhận tài khoản:\n\n" +
-                verificationUrl + "\n\n" +
-                "Link này sẽ hết hạn sau 24 giờ.\n\n" +
-                "Trân trọng!");
-        mailSender.send(message);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("Verification Email");
+            String verificationUrl = baseUrl + "/auth/verify-email/" + token;
+            message.setText("Chào bạn,\n\n" +
+                    "Cảm ơn bạn đã đăng ký tài khoản. " +
+                    "Vui lòng click vào link sau để xác nhận tài khoản:\n\n" +
+                    verificationUrl + "\n\n" +
+                    "Link này sẽ hết hạn sau 24 giờ.\n\n" +
+                    "Trân trọng!");
+            mailSender.send(message);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -38,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
         message.setFrom(fromEmail);
         message.setTo(toEmail);
         message.setSubject("Reset Password");
-        String verificationUrl = baseUrl + "/authentication/reset-password+token=?" + token ;
+        String verificationUrl = baseUrl + "/auth/reset-password/" + token ;
         message.setText("Chào bạn,\n\n" +
                 "Đây là mail xác nhận đặt lại mật khẩu" +
                 "Vui lòng click vào link sau để xác nhận tài khoản và đặt lại mật khẩu:\n\n" +

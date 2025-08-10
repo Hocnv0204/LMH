@@ -52,16 +52,15 @@ spring:
     profiles:
       active: deploy
 
-
 # Cloudinary Configuration
 cloudinary:
   cloud_name: dzvxgyg88
   api_key: 281855212738654
   api_secret: CBx98FIol43xihZJt0fX1AKgt9E
 jwt:
-  signerKey : "z8q/gnCQ3bJb4RWbC36UuznGJ0QNpnn1NSJuYO+nU0QWHPtgJE0y6BO3L2ZNZXnB"
-  valid-duration : 900
-  refreshable-duration : 604800
+  signerKey: "z8q/gnCQ3bJb4RWbC36UuznGJ0QNpnn1NSJuYO+nU0QWHPtgJE0y6BO3L2ZNZXnB"
+  valid-duration: 900
+  refreshable-duration: 604800
   api_secret: CBx98FIol43xihZJt0fX1AKgt9E
 
 # GEMINI API CONFIGURATION
@@ -72,11 +71,14 @@ gemini:
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
 
 app:
-  base-url: http://localhost:8080
+  base-url: http://localhost:5173
   verification:
     token:
       expiry: 86400000
 server:
   port: 8081
 
+logging:
+  level:
+    org.springframework.mail: DEBUG
 

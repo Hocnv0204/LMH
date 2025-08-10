@@ -1,31 +1,54 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, Eye, EyeOff, RotateCcw, ChevronLeft, ChevronRight, BookOpen, X, Clock, History } from 'lucide-react';
-import { useLessonPractice } from './hooks/useLessonPractice';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ParsedHistoryResult } from '@/api/history';
-import { HistoryList } from '@/components/history/HistoryList';
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from '@tanstack/react-router'
+import {
+  Loader2,
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+  Eye,
+  EyeOff,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
+  X,
+  Clock,
+  History,
+} from 'lucide-react'
+import { ParsedHistoryResult } from '@/api/history'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { HistoryList } from '@/components/history/HistoryList'
+import { useLessonPractice } from './hooks/useLessonPractice'
 
 interface LessonPracticePageProps {
-  lessonId: number;
-  username: string;
+  lessonId: number
+  username: string
   searchParams?: {
-    levelId?: number;
-    levelName?: string;
-    languageName?: string;
-    topicId?: number;
-    topicName?: string;
-  };
+    levelId?: number
+    levelName?: string
+    languageName?: string
+    topicId?: number
+    topicName?: string
+  }
 }
 
-export default function LessonPracticePage({ lessonId, username, searchParams }: LessonPracticePageProps) {
-  const navigate = useNavigate();
+export default function LessonPracticePage({
+  lessonId,
+  username,
+  searchParams,
+}: LessonPracticePageProps) {
+  const navigate = useNavigate()
   const {
     lesson,
     sentences,
@@ -55,34 +78,37 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
     isLoadingHistory,
     showHistory,
     fetchLessonHistory,
-    toggleHistory
-  } = useLessonPractice(lessonId, username);
+    toggleHistory,
+  } = useLessonPractice(lessonId, username)
 
   useEffect(() => {
-    fetchLesson();
-  }, [lessonId]);
+    fetchLesson()
+  }, [lessonId])
 
   const handleSubmit = async () => {
-    if (!userAnswer.trim()) return;
-    await submitAnswer();
-  };
+    if (!userAnswer.trim()) return
+    await submitAnswer()
+  }
 
   const handleNext = () => {
-    nextSentence();
-  };
+    nextSentence()
+  }
 
   const handlePrevious = () => {
-    previousSentence();
-  };
+    previousSentence()
+  }
 
-  const canProceed = true; // Always allow proceeding
-  const shouldShowRetry = validationResult && validationResult.score < 80;
-  const canGoBack = currentSentenceIndex > 0;
-  const isLastSentence = currentSentenceIndex >= sentences.length - 1;
-  const canGoNext = currentSentenceIndex < sentences.length - 1;
+  const canProceed = true // Always allow proceeding
+  const shouldShowRetry = validationResult && validationResult.score < 80
+  const canGoBack = currentSentenceIndex > 0
+  const isLastSentence = currentSentenceIndex >= sentences.length - 1
+  const canGoNext = currentSentenceIndex < sentences.length - 1
 
-  const currentSentence = sentences[currentSentenceIndex];
-  const progress = sentences.length > 0 ? ((currentSentenceIndex + 1) / sentences.length) * 100 : 0;
+  const currentSentence = sentences[currentSentenceIndex]
+  const progress =
+    sentences.length > 0
+      ? ((currentSentenceIndex + 1) / sentences.length) * 100
+      : 0
 
   // Render paragraph panel
   const ParagraphPanel = () => {
@@ -92,106 +118,113 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
       fontSize: '0.875rem',
       lineHeight: '1.5',
       whiteSpace: 'pre-wrap' as const,
-      fontWeight: '500'
-    };
+      fontWeight: '500',
+    }
 
     return (
-      <Card className="h-fit sticky top-4">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Đoạn văn gốc</CardTitle>
+      <Card className='sticky top-4 h-fit'>
+        <CardHeader className='pb-3'>
+          <div className='flex items-center justify-between'>
+            <CardTitle className='text-lg'>Đoạn văn gốc</CardTitle>
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={toggleParagraphPosition}
-              title="Chuyển vị trí"
+              title='Chuyển vị trí'
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className='h-4 w-4' />
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="bg-gray-100 border p-4 rounded-lg max-h-96 overflow-y-auto">
-            <p style={paragraphStyle}>
-              {lesson?.paragraph}
-            </p>
+          <div className='max-h-96 overflow-y-auto rounded-lg border bg-gray-100 p-4'>
+            <p style={paragraphStyle}>{lesson?.paragraph}</p>
           </div>
-          <div className="mt-3 text-xs text-muted-foreground">
+          <div className='text-muted-foreground mt-3 text-xs'>
             Câu hiện tại: {currentSentenceIndex + 1}/{sentences.length}
           </div>
         </CardContent>
       </Card>
-    );
-  };
+    )
+  }
 
-  const parseHistoryResult = (resultString: string): ParsedHistoryResult | null => {
+  const parseHistoryResult = (
+    resultString: string
+  ): ParsedHistoryResult | null => {
     try {
-      const cleanedResult = resultString.replace(/```json\n?|\n?```/g, '').trim();
-      return JSON.parse(cleanedResult);
+      const cleanedResult = resultString
+        .replace(/```json\n?|\n?```/g, '')
+        .trim()
+      return JSON.parse(cleanedResult)
     } catch {
-      return null;
+      return null
     }
-  };
+  }
 
   const handleBackToLessons = () => {
-    if (searchParams && searchParams.levelId && searchParams.levelName && searchParams.languageName) {
-      navigate({ 
+    if (
+      searchParams &&
+      searchParams.levelId &&
+      searchParams.levelName &&
+      searchParams.languageName
+    ) {
+      navigate({
         to: '/user/lessons',
         search: {
           levelId: searchParams.levelId,
           levelName: searchParams.levelName,
           languageName: searchParams.languageName,
           ...(searchParams.topicId && { topicId: searchParams.topicId }),
-          ...(searchParams.topicName && { topicName: searchParams.topicName })
-        }
-      });
+          ...(searchParams.topicName && { topicName: searchParams.topicName }),
+        },
+      })
     } else {
       // Fallback to lessons page without search params
-      navigate({ 
+      navigate({
         to: '/user/lessons',
         search: {
           levelId: 1,
           levelName: '',
-          languageName: ''
-        }
-      });
+          languageName: '',
+        },
+      })
     }
-  };
+  }
 
   if (isLoadingLesson) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin mr-3" />
-        <span className="text-lg">Đang tải bài học...</span>
+      <div className='flex min-h-screen items-center justify-center'>
+        <Loader2 className='mr-3 h-8 w-8 animate-spin' />
+        <span className='text-lg'>Đang tải bài học...</span>
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-2xl mx-auto">
-          <CardContent className="text-center py-8">
-            <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Có lỗi xảy ra</h3>
-            <p className="text-muted-foreground mb-4">{error}</p>
+      <div className='container mx-auto px-4 py-8'>
+        <Card className='mx-auto max-w-2xl'>
+          <CardContent className='py-8 text-center'>
+            <XCircle className='mx-auto mb-4 h-16 w-16 text-red-500' />
+            <h3 className='mb-2 text-xl font-semibold'>Có lỗi xảy ra</h3>
+            <p className='text-muted-foreground mb-4'>{error}</p>
             <Button onClick={handleBackToLessons}>
               Quay lại danh sách bài học
             </Button>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   if (isCompleted) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-2xl mx-auto">
-          <CardContent className="text-center py-8">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Chúc mừng!</h3>
-            <p className="text-muted-foreground mb-4">
+      <div className='container mx-auto px-4 py-8'>
+        <Card className='mx-auto max-w-2xl'>
+          <CardContent className='py-8 text-center'>
+            <CheckCircle className='mx-auto mb-4 h-16 w-16 text-green-500' />
+            <h3 className='mb-2 text-xl font-semibold'>Chúc mừng!</h3>
+            <p className='text-muted-foreground mb-4'>
               Bạn đã hoàn thành bài học "{lesson?.name}"
             </p>
             <Button onClick={handleBackToLessons}>
@@ -200,136 +233,144 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBackToLessons}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+    <div className='container mx-auto px-4 py-8'>
+      <div className='mx-auto max-w-7xl'>
+        {/* Breadcrumb Navigation */}
+        <div className='mb-6 flex items-center gap-4'>
+          <Button variant='ghost' size='sm' onClick={handleBackToLessons}>
+            <ArrowLeft className='mr-2 h-4 w-4' />
             Quay lại
           </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">{lesson?.name}</h1>
-            <p className="text-muted-foreground">{lesson?.description}</p>
+          <div className='flex-1'>
+            <h1 className='text-2xl font-bold'>{lesson?.name}</h1>
+            <p className='text-muted-foreground'>{lesson?.description}</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleParagraph}
-          >
-            {showParagraph ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+          <Button variant='outline' size='sm' onClick={toggleParagraph}>
+            {showParagraph ? (
+              <EyeOff className='mr-2 h-4 w-4' />
+            ) : (
+              <Eye className='mr-2 h-4 w-4' />
+            )}
             {showParagraph ? 'Ẩn đoạn văn' : 'Hiện đoạn văn'}
           </Button>
           <Button
-            variant="outline"
-            size="sm"
+            variant='outline'
+            size='sm'
             onClick={fetchSuggestedVocabulary}
             disabled={isLoadingVocabulary}
           >
             {isLoadingVocabulary ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
             ) : (
-              <BookOpen className="h-4 w-4 mr-2" />
+              <BookOpen className='mr-2 h-4 w-4' />
             )}
             Từ vựng gợi ý
           </Button>
           <Button
-            variant="outline"
-            size="sm"
+            variant='outline'
+            size='sm'
             onClick={fetchLessonHistory}
             disabled={isLoadingHistory}
           >
             {isLoadingHistory ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
             ) : (
-              <History className="h-4 w-4 mr-2" />
+              <History className='mr-2 h-4 w-4' />
             )}
             Lịch sử
           </Button>
         </div>
 
-        <div className={`grid gap-6 ${showParagraph ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
+        <div
+          className={`grid gap-6 ${showParagraph ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}
+        >
           {/* Left Panel - Paragraph (if position is left) */}
           {showParagraph && paragraphPosition === 'left' && (
-            <div className="lg:col-span-1">
+            <div className='lg:col-span-1'>
               <ParagraphPanel />
             </div>
           )}
 
           {/* Main Content */}
-          <div className={showParagraph ? 'lg:col-span-2' : 'col-span-1 max-w-4xl mx-auto'}>
+          <div
+            className={
+              showParagraph ? 'lg:col-span-2' : 'col-span-1 mx-auto max-w-4xl'
+            }
+          >
             {/* Progress */}
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Tiến độ</span>
-                  <span className="text-sm text-muted-foreground">
+            <Card className='mb-6'>
+              <CardContent className='pt-6'>
+                <div className='mb-2 flex items-center justify-between'>
+                  <span className='text-sm font-medium'>Tiến độ</span>
+                  <span className='text-muted-foreground text-sm'>
                     Câu {currentSentenceIndex + 1} / {sentences.length}
                   </span>
                 </div>
-                <Progress value={progress} className="h-2" />
+                <Progress value={progress} className='h-2' />
               </CardContent>
             </Card>
 
             {/* Current Sentence */}
-            <Card className="mb-6">
+            <Card className='mb-6'>
               <CardHeader>
-                <CardTitle className="text-lg">Dịch câu sau sang tiếng Anh:</CardTitle>
+                <CardTitle className='text-lg'>
+                  Dịch câu sau sang tiếng Anh:
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                  <p className="text-lg font-medium text-blue-900">
+                <div className='mb-4 rounded-lg bg-blue-50 p-4'>
+                  <p className='text-lg font-medium text-blue-900'>
                     {currentSentence}
                   </p>
                 </div>
-                
-                <div className="space-y-4">
+
+                <div className='space-y-4'>
                   <Input
-                    placeholder="Nhập bản dịch tiếng Anh của bạn..."
+                    placeholder='Nhập bản dịch tiếng Anh của bạn...'
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     disabled={isValidating || !!validationResult}
-                    className="text-lg"
+                    className='text-lg'
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter' && !isValidating && !validationResult) {
-                        handleSubmit();
+                      if (
+                        e.key === 'Enter' &&
+                        !isValidating &&
+                        !validationResult
+                      ) {
+                        handleSubmit()
                       }
                     }}
                   />
-                  
-                  <div className="flex gap-2">
+
+                  <div className='flex gap-2'>
                     {/* Previous Button */}
                     {canGoBack && (
                       <Button
                         onClick={handlePrevious}
                         disabled={isValidating}
-                        variant="outline"
-                        size="sm"
+                        variant='outline'
+                        size='sm'
                       >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        <ChevronLeft className='mr-1 h-4 w-4' />
                         Câu trước
                       </Button>
                     )}
 
                     {/* Main Action Buttons */}
-                    <div className="flex gap-2 flex-1">
+                    <div className='flex flex-1 gap-2'>
                       {!validationResult ? (
                         <Button
                           onClick={handleSubmit}
                           disabled={!userAnswer.trim() || isValidating}
-                          className="flex-1"
+                          className='flex-1'
                         >
                           {isValidating ? (
                             <>
-                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                               Đang kiểm tra...
                             </>
                           ) : (
@@ -337,13 +378,13 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
                           )}
                         </Button>
                       ) : (
-                        <Button 
+                        <Button
                           onClick={() => {
-                            setUserAnswer('');
-                            setValidationResult(null);
+                            setUserAnswer('')
+                            setValidationResult(null)
                           }}
-                          variant="outline"
-                          className="flex-1"
+                          variant='outline'
+                          className='flex-1'
                         >
                           Thử lại
                         </Button>
@@ -355,11 +396,11 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
                       <Button
                         onClick={handleNext}
                         disabled={isValidating}
-                        variant="outline"
-                        size="sm"
+                        variant='outline'
+                        size='sm'
                       >
                         Câu tiếp theo
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        <ChevronRight className='ml-1 h-4 w-4' />
                       </Button>
                     )}
 
@@ -368,7 +409,7 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
                       <Button
                         onClick={handleNext}
                         disabled={isValidating}
-                        size="sm"
+                        size='sm'
                       >
                         Hoàn thành
                       </Button>
@@ -376,7 +417,7 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
                   </div>
 
                   {/* Navigation Helper Text */}
-                  <div className="text-xs text-muted-foreground text-center">
+                  <div className='text-muted-foreground text-center text-xs'>
                     Bạn có thể di chuyển tự do giữa các câu để ôn tập
                   </div>
                 </div>
@@ -386,72 +427,116 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
             {/* Validation Result */}
             {validationResult && (
               <Card>
-                <CardContent className="pt-6">
-                  <div className={`p-4 rounded-lg border ${
-                    validationResult.status === 'perfect' ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800' :
-                    validationResult.status === 'good' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800' :
-                    'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
-                  }`}>
-                    <div className="flex items-center gap-2 mb-2">
+                <CardContent className='pt-6'>
+                  <div
+                    className={`rounded-lg border p-4 ${
+                      validationResult.status === 'perfect'
+                        ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
+                        : validationResult.status === 'good'
+                          ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950'
+                          : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'
+                    }`}
+                  >
+                    <div className='mb-2 flex items-center gap-2'>
                       {validationResult.status === 'perfect' ? (
-                        <CheckCircle className="h-5 w-5 text-green-700 dark:text-green-400" />
+                        <CheckCircle className='h-5 w-5 text-green-700 dark:text-green-400' />
                       ) : validationResult.status === 'good' ? (
-                        <CheckCircle className="h-5 w-5 text-yellow-700 dark:text-yellow-400" />
+                        <CheckCircle className='h-5 w-5 text-yellow-700 dark:text-yellow-400' />
                       ) : (
-                        <XCircle className="h-5 w-5 text-red-700 dark:text-red-400" />
+                        <XCircle className='h-5 w-5 text-red-700 dark:text-red-400' />
                       )}
-                      <span className={`font-semibold ${
-                        validationResult.status === 'perfect' ? 'text-green-800 dark:text-green-200' :
-                        validationResult.status === 'good' ? 'text-yellow-800 dark:text-yellow-200' :
-                        'text-red-800 dark:text-red-200'
-                      }`}>
+                      <span
+                        className={`font-semibold ${
+                          validationResult.status === 'perfect'
+                            ? 'text-green-800 dark:text-green-200'
+                            : validationResult.status === 'good'
+                              ? 'text-yellow-800 dark:text-yellow-200'
+                              : 'text-red-800 dark:text-red-200'
+                        }`}
+                      >
                         Điểm: {validationResult.score}/100
                       </span>
                     </div>
-                    
+
                     {validationResult.message && (
-                      <p className={`mb-2 ${
-                        validationResult.status === 'perfect' ? 'text-green-800 dark:text-green-200' :
-                        validationResult.status === 'good' ? 'text-yellow-800 dark:text-yellow-200' :
-                        'text-red-800 dark:text-red-200'
-                      }`}>{validationResult.message}</p>
+                      <p
+                        className={`mb-2 ${
+                          validationResult.status === 'perfect'
+                            ? 'text-green-800 dark:text-green-200'
+                            : validationResult.status === 'good'
+                              ? 'text-yellow-800 dark:text-yellow-200'
+                              : 'text-red-800 dark:text-red-200'
+                        }`}
+                      >
+                        {validationResult.message}
+                      </p>
                     )}
-                    
+
                     {validationResult.comment && (
-                      <p className={`mb-2 ${
-                        validationResult.status === 'perfect' ? 'text-green-700 dark:text-green-300' :
-                        validationResult.status === 'good' ? 'text-yellow-700 dark:text-yellow-300' :
-                        'text-red-700 dark:text-red-300'
-                      }`}>{validationResult.comment}</p>
+                      <p
+                        className={`mb-2 ${
+                          validationResult.status === 'perfect'
+                            ? 'text-green-700 dark:text-green-300'
+                            : validationResult.status === 'good'
+                              ? 'text-yellow-700 dark:text-yellow-300'
+                              : 'text-red-700 dark:text-red-300'
+                        }`}
+                      >
+                        {validationResult.comment}
+                      </p>
                     )}
-                    
+
                     {validationResult.improvement_suggestions && (
-                      <div className="mb-2">
-                        <p className={`font-medium ${
-                          validationResult.status === 'perfect' ? 'text-green-800 dark:text-green-200' :
-                          validationResult.status === 'good' ? 'text-yellow-800 dark:text-yellow-200' :
-                          'text-red-800 dark:text-red-200'
-                        }`}>Gợi ý cải thiện:</p>
-                        <p className={`text-sm ${
-                          validationResult.status === 'perfect' ? 'text-green-700 dark:text-green-300' :
-                          validationResult.status === 'good' ? 'text-yellow-700 dark:text-yellow-300' :
-                          'text-red-700 dark:text-red-300'
-                        }`}>{validationResult.improvement_suggestions}</p>
+                      <div className='mb-2'>
+                        <p
+                          className={`font-medium ${
+                            validationResult.status === 'perfect'
+                              ? 'text-green-800 dark:text-green-200'
+                              : validationResult.status === 'good'
+                                ? 'text-yellow-800 dark:text-yellow-200'
+                                : 'text-red-800 dark:text-red-200'
+                          }`}
+                        >
+                          Gợi ý cải thiện:
+                        </p>
+                        <p
+                          className={`text-sm ${
+                            validationResult.status === 'perfect'
+                              ? 'text-green-700 dark:text-green-300'
+                              : validationResult.status === 'good'
+                                ? 'text-yellow-700 dark:text-yellow-300'
+                                : 'text-red-700 dark:text-red-300'
+                          }`}
+                        >
+                          {validationResult.improvement_suggestions}
+                        </p>
                       </div>
                     )}
-                    
+
                     {validationResult.correct_answer && (
                       <div>
-                        <p className={`font-medium ${
-                          validationResult.status === 'perfect' ? 'text-green-800 dark:text-green-200' :
-                          validationResult.status === 'good' ? 'text-yellow-800 dark:text-yellow-200' :
-                          'text-red-800 dark:text-red-200'
-                        }`}>Đáp án tham khảo:</p>
-                        <p className={`text-sm italic ${
-                          validationResult.status === 'perfect' ? 'text-green-700 dark:text-green-300' :
-                          validationResult.status === 'good' ? 'text-yellow-700 dark:text-yellow-300' :
-                          'text-red-700 dark:text-red-300'
-                        }`}>{validationResult.correct_answer}</p>
+                        <p
+                          className={`font-medium ${
+                            validationResult.status === 'perfect'
+                              ? 'text-green-800 dark:text-green-200'
+                              : validationResult.status === 'good'
+                                ? 'text-yellow-800 dark:text-yellow-200'
+                                : 'text-red-800 dark:text-red-200'
+                          }`}
+                        >
+                          Đáp án tham khảo:
+                        </p>
+                        <p
+                          className={`text-sm italic ${
+                            validationResult.status === 'perfect'
+                              ? 'text-green-700 dark:text-green-300'
+                              : validationResult.status === 'good'
+                                ? 'text-yellow-700 dark:text-yellow-300'
+                                : 'text-red-700 dark:text-red-300'
+                          }`}
+                        >
+                          {validationResult.correct_answer}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -462,7 +547,7 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
 
           {/* Right Panel - Paragraph (if position is right) */}
           {showParagraph && paragraphPosition === 'right' && (
-            <div className="lg:col-span-1">
+            <div className='lg:col-span-1'>
               <ParagraphPanel />
             </div>
           )}
@@ -470,32 +555,36 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
 
         {/* Vocabulary Display - Show card when vocabulary panel is open */}
         {showVocabulary && (
-          <Card className="mb-6">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Từ vựng gợi ý</CardTitle>
-              <Button variant="ghost" size="sm" onClick={toggleVocabulary}>
-                <X className="h-4 w-4" />
+          <Card className='mb-6'>
+            <CardHeader className='flex flex-row items-center justify-between'>
+              <CardTitle className='text-lg'>Từ vựng gợi ý</CardTitle>
+              <Button variant='ghost' size='sm' onClick={toggleVocabulary}>
+                <X className='h-4 w-4' />
               </Button>
             </CardHeader>
             <CardContent>
               {suggestedVocabulary.length > 0 ? (
-                <div className="grid gap-3">
+                <div className='grid gap-3'>
                   {suggestedVocabulary.map((vocab) => (
-                    <div key={vocab.id} className="border rounded-lg p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium">{vocab.term}</div>
-                          <div className="text-sm text-muted-foreground">{vocab.vietnamese}</div>
+                    <div key={vocab.id} className='rounded-lg border p-3'>
+                      <div className='flex items-start justify-between'>
+                        <div className='flex-1'>
+                          <div className='font-medium'>{vocab.term}</div>
+                          <div className='text-muted-foreground text-sm'>
+                            {vocab.vietnamese}
+                          </div>
                           {vocab.pronunciation && (
-                            <div className="text-xs text-blue-600">/{vocab.pronunciation}/</div>
+                            <div className='text-xs text-blue-600'>
+                              /{vocab.pronunciation}/
+                            </div>
                           )}
                         </div>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant='secondary' className='text-xs'>
                           {vocab.type}
                         </Badge>
                       </div>
                       {vocab.example && (
-                        <div className="mt-2 text-sm italic text-gray-600">
+                        <div className='mt-2 text-sm text-gray-600 italic'>
                           {vocab.example}
                         </div>
                       )}
@@ -503,22 +592,22 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">
+                <div className='py-8 text-center'>
+                  <BookOpen className='text-muted-foreground mx-auto mb-3 h-12 w-12' />
+                  <p className='text-muted-foreground'>
                     Không có từ vựng gợi ý cho bài học này
                   </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-3"
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='mt-3'
                     onClick={fetchSuggestedVocabulary}
                     disabled={isLoadingVocabulary}
                   >
                     {isLoadingVocabulary ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                     ) : (
-                      <BookOpen className="h-4 w-4 mr-2" />
+                      <BookOpen className='mr-2 h-4 w-4' />
                     )}
                     Thử lại
                   </Button>
@@ -530,53 +619,18 @@ export default function LessonPracticePage({ lessonId, username, searchParams }:
       </div>
 
       <Dialog open={showHistory} onOpenChange={toggleHistory}>
-        <DialogContent className="w-3/4 max-w-none max-h-[80vh]">
+        <DialogContent className='max-h-[80vh] w-3/4 max-w-none'>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
+            <DialogTitle className='flex items-center gap-2'>
+              <History className='h-5 w-5' />
               Lịch sử bài học: {lesson?.name}
             </DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh]">
+          <ScrollArea className='max-h-[60vh]'>
             <HistoryList history={lessonHistory} />
           </ScrollArea>
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

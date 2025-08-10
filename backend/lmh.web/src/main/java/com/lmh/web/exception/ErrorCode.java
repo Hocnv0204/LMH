@@ -3,6 +3,9 @@ package com.lmh.web.exception;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+
+import java.util.Collection;
+
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
@@ -23,7 +26,9 @@ public enum ErrorCode {
     TOKEN_EXISTS(1013 , "Token already exists" , HttpStatus.BAD_REQUEST),
     TOKEN_NOT_EXISTS(1014 , "Token is not exists" , HttpStatus.BAD_REQUEST) ,
     USER_ENABLED(1015 , "User already enabled" , HttpStatus.BAD_REQUEST) ,
-    EMAIL_NOT_EXISTS(1016 , "Email is not exists" , HttpStatus.BAD_REQUEST) ;
+    EMAIL_NOT_EXISTS(1016 , "Email is not exists" , HttpStatus.BAD_REQUEST) ,
+    COLLECTION_EXISTS(1017 , "Collection is exists" , HttpStatus.BAD_REQUEST) ,
+    INVALID_DATA(1018 , "Invalid data" , HttpStatus.BAD_REQUEST) ;
 
 
 
