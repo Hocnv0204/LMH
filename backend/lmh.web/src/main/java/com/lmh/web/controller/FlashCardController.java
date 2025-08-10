@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FlashCardController {
     private final FlashCardService flashCardService ;
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> deleteFlashCard(@PathVariable Integer id){
         flashCardService.deleteFlashCard(id);
         return ResponseEntity.ok().body(

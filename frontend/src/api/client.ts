@@ -90,18 +90,25 @@ apiClient.interceptors.response.use(
     return response
   },
   async (error: AxiosError<ApiError>) => {
-    const originalRequest = error.config
+    const originalRequest = error.config as ExtendedAxiosRequestConfig
 
     // If 401 and we haven't already tried to refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       if (isRefreshing) {
         // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
-            return apiClient(originalRequest)
+            if (originalRequest) {
+              originalRequest.headers.Authorization = `Bearer ${token}`
+              return apiClient(originalRequest)
+            }
+            return Promise.reject(new Error('Original request not found'))
           })
           .catch((err) => {
             return Promise.reject(err)
@@ -143,8 +150,11 @@ apiClient.interceptors.response.use(
 
           // Process queue và retry original request
           processQueue(null, accessToken)
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`
-          return apiClient(originalRequest)
+          if (originalRequest) {
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`
+            return apiClient(originalRequest)
+          }
+          return Promise.reject(new Error('Original request not found'))
         } else {
           throw new Error('Refresh token failed: Invalid response format')
         }
