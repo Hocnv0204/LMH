@@ -14,9 +14,6 @@
     <changeSet id="004_change_result_text.sql" author="Minh" dbms="postgresql" onValidationFail="HALT" failOnError="true">
         <sqlFile path="db/changelog/004_change_result_text.sql"/>
     </changeSet>
-    <changeSet id="005_init_language_sql" author="Minh" dbms="postgresql" onValidationFail="HALT" failOnError="true">
-        <sqlFile path="db/changelog/005_init_language_sql"/>
-    </changeSet>
     <changeSet id="005_add_image_column" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
         <sqlFile path="db/changelog/005_add_image_column.sql"/>
     </changeSet>

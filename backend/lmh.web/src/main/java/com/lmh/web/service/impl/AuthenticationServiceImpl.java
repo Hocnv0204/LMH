@@ -40,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -144,7 +145,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String generateAccessToken(User user) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(user.getUsername() != null && !user.getUsername().isEmpty() ? user.getUsername() : "student")
                 .issuer("LMH")
                 .issueTime(new Date())
                 .expirationTime(new Date(
@@ -152,6 +153,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", user.getRole())
+                .claim("id" , user.getId())
+                .claim("fullName" , (user.getName() != null && !user.getName().isEmpty()) ? user.getName() : "Student")
+                .claim("email" , user.getEmail())
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);

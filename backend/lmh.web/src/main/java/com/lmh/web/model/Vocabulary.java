@@ -33,7 +33,7 @@ public class Vocabulary {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
-    private CollectionVocab collection;
+    private CollectionVoca collection;
 
     
     @ManyToOne(fetch = FetchType.LAZY)

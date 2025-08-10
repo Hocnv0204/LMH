@@ -6,9 +6,9 @@ import com.lmh.web.dto.request.vocab.CreateVocabularyRequest;
 import com.lmh.web.dto.request.vocab.UpdateVocabularyRequest;
 import com.lmh.web.exception.AppException;
 import com.lmh.web.mapper.VocabMapper;
-import com.lmh.web.model.CollectionVocab;
+import com.lmh.web.model.CollectionVoca;
+
 import com.lmh.web.model.FlashCard;
-import com.lmh.web.model.User;
 import com.lmh.web.model.Vocabulary;
 import com.lmh.web.exception.ErrorCode;
 import com.lmh.web.repository.CollectionVocaRepository;
@@ -19,13 +19,14 @@ import com.lmh.web.service.FileStorageService;
 import com.lmh.web.service.VocabService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ import java.util.Optional;
 public class VocabServiceImpl implements VocabService {
     
     private final VocabularyRepository vocabularyRepository;
-    private final CollectionVocaRepository collectionVocaRepository;
+    private final CollectionVocaRepository collectionVocaRepository ;
     private final UserRepository userRepository;
     private final VocabMapper vocabMapper ;
     private final FileStorageService fileStorageService ;
@@ -48,6 +49,9 @@ public class VocabServiceImpl implements VocabService {
     @Override
     public VocabularyDTO createVocab(CreateVocabularyRequest request , MultipartFile image) {
         // Gọi API dictionary để lấy thông tin từ
+        if(request.getCollectionId() == null){
+            throw new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS) ;
+        }
         DictionaryApiResponse[] apiResponse = callDictionaryApi(request.getTerm());
         
         if (apiResponse == null || apiResponse.length == 0) {
@@ -94,7 +98,9 @@ public class VocabServiceImpl implements VocabService {
         
         // Set collection và user
         if (request.getCollectionId() != null) {
-            vocabulary.setCollection(collectionVocaRepository.findById(request.getCollectionId()).orElse(null));
+            vocabulary.setCollection(collectionVocaRepository.findById(request.getCollectionId()).orElseThrow(
+                    () -> new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS)
+            ));
         }
         if (request.getUserId() != null) {
             vocabulary.setUser(userRepository.findById(request.getUserId()).orElse(null));
@@ -138,14 +144,14 @@ public class VocabServiceImpl implements VocabService {
     public VocabularyDTO updateVocab(UpdateVocabularyRequest request , Integer id){
         Vocabulary vocabulary = vocabularyRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.WORD_IS_NOT_EXISTS));
-        CollectionVocab collectionVoca = collectionVocaRepository.findById(request.getCollectionId())
+        CollectionVoca collectionVocab = collectionVocaRepository.findById(request.getCollectionId())
                 .orElseThrow(
                         () -> new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS)
                 ) ;
         vocabulary.setType(request.getType());
         vocabulary.setVi(request.getVi());
         vocabulary.setExample(request.getExample());
-        vocabulary.setCollection(collectionVoca);
+        vocabulary.setCollection(collectionVocab);
         Vocabulary savedVocabulary = vocabularyRepository.save(vocabulary) ;
         FlashCard card = flashCardRepository.findByVocabulary(savedVocabulary) ;
         card.setVocabulary(savedVocabulary);
@@ -171,7 +177,9 @@ public class VocabServiceImpl implements VocabService {
     }
 
     @Override
-    public List<VocabularyDTO> getListVocab(){
-        return vocabMapper.toDto(vocabularyRepository.findAll()) ;
+    public Page<VocabularyDTO> getListVocab(Integer userId , Pageable pageable){
+        Page<Vocabulary> vocabularies = vocabularyRepository.findByUserId(userId , pageable);
+        Page<VocabularyDTO> vocabularyDTOS = vocabularies.map(vocabMapper ::toDto) ;
+        return vocabularyDTOS ;
     }
 }

@@ -10,9 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserRouteRouteImport } from './routes/user/route'
+import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VocabIndexRouteImport } from './routes/vocab/index'
+import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as VocabFlashcardRouteImport } from './routes/vocab/flashcard'
+import { Route as AuthenticationVerifyRouteImport } from './routes/authentication/verify'
+import { Route as AuthRegisterRouteImport } from './routes/auth/register'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google-callback'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthEmailVerificationRouteImport } from './routes/auth/email-verification'
 import { Route as UserTopicsIndexRouteImport } from './routes/user/topics/index'
 import { Route as UserLevelIndexRouteImport } from './routes/user/level/index'
 import { Route as UserLessonsIndexRouteImport } from './routes/user/lessons/index'
@@ -21,10 +31,17 @@ import { Route as AdminTopicIndexRouteImport } from './routes/admin/topic/index'
 import { Route as AdminLevelIndexRouteImport } from './routes/admin/level/index'
 import { Route as AdminLanguageIndexRouteImport } from './routes/admin/language/index'
 import { Route as UserLessonPracticeLessonIdRouteImport } from './routes/user/lesson-practice/$lessonId'
+import { Route as AuthVerifyEmailTokenRouteImport } from './routes/auth/verify-email/$token'
+import { Route as AuthResetPasswordTokenRouteImport } from './routes/auth/reset-password/$token'
 
 const UserRouteRoute = UserRouteRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -37,10 +54,55 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VocabIndexRoute = VocabIndexRouteImport.update({
+  id: '/vocab/',
+  path: '/vocab/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const VocabFlashcardRoute = VocabFlashcardRouteImport.update({
+  id: '/vocab/flashcard',
+  path: '/vocab/flashcard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticationVerifyRoute = AuthenticationVerifyRouteImport.update({
+  id: '/authentication/verify',
+  path: '/authentication/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
+  id: '/google-callback',
+  path: '/google-callback',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthEmailVerificationRoute = AuthEmailVerificationRouteImport.update({
+  id: '/email-verification',
+  path: '/email-verification',
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const UserTopicsIndexRoute = UserTopicsIndexRouteImport.update({
   id: '/topics/',
@@ -83,12 +145,34 @@ const UserLessonPracticeLessonIdRoute =
     path: '/lesson-practice/$lessonId',
     getParentRoute: () => UserRouteRoute,
   } as any)
+const AuthVerifyEmailTokenRoute = AuthVerifyEmailTokenRouteImport.update({
+  id: '/verify-email/$token',
+  path: '/verify-email/$token',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthResetPasswordTokenRoute = AuthResetPasswordTokenRouteImport.update({
+  id: '/reset-password/$token',
+  path: '/reset-password/$token',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/auth': typeof AuthRouteRouteWithChildren
   '/user': typeof UserRouteRouteWithChildren
+  '/auth/email-verification': typeof AuthEmailVerificationRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/google-callback': typeof AuthGoogleCallbackRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/authentication/verify': typeof AuthenticationVerifyRoute
+  '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin/': typeof AdminIndexRoute
+  '/collections': typeof CollectionsIndexRoute
+  '/vocab': typeof VocabIndexRoute
+  '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
+  '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/language': typeof AdminLanguageIndexRoute
   '/admin/level': typeof AdminLevelIndexRoute
@@ -100,8 +184,20 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/user': typeof UserRouteRouteWithChildren
+  '/auth/email-verification': typeof AuthEmailVerificationRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/google-callback': typeof AuthGoogleCallbackRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/authentication/verify': typeof AuthenticationVerifyRoute
+  '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin': typeof AdminIndexRoute
+  '/collections': typeof CollectionsIndexRoute
+  '/vocab': typeof VocabIndexRoute
+  '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
+  '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/language': typeof AdminLanguageIndexRoute
   '/admin/level': typeof AdminLevelIndexRoute
@@ -115,8 +211,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/auth': typeof AuthRouteRouteWithChildren
   '/user': typeof UserRouteRouteWithChildren
+  '/auth/email-verification': typeof AuthEmailVerificationRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/google-callback': typeof AuthGoogleCallbackRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/authentication/verify': typeof AuthenticationVerifyRoute
+  '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin/': typeof AdminIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
+  '/vocab/': typeof VocabIndexRoute
+  '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
+  '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/language/': typeof AdminLanguageIndexRoute
   '/admin/level/': typeof AdminLevelIndexRoute
@@ -131,8 +239,20 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/auth'
     | '/user'
+    | '/auth/email-verification'
+    | '/auth/forgot-password'
+    | '/auth/google-callback'
+    | '/auth/login'
+    | '/auth/register'
+    | '/authentication/verify'
+    | '/vocab/flashcard'
     | '/admin/'
+    | '/collections'
+    | '/vocab'
+    | '/auth/reset-password/$token'
+    | '/auth/verify-email/$token'
     | '/user/lesson-practice/$lessonId'
     | '/admin/language'
     | '/admin/level'
@@ -144,8 +264,20 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/user'
+    | '/auth/email-verification'
+    | '/auth/forgot-password'
+    | '/auth/google-callback'
+    | '/auth/login'
+    | '/auth/register'
+    | '/authentication/verify'
+    | '/vocab/flashcard'
     | '/admin'
+    | '/collections'
+    | '/vocab'
+    | '/auth/reset-password/$token'
+    | '/auth/verify-email/$token'
     | '/user/lesson-practice/$lessonId'
     | '/admin/language'
     | '/admin/level'
@@ -158,8 +290,20 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/auth'
     | '/user'
+    | '/auth/email-verification'
+    | '/auth/forgot-password'
+    | '/auth/google-callback'
+    | '/auth/login'
+    | '/auth/register'
+    | '/authentication/verify'
+    | '/vocab/flashcard'
     | '/admin/'
+    | '/collections/'
+    | '/vocab/'
+    | '/auth/reset-password/$token'
+    | '/auth/verify-email/$token'
     | '/user/lesson-practice/$lessonId'
     | '/admin/language/'
     | '/admin/level/'
@@ -173,7 +317,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
   UserRouteRoute: typeof UserRouteRouteWithChildren
+  AuthenticationVerifyRoute: typeof AuthenticationVerifyRoute
+  VocabFlashcardRoute: typeof VocabFlashcardRoute
+  CollectionsIndexRoute: typeof CollectionsIndexRoute
+  VocabIndexRoute: typeof VocabIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -183,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof UserRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -199,12 +355,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vocab/': {
+      id: '/vocab/'
+      path: '/vocab'
+      fullPath: '/vocab'
+      preLoaderRoute: typeof VocabIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/vocab/flashcard': {
+      id: '/vocab/flashcard'
+      path: '/vocab/flashcard'
+      fullPath: '/vocab/flashcard'
+      preLoaderRoute: typeof VocabFlashcardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authentication/verify': {
+      id: '/authentication/verify'
+      path: '/authentication/verify'
+      fullPath: '/authentication/verify'
+      preLoaderRoute: typeof AuthenticationVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/google-callback': {
+      id: '/auth/google-callback'
+      path: '/google-callback'
+      fullPath: '/auth/google-callback'
+      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/email-verification': {
+      id: '/auth/email-verification'
+      path: '/email-verification'
+      fullPath: '/auth/email-verification'
+      preLoaderRoute: typeof AuthEmailVerificationRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/user/topics/': {
       id: '/user/topics/'
@@ -262,6 +481,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserLessonPracticeLessonIdRouteImport
       parentRoute: typeof UserRouteRoute
     }
+    '/auth/verify-email/$token': {
+      id: '/auth/verify-email/$token'
+      path: '/verify-email/$token'
+      fullPath: '/auth/verify-email/$token'
+      preLoaderRoute: typeof AuthVerifyEmailTokenRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/reset-password/$token': {
+      id: '/auth/reset-password/$token'
+      path: '/reset-password/$token'
+      fullPath: '/auth/reset-password/$token'
+      preLoaderRoute: typeof AuthResetPasswordTokenRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
   }
 }
 
@@ -285,6 +518,30 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface AuthRouteRouteChildren {
+  AuthEmailVerificationRoute: typeof AuthEmailVerificationRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthResetPasswordTokenRoute: typeof AuthResetPasswordTokenRoute
+  AuthVerifyEmailTokenRoute: typeof AuthVerifyEmailTokenRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthEmailVerificationRoute: AuthEmailVerificationRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+  AuthResetPasswordTokenRoute: AuthResetPasswordTokenRoute,
+  AuthVerifyEmailTokenRoute: AuthVerifyEmailTokenRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 interface UserRouteRouteChildren {
   UserLessonPracticeLessonIdRoute: typeof UserLessonPracticeLessonIdRoute
   UserLessonsIndexRoute: typeof UserLessonsIndexRoute
@@ -306,7 +563,12 @@ const UserRouteRouteWithChildren = UserRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
   UserRouteRoute: UserRouteRouteWithChildren,
+  AuthenticationVerifyRoute: AuthenticationVerifyRoute,
+  VocabFlashcardRoute: VocabFlashcardRoute,
+  CollectionsIndexRoute: CollectionsIndexRoute,
+  VocabIndexRoute: VocabIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -35,16 +35,16 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal() ;
         String email = oAuth2User.getAttribute("email") ;
         String name = oAuth2User.getAttribute("name") ;
+        String username = oAuth2User.getAttribute("sub") ;
         User user = userRepository.findByEmailIgnoreCase(email).orElseGet(
                 () -> {
                     User newUser = User.builder()
                             .name(name)
                             .email(email)
                             .role(Role.USER.name())
-
+                            .username(username)
                             .enable(true)
                             .createdAt(LocalDateTime.now())
-
                             .build();
                     return userRepository.save(newUser);
                 }
@@ -57,9 +57,10 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build() ;
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-        new com.fasterxml.jackson.databind.ObjectMapper().writeValue(response.getWriter(), authenticationResponse);
+        String frontendUrl = "http://localhost:5173"; // Hoặc lấy từ config
+        String redirectUrl = String.format("%s/auth/google-callback?accessToken=%s&refreshToken=%s&authenticated=true",
+                frontendUrl, accessToken, refreshToken);
+
+        response.sendRedirect(redirectUrl);
     }
 }
