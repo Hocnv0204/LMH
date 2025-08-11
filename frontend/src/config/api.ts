@@ -4,6 +4,7 @@ const isDevelopment = import.meta.env.DEV
 export const API_CONFIG = {
   // BASE_URL: 'http://localhost:8081',
   BASE_URL: 'http://13.211.99.103:8090',
+
 } as const
 
 // API Endpoints
@@ -20,6 +21,7 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: '/api/auth/reset-password',
   },
 } as const
+
 
 // Helper function to build API URLs
 export const buildApiUrl = (endpoint: string): string => {
