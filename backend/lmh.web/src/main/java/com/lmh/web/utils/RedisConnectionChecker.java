@@ -1,11 +1,13 @@
 package com.lmh.web.utils;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class RedisConnectionChecker {
 
     @Autowired
@@ -18,12 +20,12 @@ public class RedisConnectionChecker {
                     .getConnection()
                     .ping();
             if ("PONG".equalsIgnoreCase(pong)) {
-                System.out.println("✅ Redis connected successfully!");
+                log.info("✅ Redis connected successfully!");
             } else {
-                System.err.println("⚠️ Redis ping returned: " + pong);
+                log.info("⚠\uFE0F Redis ping returned: {}", pong);
             }
         } catch (Exception e) {
-            System.err.println("❌ Redis connection failed: " + e.getMessage());
+            log.info("❌ Redis connection failed: {}", e.getMessage());
         }
     }
 }
