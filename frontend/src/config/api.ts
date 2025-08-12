@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // BASE_URL: 'http://localhost:8081',
-  BASE_URL: 'https://13.211.99.103:8090',
+  BASE_URL: 'https://api-lmh-writting-practice.id.vn',
 } as const;
 
 // Helper function to build API URLs
