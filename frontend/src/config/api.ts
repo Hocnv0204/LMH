@@ -3,9 +3,8 @@ const isDevelopment = import.meta.env.DEV
 
 export const API_CONFIG = {
   // BASE_URL: 'http://localhost:8081',
-
- BASE_URL: 'https://api-lmh-writting-practice.id.vn',
-
+  BASE_URL: 'https://api-lmh-writting-practice.id.vn',
+  TIMEOUT: 10000, // 10 seconds timeout
 } as const
 
 // API Endpoints
@@ -22,9 +21,6 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: '/api/auth/reset-password',
   },
 } as const
-
-
-
 
 // Helper function to build API URLs
 export const buildApiUrl = (endpoint: string): string => {
