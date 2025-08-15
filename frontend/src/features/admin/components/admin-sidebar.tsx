@@ -39,6 +39,16 @@ const items = [
     url: '/admin/user/',
     icon: Settings,
   },
+  {
+    title: 'Manage Lessons',
+    url: '/admin/lesson/',
+    icon: Settings,
+  },
+  {
+    title: 'History Statistics',
+    url: '/admin/history/',
+    icon: Settings,
+  },
 ]
 
 export function AdminSidebar() {

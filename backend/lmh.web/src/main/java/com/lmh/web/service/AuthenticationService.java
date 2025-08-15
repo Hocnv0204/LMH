@@ -31,4 +31,6 @@ public interface AuthenticationService {
     void forgotPassword(ForgotPasswordRequest request);
     void resetPassword(ResetPasswordRequest request) ;
 
+    boolean verifyUserIdentity(String token, int userId);
+
 }

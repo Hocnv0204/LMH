@@ -10,6 +10,7 @@ import type {
   AdminCreateTopicRequest,
   AdminUpdateTopicRequest,
 } from '@/types/topic'
+import { useAvailableLanguages } from '@/hooks/admin/use-languages-admin.ts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -41,8 +42,6 @@ interface TopicFormProps {
   isLoading?: boolean
 }
 
-const languages = ['Tiếng Anh', 'Tiếng Nhật', 'Tiếng Hàn']
-
 export function TopicForm({
   topic,
   onSubmit,
@@ -69,6 +68,9 @@ export function TopicForm({
       languageName: topic?.languageName || '',
     },
   })
+
+  const { data: languagesData } = useAvailableLanguages()
+  const languages = languagesData?.data || []
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -133,8 +135,8 @@ export function TopicForm({
           </SelectTrigger>
           <SelectContent>
             {languages.map((lang) => (
-              <SelectItem key={lang} value={lang}>
-                {lang}
+              <SelectItem key={lang.id} value={lang.name}>
+                {lang.name}
               </SelectItem>
             ))}
           </SelectContent>

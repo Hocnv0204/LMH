@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 public class AdminLessonSummaryResponse {
     private Integer id;
     private String name;
-    private String status; // Trạng thái: GENERATING, COMPLETED, FAILED
-    private TypeLesson type; // Loại: DEFAULT, USER_CREATION
     private String topicName;
+    private String levelName;
+    private String languageName;
     private LocalDateTime createdAt;
     private Boolean deleteFlag;
 }

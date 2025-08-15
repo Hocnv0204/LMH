@@ -24,4 +24,16 @@
         <sqlFile path="db/changelog/005_add_image_column.sql"/>
     </changeSet>
 
+    <changeSet id="10_8_add_column_lesson.sql" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/10_8_add_column_lesson.sql"/>
+    </changeSet>
+
+    <changeSet id="11_8_add_apikey_column_user.sql" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/11_8_add_apikey_column_user.sql"/>
+    </changeSet>
+
+    <changeSet id="11_8_add_createdat_column_history.sql" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/11_8_add_createdat_column_history.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

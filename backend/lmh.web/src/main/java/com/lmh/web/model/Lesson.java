@@ -41,7 +41,7 @@ public class Lesson {
     
     @Column(name = "last_practice")
     private LocalDateTime lastPractice;
-    
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -51,6 +51,14 @@ public class Lesson {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
     private Topic topic;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "level_id")
+    private Level level;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
+    private Language language;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

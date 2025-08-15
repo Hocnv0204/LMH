@@ -50,6 +50,7 @@ import java.time.LocalDateTime;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -365,4 +366,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         verificationTokenRepository.delete(verificationToken);
     }
 
+    @Override
+    public boolean verifyUserIdentity(String token, int userId) {
+        try {
+            // Bước 1: Dùng lại hàm `verifiedToken` để giải mã và xác thực token
+            SignedJWT signedJWT = verifiedToken(token, false);
+
+            // Bước 2: Lấy claim "id" từ token. Vì ID trong DB là integer,
+            // ta dùng getIntegerClaim để lấy đúng kiểu dữ liệu.
+            Integer idFromToken = signedJWT.getJWTClaimsSet().getIntegerClaim("id");
+
+            // Bước 3: Kiểm tra null và so sánh id từ token với id được truyền vào
+            if (idFromToken == null) {
+                return false;
+            }
+            return Objects.equals(idFromToken, userId);
+
+        } catch (Exception e) {
+            // Nếu có bất kỳ lỗi nào xảy ra (token hết hạn, sai chữ ký, sai định dạng)
+            // thì đều coi như xác thực thất bại.
+            log.error("Token verification failed for user {}: {}", userId, e.getMessage());
+            return false;
+        }
+    }
 }

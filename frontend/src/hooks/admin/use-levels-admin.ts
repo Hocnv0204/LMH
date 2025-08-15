@@ -28,14 +28,6 @@ export const useLevelDetails = (levelId: number) => {
   })
 }
 
-export const useAvailableLanguages = () => {
-  return useQuery({
-    queryKey: ['available-languages'],
-    queryFn: () => levelApi.getAvailableLanguages(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  })
-}
-
 export const useCreateLevel = () => {
   const queryClient = useQueryClient()
 

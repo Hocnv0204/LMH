@@ -4,9 +4,8 @@ import type {
   AdminCreateLevelRequest,
   AdminUpdateLevelRequest,
   LevelFilters,
-  LanguageOption,
 } from '@/types/level.ts'
-import { fetchApi } from './apiClient.ts'
+import { fetchApi } from '../apiClient.ts'
 
 export const levelApi = {
   getAllLevels: async (
@@ -62,21 +61,5 @@ export const levelApi = {
     return fetchApi(`/admin/levels/${levelId}/restore`, {
       method: 'PUT',
     })
-  },
-
-  // Helper function to get available languages for dropdowns
-  getAvailableLanguages: async (): Promise<
-    CustomResponse<LanguageOption[]>
-  > => {
-    // This assumes you have an endpoint to get active languages
-    // You might need to adjust this based on your actual API
-    return fetchApi('/admin/languages?size=100&isDeleted=false').then(
-      (response: any) => ({
-        data: response.data.content.map((lang: any) => ({
-          id: lang.id,
-          name: lang.name,
-        })),
-      })
-    )
   },
 }

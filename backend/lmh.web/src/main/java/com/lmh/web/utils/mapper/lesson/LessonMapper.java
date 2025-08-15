@@ -26,10 +26,13 @@ public interface LessonMapper {
     List<LessonResponse> toResponseList(List<Lesson> lessons);
 
     @Mapping(target = "topicName", source = "topic.name")
+    @Mapping(target = "levelName", source = "level.name")
+    @Mapping(target = "languageName", source = "language.name")
     AdminLessonSummaryResponse toAdminSummaryResponse(Lesson lesson);
 
     @Mapping(target = "topicName", source = "topic.name")
-    @Mapping(target = "topicId", source = "topic.id")
+    @Mapping(target = "levelName", source = "level.name")
+    @Mapping(target = "languageName", source = "language.name")
     @Mapping(target = "suggestVocabularies", source = "suggestVocabularies")
     AdminLessonDetailResponse toAdminDetailResponse(Lesson lesson);
 

@@ -16,12 +16,11 @@ public class AdminLessonDetailResponse {
     private String paragraph;
     private String note;
     private String description;
-    private String status;
     private Boolean deleteFlag;
-    private TypeLesson type;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Integer topicId;
     private String topicName;
+    private String levelName;
+    private String languageName;
     private List<SuggestVocabularyResponse> suggestVocabularies;
 }
