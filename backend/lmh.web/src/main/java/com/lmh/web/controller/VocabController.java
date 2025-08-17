@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmh.web.common.utils.PageableUtils;
 import com.lmh.web.dto.VocabularyDTO;
 import com.lmh.web.dto.request.vocab.CreateVocabularyRequest;
+import com.lmh.web.dto.request.vocab.GetListVocabRequest;
 import com.lmh.web.dto.request.vocab.UpdateVocabularyRequest;
 import com.lmh.web.dto.response.ApiResponse;
 import com.lmh.web.service.VocabService;
@@ -46,9 +47,19 @@ public class VocabController {
                         .build()
         ) ;
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> updateVocabulary(@RequestBody UpdateVocabularyRequest request , @PathVariable Integer id){
-        VocabularyDTO dto = vocabService.updateVocab(request , id ) ;
+    @PutMapping("/{vocabId}")
+    public ResponseEntity<ApiResponse<?>> updateVocabulary(
+            @RequestPart (value = "vocab")String request ,
+            @PathVariable Integer vocabId,
+            @RequestPart (value = "image" , required = false) MultipartFile image) throws Exception {
+        UpdateVocabularyRequest updateVocabularyRequest = null ;
+        ObjectMapper mapper = new ObjectMapper() ;
+        try{
+            updateVocabularyRequest = mapper.readValue(request , UpdateVocabularyRequest.class) ;
+        }catch (Exception e){
+            throw new RuntimeException("Invalid request body") ;
+        }
+        VocabularyDTO dto = vocabService.updateVocab(updateVocabularyRequest , vocabId , image ) ;
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .success(true)
@@ -79,6 +90,18 @@ public class VocabController {
                 ApiResponse.builder()
                         .success(true)
                         .data("Word is deleted")
+                        .build()
+        ) ;
+    }
+    @GetMapping ("/collection/{collectionId}")
+    public ResponseEntity<ApiResponse<?>> getByCollection(
+            @PathVariable Integer collectionId
+            ){
+        List<VocabularyDTO> vocabularyDTOS = vocabService.findByCollection(collectionId) ;
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .data(vocabularyDTOS)
                         .build()
         ) ;
     }

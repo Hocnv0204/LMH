@@ -1,33 +1,28 @@
-# Quiz API Documentation
+# Quiz API - Module Trắc Nghiệm Từ Vựng
 
-## Overview
+## Mô tả chức năng
 
-API luyện trắc nghiệm từ vocab thuộc các collection của user. Mỗi câu hỏi là trắc nghiệm với:
+Module trắc nghiệm từ vựng tiếng Anh sang tiếng Việt với các tính năng:
 
-- **Câu hỏi**: Từ tiếng Anh (term)
-- **Đáp án**: 4 lựa chọn tiếng Việt (vi) từ database
-- **Hiển thị**: Lần lượt từng câu hỏi thay vì hiển thị toàn bộ
+- Mỗi câu hỏi là một từ tiếng Anh
+- Câu trả lời là từ tiếng Việt
+- Người dùng chọn collection và số lượng câu hỏi
+- Hệ thống chọn ngẫu nhiên các từ thuộc collection
+- Mỗi câu hỏi có 1 đáp án đúng và 3 đáp án sai
+- Logic xử lý hàng đợi câu hỏi thông minh
 
-## Features
+## API Endpoints
 
-- Trả lời đúng → chuyển câu tiếp theo
-- Trả lời sai → bắt buộc làm lại câu đó đến khi đúng (không giới hạn số lần)
-- Không lưu kết quả, không tính thời gian
-- Phiên làm bài chỉ là tạm thời (ephemeral)
-- Xáo trộn thứ tự đáp án và câu hỏi (deterministic nếu client gửi seed)
+### 1. Bắt đầu Quiz
 
-## Endpoints
-
-### 1. Start Quiz
-
-**POST** `/api/quiz/start`
+**POST** `/api/quiz/start?userId={userId}`
 
 **Request Body:**
 
 ```json
 {
   "collectionId": 1,
-  "totalQuestions": 10,
+  "questionCount": 10,
   "seed": 12345
 }
 ```
@@ -47,9 +42,75 @@ API luyện trắc nghiệm từ vocab thuộc các collection của user. Mỗi
 }
 ```
 
-### 2. Get Current Question
+### 2. Trả lời câu hỏi
 
-**GET** `/api/quiz/question?sessionId={sessionId}`
+**POST** `/api/quiz/answer?userId={userId}`
+
+**Request Body:**
+
+```json
+{
+  "quizId": "quiz_abc123def456",
+  "questionId": "question_uuid",
+  "selectedAnswer": "Đáp án người dùng chọn"
+}
+```
+
+**Response khi đúng:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "correct": true,
+    "message": "Chính xác! Chuyển sang câu hỏi tiếp theo.",
+    "nextQuestion": {
+      "questionId": "next_question_uuid",
+      "question": "Từ tiếng Anh tiếp theo",
+      "options": ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"],
+      "correctAnswer": null,
+      "isCorrect": false,
+      "message": "Câu hỏi hiện tại",
+      "isCompleted": false,
+      "currentQuestionNumber": 2,
+      "totalQuestions": 10
+    },
+    "isCompleted": false,
+    "currentQuestionNumber": 2,
+    "totalQuestions": 10
+  }
+}
+```
+
+**Response khi sai:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "correct": false,
+    "message": "Sai rồi! Câu hỏi này sẽ xuất hiện lại sau.",
+    "nextQuestion": {
+      "questionId": "next_question_uuid",
+      "question": "Từ tiếng Anh tiếp theo",
+      "options": ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"],
+      "correctAnswer": null,
+      "isCorrect": false,
+      "message": "Câu hỏi hiện tại",
+      "isCompleted": false,
+      "currentQuestionNumber": 2,
+      "totalQuestions": 10
+    },
+    "isCompleted": false,
+    "currentQuestionNumber": 2,
+    "totalQuestions": 10
+  }
+}
+```
+
+### 3. Lấy câu hỏi hiện tại
+
+**GET** `/api/quiz/question?quizId={quizId}&userId={userId}`
 
 **Response:**
 
@@ -57,9 +118,9 @@ API luyện trắc nghiệm từ vocab thuộc các collection của user. Mỗi
 {
   "success": true,
   "data": {
-    "questionId": "uuid-123",
-    "question": "hello",
-    "options": ["Xin chào", "Tạm biệt", "Cảm ơn", "Không xác định"],
+    "questionId": "question_uuid",
+    "question": "Từ tiếng Anh",
+    "options": ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"],
     "correctAnswer": null,
     "isCorrect": false,
     "message": "Câu hỏi hiện tại",
@@ -70,60 +131,9 @@ API luyện trắc nghiệm từ vocab thuộc các collection của user. Mỗi
 }
 ```
 
-### 3. Answer Question
+### 4. Kết thúc Quiz
 
-**POST** `/api/quiz/answer?sessionId={sessionId}`
-
-**Request Body:**
-
-```json
-{
-  "questionId": "uuid-123",
-  "answer": "Xin chào"
-}
-```
-
-**Response (Correct Answer):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "questionId": "uuid-123",
-    "question": "hello",
-    "options": ["Xin chào", "Tạm biệt", "Cảm ơn", "Không xác định"],
-    "correctAnswer": "Xin chào",
-    "isCorrect": true,
-    "message": "Chính xác! Chuyển sang câu hỏi tiếp theo.",
-    "isCompleted": false,
-    "currentQuestionNumber": 2,
-    "totalQuestions": 10
-  }
-}
-```
-
-**Response (Wrong Answer):**
-
-```json
-{
-  "success": true,
-  "data": {
-    "questionId": "uuid-123",
-    "question": "hello",
-    "options": ["Xin chào", "Tạm biệt", "Cảm ơn", "Không xác định"],
-    "correctAnswer": null,
-    "isCorrect": false,
-    "message": "Sai rồi! Hãy thử lại.",
-    "isCompleted": false,
-    "currentQuestionNumber": 1,
-    "totalQuestions": 10
-  }
-}
-```
-
-### 4. End Quiz
-
-**POST** `/api/quiz/end?sessionId={sessionId}`
+**POST** `/api/quiz/finish?quizId={quizId}&userId={userId}`
 
 **Response:**
 
@@ -134,30 +144,61 @@ API luyện trắc nghiệm từ vocab thuộc các collection của user. Mỗi
 }
 ```
 
-## Headers
+## Logic xử lý hàng đợi câu hỏi
 
-- `User-Id`: ID của user đang làm bài (required)
+### Khi trả lời đúng:
 
-## Business Rules
+- Câu hỏi được đánh dấu là đã trả lời
+- Chuyển sang câu hỏi tiếp theo
+- Câu hỏi đã trả lời không xuất hiện lại
 
-1. **Question Generation**: Mỗi câu hỏi hiển thị từ tiếng Anh (term) từ vocab trong collection
-2. **Answer Options**: 4 đáp án tiếng Việt (vi), trong đó 1 đúng và 3 nhiễu
-3. **Distractor Generation**: Đáp án nhiễu được lấy từ vocab trong cùng collection, ưu tiên cùng part-of-speech
-4. **Progress Tracking**: Chỉ chuyển câu hỏi khi trả lời đúng
-5. **Session Management**: Quiz sessions được lưu trong memory và tự động cleanup sau 2 giờ
-6. **No Persistence**: Không lưu kết quả vào database
-7. **Sequential Display**: Hiển thị lần lượt từng câu hỏi thay vì hiển thị toàn bộ
+### Khi trả lời sai:
 
-## Error Handling
+- Câu hỏi được chèn lại vào hàng đợi
+- Vị trí chèn: sau 2-3 câu hỏi (random)
+- Câu hỏi sẽ xuất hiện lại để người dùng thử lại
 
-- `COLLECTION_IS_NOT_EXISTS`: Collection không tồn tại
-- `INVALID_DATA`: Dữ liệu không hợp lệ (không đủ vocab, session không tồn tại)
-- `UNAUTHORIZED`: Không có quyền truy cập session
+## Cấu trúc dữ liệu
 
-## Performance Considerations
+### QuizSession
 
-- Sử dụng in-memory storage cho quiz sessions
-- Batch fetch vocabularies từ collection với limit 20 để có đa dạng đáp án nhiễu
-- Scheduled cleanup để tránh memory leak
-- Deterministic shuffling với seed để tái tạo kết quả nếu cần
-- Tối ưu query với `ORDER BY RAND()` và `Pageable` để lấy vocab ngẫu nhiên
+```java
+public class QuizSession {
+    private String sessionId;
+    private Integer userId;
+    private Integer collectionId;
+    private Integer totalQuestions;
+    private Integer currentQuestionIndex;
+    private List<QuizQuestion> questions;
+    private Map<String, Integer> questionAttempts;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastActivityAt;
+}
+```
+
+### QuizQuestion
+
+```java
+public static class QuizQuestion {
+    private String questionId;
+    private Integer vocabularyId;
+    private String question;        // Từ tiếng Anh
+    private String correctAnswer;   // Nghĩa tiếng Việt đúng
+    private List<String> options;   // 4 đáp án (1 đúng + 3 sai)
+    private boolean isAnswered;
+}
+```
+
+## Lưu ý
+
+1. **Session Management**: Quiz session được lưu trong memory (ConcurrentHashMap). Có thể nâng cấp lên Redis để hỗ trợ scale.
+
+2. **Security**: Mỗi user chỉ có thể truy cập quiz session của mình thông qua parameter `userId`.
+
+3. **Performance**: Sử dụng `findByCollectionId` để lấy từ vựng, có thể tối ưu thêm với pagination nếu collection lớn.
+
+4. **Randomization**: Hỗ trợ seed để đảm bảo tính nhất quán khi cần thiết.
+
+5. **Cleanup**: Session tự động được xóa khi kết thúc quiz hoặc có thể thêm cleanup job định kỳ.
+
+6. **API Usage**: `userId` được truyền qua query parameter thay vì header, giúp dễ test và sử dụng hơn.

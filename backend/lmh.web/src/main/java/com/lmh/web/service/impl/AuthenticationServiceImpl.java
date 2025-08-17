@@ -206,9 +206,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthenticationResponse refreshToken(RefreshTokenRequest request) throws ParseException, JOSEException {
         var token = request.getRefreshToken() ;
         SignedJWT signedJWT = verifiedToken(token , true) ;
-        var user = userRepository.findByUsername(signedJWT.getJWTClaimsSet().getSubject()).orElseThrow(
+        var user = userRepository.findById(request.getUserId()).orElseThrow(
                 () -> new AppException(ErrorCode.UNAUTHORIZED)
         ) ;
+    if (!user.getUsername().equals(signedJWT.getJWTClaimsSet().getSubject())) {
+        throw new AppException(ErrorCode.UNAUTHORIZED);
+    }
         String savedRefreshToken = redisService.getRefreshToken(user.getId()).orElseThrow(
                 () -> new AppException(ErrorCode.UNAUTHORIZED)
         ) ;

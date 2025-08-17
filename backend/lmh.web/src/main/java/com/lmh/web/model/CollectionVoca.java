@@ -22,10 +22,14 @@ public class CollectionVoca {
 
     @Column(length = 100)
     private String name;
-
+    
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vocabulary> vocabularies;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+
+    private User user ;
     public CollectionVoca() {}
 
 

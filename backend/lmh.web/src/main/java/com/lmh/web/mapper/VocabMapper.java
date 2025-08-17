@@ -20,6 +20,7 @@ public class VocabMapper {
                 .term(vocab.getTerm())
                 .type(vocab.getType())
                 .audioUrl(vocab.getAudioUrl())
+                .imageUrl(vocab.getImageUrl())
                 .build() ;
         return dto ;
     }

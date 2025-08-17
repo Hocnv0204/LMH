@@ -21,6 +21,7 @@ export interface VocabularyDTO {
 }
 
 export interface CreateCollectionRequest {
+  userId: number
   collectionName: string
 }
 
@@ -28,11 +29,42 @@ export interface UpdateCollectionRequest {
   collectionName: string
 }
 
+export interface PageResponse<T> {
+  content: T[]
+  pageable: {
+    pageNumber: number
+    pageSize: number
+    sort: {
+      sorted: boolean
+      empty: boolean
+      unsorted: boolean
+    }
+    offset: number
+    paged: boolean
+    unpaged: boolean
+  }
+  last: boolean
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+  sort: {
+    sorted: boolean
+    empty: boolean
+    unsorted: boolean
+  }
+  first: boolean
+  numberOfElements: number
+  empty: boolean
+}
+
 const BASE_PATH = '/api/collection'
 
 export const collectionApi = {
-  async list(): Promise<CollectionDTO[]> {
-    const { data } = await api.get<CollectionDTO[]>(`${BASE_PATH}`)
+  async list(userId: number): Promise<PageResponse<CollectionDTO>> {
+    const { data } = await api.get<PageResponse<CollectionDTO>>(
+      `${BASE_PATH}/user/${userId}`
+    )
     return data
   },
 

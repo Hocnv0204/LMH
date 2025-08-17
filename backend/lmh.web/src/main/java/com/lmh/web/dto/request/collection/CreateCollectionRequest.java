@@ -7,4 +7,5 @@ import lombok.Data;
 @Data
 public class CreateCollectionRequest {
     private String collectionName ;
+    private Integer userId ;
 }

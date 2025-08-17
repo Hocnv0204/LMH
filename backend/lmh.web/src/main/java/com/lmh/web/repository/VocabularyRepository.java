@@ -14,9 +14,9 @@ import java.util.List;
 @Repository
 public interface VocabularyRepository extends JpaRepository<Vocabulary, Integer> {
     Page<Vocabulary> findByUserId(Integer userId , Pageable pageable);
-    List<Vocabulary> findByCollectionId(Integer collectionId);
-    
+   List<Vocabulary> findByCollectionId(Integer collectionId) ;
     // Optimized method for quiz with limit
-    @Query("SELECT v FROM Vocabulary v WHERE v.collection.id = :collectionId ORDER BY RAND()")
+    @Query("SELECT v FROM Vocabulary v WHERE v.collection.id = :collectionId ORDER BY function('random')")
     List<Vocabulary> findRandomByCollectionId(@Param("collectionId") Integer collectionId, Pageable pageable);
 }
+

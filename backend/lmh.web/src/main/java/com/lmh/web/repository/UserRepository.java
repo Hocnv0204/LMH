@@ -2,6 +2,7 @@ package com.lmh.web.repository;
 
 
 import com.lmh.web.dto.response.user.AdminUserSummaryResponse;
+import com.lmh.web.model.CollectionVoca;
 import com.lmh.web.model.Topic;
 import com.lmh.web.model.User;
 import org.springframework.data.domain.Page;
@@ -43,5 +44,6 @@ public interface UserRepository  extends JpaRepository<User, Integer>, JpaSpecif
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.topics LEFT JOIN FETCH u.lessons WHERE u.id = :userId")
     Optional<User> findByIdWithDetails(@Param("userId") Integer userId);
+
 }
 

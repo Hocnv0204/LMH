@@ -14,6 +14,12 @@
     <changeSet id="004_change_result_text.sql" author="Minh" dbms="postgresql" onValidationFail="HALT" failOnError="true">
         <sqlFile path="db/changelog/004_change_result_text.sql"/>
     </changeSet>
+    <changeSet id="006_add_user_id_to_collectionvoca.sql" author="Hoc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/006_add_user_id_to_collectionvoca.sql"/>
+    </changeSet>
+    <changeSet id="007_create_invalid_token_table.sql" author="Hoc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/007_create_invalid_token_table.sql"/>
+    </changeSet>
     <changeSet id="005_add_image_column" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
         <sqlFile path="db/changelog/005_add_image_column.sql"/>
     </changeSet>

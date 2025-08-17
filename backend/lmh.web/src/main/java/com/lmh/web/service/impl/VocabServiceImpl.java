@@ -3,6 +3,7 @@ package com.lmh.web.service.impl;
 import com.lmh.web.dto.DictionaryApiResponse;
 import com.lmh.web.dto.VocabularyDTO;
 import com.lmh.web.dto.request.vocab.CreateVocabularyRequest;
+import com.lmh.web.dto.request.vocab.GetListVocabRequest;
 import com.lmh.web.dto.request.vocab.UpdateVocabularyRequest;
 import com.lmh.web.exception.AppException;
 import com.lmh.web.mapper.VocabMapper;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,48 +54,54 @@ public class VocabServiceImpl implements VocabService {
         if(request.getCollectionId() == null){
             throw new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS) ;
         }
+        if(!collectionVocaRepository.existsByIdAndUserId(request.getCollectionId() , request.getUserId())){
+            throw new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS) ;
+        }
         DictionaryApiResponse[] apiResponse = callDictionaryApi(request.getTerm());
-        
-        if (apiResponse == null || apiResponse.length == 0) {
+        boolean isInvalid = (apiResponse == null || apiResponse.length == 0 ) ;
+        if (isInvalid && !request.isForceAdd()) {
+            System.out.println(request.isForceAdd());
             throw new AppException(ErrorCode.WORD_INVALID) ;
         }
         
-        DictionaryApiResponse wordInfo = apiResponse[0];
-        
+
         // Tạo entity Vocabulary
         Vocabulary vocabulary = new Vocabulary();
         vocabulary.setTerm(request.getTerm());
         vocabulary.setVi(request.getVi());
         // Kiểm tra từ mới đã tồn tại chưa
         String audioUrl = null;
-        
-        // Lấy thông tin từ API response
-        if (wordInfo.getMeanings() != null && !wordInfo.getMeanings().isEmpty()) {
-            DictionaryApiResponse.Meaning firstMeaning = wordInfo.getMeanings().get(0);
-            vocabulary.setType(firstMeaning.getPartOfSpeech());
-            
-            // Lấy ví dụ từ definition đầu tiên
-            if (firstMeaning.getDefinitions() != null && !firstMeaning.getDefinitions().isEmpty()) {
-                DictionaryApiResponse.Definition firstDefinition = firstMeaning.getDefinitions().get(0);
-                vocabulary.setExample(firstDefinition.getExample());
+        if(!isInvalid) {
+            DictionaryApiResponse wordInfo = apiResponse[0];
+
+            // Lấy thông tin từ API response
+            if (wordInfo.getMeanings() != null && !wordInfo.getMeanings().isEmpty()) {
+                DictionaryApiResponse.Meaning firstMeaning = wordInfo.getMeanings().get(0);
+                vocabulary.setType(firstMeaning.getPartOfSpeech());
+
+                // Lấy ví dụ từ definition đầu tiên
+                if (firstMeaning.getDefinitions() != null && !firstMeaning.getDefinitions().isEmpty()) {
+                    DictionaryApiResponse.Definition firstDefinition = firstMeaning.getDefinitions().get(0);
+                    vocabulary.setExample(firstDefinition.getExample());
+                }
             }
-        }
-        
-        // Lấy phát âm và audio URL
-        if (wordInfo.getPhonetics() != null && !wordInfo.getPhonetics().isEmpty()) {
-            // Tìm phonetic có audio
-            Optional<DictionaryApiResponse.Phonetic> phoneticWithAudio = wordInfo.getPhonetics().stream()
-                    .filter(p -> p.getAudio() != null && !p.getAudio().isEmpty())
-                    .findFirst();
-            
-            if (phoneticWithAudio.isPresent()) {
-                vocabulary.setPronunciation(phoneticWithAudio.get().getText());
-                audioUrl = phoneticWithAudio.get().getAudio();
+
+            // Lấy phát âm và audio URL
+            if (wordInfo.getPhonetics() != null && !wordInfo.getPhonetics().isEmpty()) {
+                // Tìm phonetic có audio
+                Optional<DictionaryApiResponse.Phonetic> phoneticWithAudio = wordInfo.getPhonetics().stream()
+                        .filter(p -> p.getAudio() != null && !p.getAudio().isEmpty())
+                        .findFirst();
+
+                if (phoneticWithAudio.isPresent()) {
+                    vocabulary.setPronunciation(phoneticWithAudio.get().getText());
+                    audioUrl = phoneticWithAudio.get().getAudio();
+                } else if (wordInfo.getPhonetic() != null) {
+                    vocabulary.setPronunciation(wordInfo.getPhonetic());
+                }
             } else if (wordInfo.getPhonetic() != null) {
                 vocabulary.setPronunciation(wordInfo.getPhonetic());
             }
-        } else if (wordInfo.getPhonetic() != null) {
-            vocabulary.setPronunciation(wordInfo.getPhonetic());
         }
         
         // Set collection và user
@@ -114,6 +122,7 @@ public class VocabServiceImpl implements VocabService {
                 throw new AppException(ErrorCode.IMAGE_UPLOAD_FAILED) ;
             }
         }
+        vocabulary.setImageUrl(imageUrl);
         Vocabulary savedVocabulary = vocabularyRepository.save(vocabulary);
         FlashCard flashCard = FlashCard.builder()
                 .imageUrl(imageUrl)
@@ -132,16 +141,17 @@ public class VocabServiceImpl implements VocabService {
             return response.getBody();
         } catch (HttpClientErrorException e) {
             String responseBody = e.getResponseBodyAsString() ;
-            if(responseBody != null && responseBody.contains("No Definitions Found")){
-                throw new AppException(ErrorCode.WORD_INVALID) ;
+            if (responseBody != null && responseBody.contains("No Definitions Found")) {
+                return null;
             }
-            // Xử lý exception của thêm từ mới
-            throw new AppException(ErrorCode.WORD_INVALID) ;
+            return null;
+        } catch (Exception e) {
+            return null;
         }
     }
 
     @Override
-    public VocabularyDTO updateVocab(UpdateVocabularyRequest request , Integer id){
+    public VocabularyDTO updateVocab(UpdateVocabularyRequest request , Integer id , MultipartFile image ) throws Exception {
         Vocabulary vocabulary = vocabularyRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.WORD_IS_NOT_EXISTS));
         CollectionVoca collectionVocab = collectionVocaRepository.findById(request.getCollectionId())
@@ -152,6 +162,18 @@ public class VocabServiceImpl implements VocabService {
         vocabulary.setVi(request.getVi());
         vocabulary.setExample(request.getExample());
         vocabulary.setCollection(collectionVocab);
+        // Update image if provided
+        if (image != null && !image.isEmpty()) {
+            // Delete old image
+            String oldImageUrl = vocabulary.getImageUrl();
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                fileStorageService.deleteFile(oldImageUrl, "flash_card");
+            }
+
+            // Store new image
+            String newImageUrl = fileStorageService.storeFile(image, "flash_card");
+            vocabulary.setImageUrl(newImageUrl);
+        }
         Vocabulary savedVocabulary = vocabularyRepository.save(vocabulary) ;
         FlashCard card = flashCardRepository.findByVocabulary(savedVocabulary) ;
         card.setVocabulary(savedVocabulary);
@@ -180,6 +202,13 @@ public class VocabServiceImpl implements VocabService {
     public Page<VocabularyDTO> getListVocab(Integer userId , Pageable pageable){
         Page<Vocabulary> vocabularies = vocabularyRepository.findByUserId(userId , pageable);
         Page<VocabularyDTO> vocabularyDTOS = vocabularies.map(vocabMapper ::toDto) ;
+        return vocabularyDTOS ;
+    }
+
+    @Override
+    public List<VocabularyDTO> findByCollection(Integer collectionId){
+        List<Vocabulary> vocabularies = vocabularyRepository.findByCollectionId(collectionId) ;
+        List<VocabularyDTO> vocabularyDTOS = vocabularies.stream().map(vocabMapper ::toDto).collect(Collectors.toList()) ;
         return vocabularyDTOS ;
     }
 }

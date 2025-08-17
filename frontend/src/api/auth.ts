@@ -133,10 +133,6 @@ export const authService = {
       })
     } catch (error) {
       console.error('Logout error:', error)
-    } finally {
-      // Clear tokens regardless of API call success
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
     }
   },
 
@@ -158,7 +154,6 @@ export const authService = {
     }
   },
 
-  // Check if token is expired (basic check)
   isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
@@ -173,13 +168,36 @@ export const authService = {
     }
   },
 
-  // Check if user is authenticated (with token expiration check)
-  isAuthenticated(): boolean {
+  // Check if user is authenticated (with token expiration check and auto-refresh)
+  async isAuthenticated(): Promise<boolean> {
     const token = localStorage.getItem('accessToken')
     if (!token) return false
 
     try {
-      return !this.isTokenExpired(token)
+      if (this.isTokenExpired(token)) {
+        console.log(
+          'Token expired in isAuthenticated, attempting to refresh...'
+        )
+
+        // Import tokenManager dynamically to avoid circular dependency
+        const { tokenManager } = await import('@/utils/token-manager')
+
+        try {
+          // Attempt to refresh token
+          const newToken = await tokenManager.refreshToken()
+          return !!newToken
+        } catch (refreshError) {
+          console.error(
+            'Failed to refresh token in isAuthenticated:',
+            refreshError
+          )
+          // Clear tokens if refresh fails
+          tokenManager.clearTokens()
+          return false
+        }
+      }
+
+      return true
     } catch (error) {
       console.error('Error checking authentication:', error)
       return false
@@ -187,15 +205,39 @@ export const authService = {
   },
 
   // Get current user from token (improved implementation)
-  getCurrentUser(): AuthResponse['user'] | null {
+  async getCurrentUser(): Promise<AuthResponse['user'] | null> {
     const token = localStorage.getItem('accessToken')
     if (!token) return null
 
     try {
       // Check if token is expired
       if (this.isTokenExpired(token)) {
-        console.log('Token expired, user needs to refresh')
-        return null
+        console.log('Token expired, attempting to refresh...')
+
+        // Import tokenManager dynamically to avoid circular dependency
+        const { tokenManager } = await import('@/utils/token-manager')
+
+        try {
+          // Attempt to refresh token
+          const newToken = await tokenManager.refreshToken()
+          if (newToken) {
+            console.log('Token refreshed successfully, decoding new token...')
+            // Decode the new refreshed token
+            const payload = JSON.parse(atob(newToken.split('.')[1]))
+            return {
+              username: payload.sub,
+              name: payload.fullName || 'Student',
+              role: payload.scope,
+              id: payload.id?.toString() || '',
+              email: payload.email || '',
+            }
+          }
+        } catch (refreshError) {
+          console.error('Failed to refresh token:', refreshError)
+          // Clear tokens if refresh fails
+          tokenManager.clearTokens()
+          return null
+        }
       }
 
       // Decode JWT token (matching backend structure)

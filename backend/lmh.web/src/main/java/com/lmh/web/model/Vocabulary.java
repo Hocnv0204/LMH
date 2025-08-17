@@ -30,7 +30,8 @@ public class Vocabulary {
     private String example;
     @Column
     private String audioUrl ;
-    
+    @Column
+    private String imageUrl ;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
     private CollectionVoca collection;
