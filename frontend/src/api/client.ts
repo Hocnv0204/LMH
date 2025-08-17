@@ -12,6 +12,25 @@ interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
 }
 
+// Add a flag to prevent infinite retry loops
+let isRefreshing = false
+let failedQueue: Array<{
+  resolve: (value: any) => void
+  reject: (error: any) => void
+}> = []
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+    } else {
+      resolve(token)
+    }
+  })
+
+  failedQueue = []
+}
+
 // Types for API responses (matching backend structure)
 export interface ApiResponse<T = unknown> {
   success: boolean
@@ -37,9 +56,9 @@ export const apiClient = axios.create({
   timeout: API_CONFIG.TIMEOUT,
 })
 
-// Request interceptor - chỉ thêm token, không refresh
+// Request interceptor
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
     // Skip token for auth endpoints
     if (
       config.url?.includes('/auth/') &&
@@ -48,10 +67,15 @@ apiClient.interceptors.request.use(
       return config
     }
 
-    // Chỉ thêm token hiện tại, không kiểm tra expiration
-    const token = tokenManager.getAccessToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    try {
+      // Get current token from localStorage (don't auto-refresh on every request)
+      const token = localStorage.getItem('accessToken')
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch (error) {
+      console.error('Failed to get access token:', error)
     }
 
     return config
@@ -120,6 +144,8 @@ apiClient.interceptors.response.use(
         tokenManager.logoutAndRedirect()
 
         return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
       }
     }
 
