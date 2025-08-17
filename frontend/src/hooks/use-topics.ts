@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { buildApiUrl } from '@/config/api';
 
 interface TopicResponse {
@@ -39,7 +40,7 @@ interface UseTopicsReturn {
   fetchTopics: (params: {
     levelName: string;
     languageName: string;
-    userId: number;
+    userId?: number; // Make userId optional since we'll get it from localStorage
     page?: number;
     size?: number;
   }) => Promise<void>;
@@ -52,6 +53,7 @@ interface UseTopicsReturn {
 }
 
 export const useTopics = (): UseTopicsReturn => {
+  const navigate = useNavigate();
   const [topics, setTopics] = useState<TopicResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +66,7 @@ export const useTopics = (): UseTopicsReturn => {
   const fetchTopics = useCallback(async (params: {
     levelName: string;
     languageName: string;
-    userId: number;
+    userId?: number; // Make userId optional since we'll get it from localStorage
     page?: number;
     size?: number;
   }) => {
@@ -72,7 +74,35 @@ export const useTopics = (): UseTopicsReturn => {
     setError(null);
 
     try {
-      const { levelName, languageName, userId, page = 0, size = 10 } = params;
+      // Get userId from localStorage if not provided
+      let userId = params.userId;
+      if (!userId) {
+        const userDataString = localStorage.getItem('user');
+        if (!userDataString) {
+          // No user data in localStorage, redirect to login
+          navigate({ to: '/auth/login' });
+          return;
+        }
+        
+        try {
+          const userData = JSON.parse(userDataString);
+          userId = userData.id ? Number(userData.id) : undefined;
+        } catch (parseError) {
+          console.error('Error parsing user data from localStorage:', parseError);
+          // Invalid user data, redirect to login
+          localStorage.removeItem('user');
+          navigate({ to: '/auth/login' });
+          return;
+        }
+
+        if (!userId) {
+          // No valid userId found, redirect to login
+          navigate({ to: '/auth/login' });
+          return;
+        }
+      }
+
+      const { levelName, languageName, page = 0, size = 10 } = params;
       
       const url = buildApiUrl(`/user/topic?userId=${userId}&languageName=${languageName}&levelName=${levelName}&page=${page}&size=${size}&sortBy=id`);
       
@@ -102,7 +132,7 @@ export const useTopics = (): UseTopicsReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [navigate]);
 
   const createTopic = useCallback(async (username: string, data: CreateTopicRequest) => {
     setIsCreating(true);

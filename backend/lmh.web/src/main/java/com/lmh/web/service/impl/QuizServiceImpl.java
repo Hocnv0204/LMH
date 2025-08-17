@@ -30,7 +30,7 @@ public class QuizServiceImpl implements QuizService {
     
     // Lưu trữ session quiz trong memory (có thể thay bằng Redis sau)
     private final Map<String, QuizSession> quizSessions = new ConcurrentHashMap<>();
-    
+
     @Override
     public QuizSessionResponse startQuiz(StartQuizRequest request, Integer userId) {
         // Validate collection exists and user has access
@@ -41,12 +41,12 @@ public class QuizServiceImpl implements QuizService {
         if (!collection.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.UNAUTHORIZED, "Bạn không có quyền truy cập collection này");
         }
-        
+
         // Get vocabularies from the collection
         List<Vocabulary> vocabularies = vocabularyRepository.findByCollectionId(request.getCollectionId());
-        
+
         if (vocabularies.size() < request.getQuestionCount()) {
-            throw new AppException(ErrorCode.INVALID_DATA, 
+            throw new AppException(ErrorCode.INVALID_DATA,
                 "Collection không có đủ từ vựng. Có sẵn: " + vocabularies.size());
         }
         
@@ -55,7 +55,7 @@ public class QuizServiceImpl implements QuizService {
         
         // Generate quiz questions with random selection
         List<QuizSession.QuizQuestion> questions = generateQuizQuestions(vocabularies, request.getQuestionCount(), request.getSeed());
-        
+
         // Create quiz session
         QuizSession session = QuizSession.builder()
                 .sessionId(sessionId)
@@ -70,7 +70,7 @@ public class QuizServiceImpl implements QuizService {
                 .build();
         
         quizSessions.put(sessionId, session);
-        
+
         return QuizSessionResponse.builder()
                 .sessionId(sessionId)
                 .collectionId(request.getCollectionId())
@@ -83,10 +83,10 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public AnswerResponse answerQuestion(AnswerRequest request, Integer userId) {
         QuizSession session = getAndValidateSession(request.getQuizId(), userId);
-        
+
         // Find the current question
         QuizSession.QuizQuestion currentQuestion = session.getQuestions().get(session.getCurrentQuestionIndex());
-        
+
         if (!currentQuestion.getQuestionId().equals(request.getQuestionId())) {
             throw new AppException(ErrorCode.INVALID_DATA, "Question ID không khớp");
         }
@@ -96,7 +96,7 @@ public class QuizServiceImpl implements QuizService {
         session.setLastActivityAt(LocalDateTime.now());
         
         boolean isCorrect = currentQuestion.getCorrectAnswer().equals(request.getSelectedAnswer());
-        
+
         if (isCorrect) {
             // Mark question as answered and move to next
             currentQuestion.setAnswered(true);
@@ -115,7 +115,7 @@ public class QuizServiceImpl implements QuizService {
             
             // Get next question
             QuizSession.QuizQuestion nextQuestion = session.getQuestions().get(session.getCurrentQuestionIndex());
-            
+
             return AnswerResponse.builder()
                     .correct(true)
                     .message("Chính xác! Chuyển sang câu hỏi tiếp theo.")
@@ -127,7 +127,7 @@ public class QuizServiceImpl implements QuizService {
         } else {
             // Wrong answer - reinsert question after 2-3 questions
             reinsertQuestion(session, currentQuestion);
-            
+
             return AnswerResponse.builder()
                     .correct(false)
                     .message("Sai rồi! Câu hỏi này sẽ xuất hiện lại sau.")
@@ -142,36 +142,36 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public QuizQuestionResponse getCurrentQuestion(String quizId, Integer userId) {
         QuizSession session = getAndValidateSession(quizId, userId);
-        
+
         if (session.getCurrentQuestionIndex() >= session.getTotalQuestions()) {
             throw new AppException(ErrorCode.INVALID_DATA, "Quiz đã hoàn thành");
         }
-        
+
         QuizSession.QuizQuestion currentQuestion = session.getQuestions().get(session.getCurrentQuestionIndex());
         return createQuizQuestionResponse(currentQuestion, session);
     }
-    
+
     @Override
     public void finishQuiz(String quizId, Integer userId) {
         QuizSession session = getAndValidateSession(quizId, userId);
         quizSessions.remove(quizId);
     }
-    
+
     private void reinsertQuestion(QuizSession session, QuizSession.QuizQuestion question) {
         // Remove current question from its position
         session.getQuestions().remove(session.getCurrentQuestionIndex());
-        
+
         // Calculate insertion position (after 2-3 questions)
-        int insertPosition = Math.min(session.getCurrentQuestionIndex() + 2 + new Random().nextInt(2), 
+        int insertPosition = Math.min(session.getCurrentQuestionIndex() + 2 + new Random().nextInt(2),
                                     session.getQuestions().size());
-        
+
         // Insert question at new position
         session.getQuestions().add(insertPosition, question);
-        
+
         // Reset question state
         question.setAnswered(false);
     }
-    
+
     private QuizQuestionResponse createQuizQuestionResponse(QuizSession.QuizQuestion question, QuizSession session) {
         return QuizQuestionResponse.builder()
                 .questionId(question.getQuestionId())

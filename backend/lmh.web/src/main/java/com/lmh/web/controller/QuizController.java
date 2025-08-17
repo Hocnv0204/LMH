@@ -23,7 +23,7 @@ public class QuizController {
     public ResponseEntity<ApiResponse<?>> startQuiz(
             @Valid @RequestBody StartQuizRequest request,
             @RequestParam Integer userId) {
-        
+
         QuizSessionResponse response = quizService.startQuiz(request, userId);
         
         return ResponseEntity.ok().body(
@@ -38,9 +38,9 @@ public class QuizController {
     public ResponseEntity<ApiResponse<?>> answerQuestion(
             @Valid @RequestBody AnswerRequest request,
             @RequestParam Integer userId) {
-        
+
         AnswerResponse response = quizService.answerQuestion(request, userId);
-        
+
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .success(true)
@@ -53,9 +53,9 @@ public class QuizController {
     public ResponseEntity<ApiResponse<?>> getCurrentQuestion(
             @RequestParam String quizId,
             @RequestParam Integer userId) {
-        
+
         QuizQuestionResponse response = quizService.getCurrentQuestion(quizId, userId);
-        
+
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .success(true)
@@ -68,9 +68,9 @@ public class QuizController {
     public ResponseEntity<ApiResponse<?>> finishQuiz(
             @RequestParam String quizId,
             @RequestParam Integer userId) {
-        
+
         quizService.finishQuiz(quizId, userId);
-        
+
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .success(true)

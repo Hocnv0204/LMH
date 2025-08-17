@@ -133,9 +133,7 @@ export const authService = {
       })
     } catch (error) {
       console.error('Logout error:', error)
-      // Continue with logout even if API call fails
     }
-    // Không clear tokens ở đây, để AuthContext xử lý
   },
 
   // Forgot password
@@ -156,7 +154,6 @@ export const authService = {
     }
   },
 
-  // Check if token is expired (basic check) - deprecated, use isTokenExpiredWithBuffer from jwt-utils
   isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
