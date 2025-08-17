@@ -1,6 +1,6 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+import { API_CONFIG } from '@/config/api'
 
+const API_BASE_URL = API_CONFIG.BASE_URL
 /**
  * Lớp lỗi tùy chỉnh để chứa status code từ API.
  */

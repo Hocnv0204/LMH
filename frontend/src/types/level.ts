@@ -21,8 +21,8 @@ export interface AdminUpdateLevelRequest {
 }
 
 export interface LevelResponse {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 export interface LevelFilters {
@@ -36,12 +36,7 @@ export interface LevelFilters {
 }
 
 export interface Level {
-  id: number;
-  name: string;
-  description?: string;
-}
-
-export interface LanguageOption {
   id: number
   name: string
+  description?: string
 }

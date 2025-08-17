@@ -12,6 +12,14 @@ import type {
 import { toast } from 'sonner'
 import { languageApi } from '@/api/admin/adminLanguageApi.ts'
 
+export const useAvailableLanguages = () => {
+  return useQuery({
+    queryKey: ['available-languages'],
+    queryFn: () => languageApi.getAvailableLanguages(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
 export const useLanguagesAdmin = (filters: LanguageFilters) => {
   return useQuery({
     queryKey: ['languages', filters],

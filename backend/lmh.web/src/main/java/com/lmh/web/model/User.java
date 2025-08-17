@@ -59,7 +59,13 @@ public class User {
 
     @Column(name = "delete_flag")
     private Boolean deleteFlag;
-    
+
+    @Column(name = "api_key")
+    private String apiKey;
+
+    @Column(name = "api_url")
+    private String apiUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbacks;
 

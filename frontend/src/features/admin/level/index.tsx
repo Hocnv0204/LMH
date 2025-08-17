@@ -6,11 +6,11 @@ import type {
   AdminUpdateLevelRequest,
 } from '@/types/level'
 import { Plus, Search } from 'lucide-react'
+import { useAvailableLanguages } from '@/hooks/admin/use-languages-admin.ts'
 import {
   useLevelsAdmin,
   useCreateLevel,
   useUpdateLevel,
-  useAvailableLanguages,
 } from '@/hooks/admin/use-levels-admin.ts'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

@@ -14,7 +14,7 @@ export interface AdminCreateLanguageRequest {
 }
 
 export interface Language {
-  name: string;
+  name: string
 }
 
 export interface AdminUpdateLanguageRequest {
@@ -24,8 +24,8 @@ export interface AdminUpdateLanguageRequest {
 }
 
 export interface LanguageResponse {
-  data: Language[];
-  httpStatus: string;
+  data: Language[]
+  httpStatus: string
 }
 
 export interface LanguageFilters {
@@ -35,4 +35,9 @@ export interface LanguageFilters {
   size: number
   sortBy: string
   sortDir: 'ASC' | 'DESC'
+}
+
+export interface LanguageOption {
+  id: number
+  name: string
 }

@@ -79,13 +79,14 @@ public class GeminiLessonGeneratorService {
         } catch (Exception e) {
             log.error("Failed to generate lesson content for lessonId: {}", lessonId, e);
             // Cập nhật trạng thái lỗi cho bài học
-            lesson.setStatus("FAILED");
-            lessonRepository.save(lesson);
+            // lesson.setStatus("FAILED");
+            // lessonRepository.save(lesson);
+            lessonRepository.delete(lesson);
         }
     }
 
     private String loadAndFormatPrompt(String topic, String level, String description, String languageCode) throws Exception {
-        String promptFileName = "prompt/create_lesson_prompt_" + languageCode + ".txt";
+        String promptFileName = "prompt/create_lesson_prompt_" + languageCode.trim() + ".txt";
         log.info("Loading prompt from: {}", promptFileName);
 
         Resource resource = resourceLoader.getResource("classpath:" + promptFileName);

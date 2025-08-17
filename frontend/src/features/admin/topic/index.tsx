@@ -8,6 +8,7 @@ import type {
   AdminUpdateTopicRequest,
 } from '@/types/topic'
 import { Plus, Search } from 'lucide-react'
+import { useAvailableLanguages } from '@/hooks/admin/use-languages-admin.ts'
 import {
   useTopicsAdmin,
   useCreateTopic,
@@ -34,18 +35,19 @@ import { TopicForm } from './topic-form'
 import { TopicsPagination } from './topics-pagination'
 import { TopicsTable } from './topics-table'
 
-const languages = ['All Languages', 'Tiếng Anh', 'Tiếng Nhật', 'Tiếng Hàn']
-
 export default function TopicsManagementPage() {
   const [filters, setFilters] = useState<TopicFilters>({
     searchTerm: '',
-    languageName: 'Tiếng Anh',
+    languageName: '',
     isDeleted: undefined,
     page: 0,
     size: 10,
     sortBy: 'createdAt',
     sortDir: 'DESC',
   })
+
+  const { data: languagesData } = useAvailableLanguages()
+  const languages = languagesData?.data || []
 
   const [searchInput, setSearchInput] = useState('')
   const [createModalOpen, setCreateModalOpen] = useState(false)
@@ -67,7 +69,7 @@ export default function TopicsManagementPage() {
   }
 
   const handleLanguageChange = (language: string) => {
-    const languageName = language === 'All Languages' ? undefined : language
+    const languageName = language === 'all' ? undefined : language
     setFilters((prev) => ({ ...prev, languageName, page: 0 }))
   }
 
@@ -129,16 +131,19 @@ export default function TopicsManagementPage() {
         </CardHeader>
         <CardContent>
           <Select
-            value={filters.languageName || 'All Languages'}
+            value={
+              filters.languageName ? filters.languageName.toString() : 'all'
+            }
             onValueChange={handleLanguageChange}
           >
             <SelectTrigger className='w-[200px]'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value='all'>All Languages</SelectItem>
               {languages.map((lang) => (
-                <SelectItem key={lang} value={lang}>
-                  {lang}
+                <SelectItem key={lang.id} value={lang.name}>
+                  {lang.name}
                 </SelectItem>
               ))}
             </SelectContent>

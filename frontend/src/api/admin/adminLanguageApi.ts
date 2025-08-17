@@ -4,8 +4,9 @@ import type {
   AdminCreateLanguageRequest,
   AdminUpdateLanguageRequest,
   LanguageFilters,
+  LanguageOption,
 } from '@/types/language.ts'
-import { fetchApi } from './apiClient.ts'
+import { fetchApi } from '../apiClient.ts'
 
 export const languageApi = {
   getAllLanguages: async (
@@ -63,5 +64,19 @@ export const languageApi = {
     return fetchApi(`/admin/languages/${languageId}/restore`, {
       method: 'PUT',
     })
+  },
+
+  // Helper function to get available languages for dropdowns
+  getAvailableLanguages: async (): Promise<
+    CustomResponse<LanguageOption[]>
+  > => {
+    return fetchApi('/admin/languages?size=100&isDeleted=false').then(
+      (response: any) => ({
+        data: response.data.content.map((lang: any) => ({
+          id: lang.id,
+          name: lang.name,
+        })),
+      })
+    )
   },
 }
