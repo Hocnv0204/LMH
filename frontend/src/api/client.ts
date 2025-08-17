@@ -5,29 +5,11 @@ import axios, {
   AxiosRequestConfig,
 } from 'axios'
 import { API_CONFIG } from '@/config/api'
+import { tokenManager } from '@/utils/token-manager'
 
 // Extended config interface
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
-}
-
-// Add a flag to prevent infinite retry loops
-let isRefreshing = false
-let failedQueue: Array<{
-  resolve: (value: any) => void
-  reject: (error: any) => void
-}> = []
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) {
-      reject(error)
-    } else {
-      resolve(token)
-    }
-  })
-
-  failedQueue = []
 }
 
 // Types for API responses (matching backend structure)
@@ -55,9 +37,9 @@ export const apiClient = axios.create({
   timeout: API_CONFIG.TIMEOUT,
 })
 
-// Request interceptor
+// Request interceptor - chỉ thêm token, không refresh
 apiClient.interceptors.request.use(
-  async (config) => {
+  (config) => {
     // Skip token for auth endpoints
     if (
       config.url?.includes('/auth/') &&
@@ -66,15 +48,10 @@ apiClient.interceptors.request.use(
       return config
     }
 
-    try {
-      // Get current token from localStorage (don't auto-refresh on every request)
-      const token = localStorage.getItem('accessToken')
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    } catch (error) {
-      console.error('Failed to get access token:', error)
+    // Chỉ thêm token hiện tại, không kiểm tra expiration
+    const token = tokenManager.getAccessToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
 
     return config
@@ -98,84 +75,51 @@ apiClient.interceptors.response.use(
       originalRequest &&
       !originalRequest._retry
     ) {
-      if (isRefreshing) {
-        // If already refreshing, queue this request
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
-        })
-          .then((token) => {
-            if (originalRequest) {
-              originalRequest.headers.Authorization = `Bearer ${token}`
-              return apiClient(originalRequest)
-            }
-            return Promise.reject(new Error('Original request not found'))
-          })
-          .catch((err) => {
-            return Promise.reject(err)
-          })
-      }
-
+      console.log('🚨 401 Unauthorized detected, attempting token refresh...')
       originalRequest._retry = true
-      isRefreshing = true
 
       try {
-        console.log('Attempting to refresh token...')
+        console.log('🔄 Calling tokenManager.refreshToken()...')
+        const newToken = await tokenManager.refreshToken()
 
-        const response = await axios.post<ApiResponse<AuthenticationResponse>>(
-          `${API_CONFIG.BASE_URL}/api/auth/refresh`,
-          {
-            refreshToken: localStorage.getItem('refreshToken'),
+        // Cập nhật user state sau khi refresh thành công
+        if (newToken) {
+          try {
+            const payload = JSON.parse(atob(newToken.split('.')[1]))
+            const userData = {
+              id: payload.id?.toString() || '',
+              username: payload.sub || '',
+              role: payload.scope || '',
+              name: payload.fullName || '',
+              email: payload.email || '',
+            }
+
+            // Dispatch custom event để AuthContext cập nhật user state
+            window.dispatchEvent(
+              new CustomEvent('tokenRefreshed', {
+                detail: { user: userData, token: newToken },
+              })
+            )
+
+            console.log('✅ User state updated after token refresh:', userData)
+          } catch (error) {
+            console.error('Error updating user state:', error)
           }
-        )
-
-        console.log('Refresh token response:', response.data)
-
-        if (response.data.success && response.data.data) {
-          const {
-            accessToken,
-            refreshToken: newRefreshToken,
-            authenticated,
-          } = response.data.data
-
-          // Validate response
-          if (!authenticated || !accessToken || !newRefreshToken) {
-            throw new Error('Refresh token failed: Invalid response data')
-          }
-
-          // Lưu token mới
-          localStorage.setItem('accessToken', accessToken)
-          localStorage.setItem('refreshToken', newRefreshToken)
-
-          console.log('Token refreshed successfully')
-
-          // Process queue và retry original request
-          processQueue(null, accessToken)
-          if (originalRequest) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`
-            return apiClient(originalRequest)
-          }
-          return Promise.reject(new Error('Original request not found'))
-        } else {
-          throw new Error('Refresh token failed: Invalid response format')
         }
+
+        if (originalRequest) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return apiClient(originalRequest)
+        }
+        return Promise.reject(new Error('Original request not found'))
       } catch (refreshError) {
         console.error('Refresh token failed:', refreshError)
+        tokenManager.clearTokens()
 
-        // Process queue với error
-        processQueue(refreshError, null)
-
-        // Refresh failed, clear tokens and redirect to login
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-
-        // Chỉ redirect nếu không phải đang ở trang login
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login'
-        }
+        // Redirect về trang login
+        tokenManager.logoutAndRedirect()
 
         return Promise.reject(refreshError)
-      } finally {
-        isRefreshing = false
       }
     }
 

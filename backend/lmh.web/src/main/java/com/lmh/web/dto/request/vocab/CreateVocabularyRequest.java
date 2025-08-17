@@ -8,4 +8,9 @@ public class CreateVocabularyRequest {
     private String vi;
     private Integer collectionId;
     private Integer userId;
+    private boolean forceAdd = false   ;
+
+    public boolean isForceAdd() {
+        return forceAdd;
+    }
 }

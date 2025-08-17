@@ -26,7 +26,7 @@ public class QuizServiceTest {
         
         StartQuizRequest request = new StartQuizRequest();
         request.setCollectionId(1);
-        request.setTotalQuestions(5);
+        request.setQuestionCount(5);
         request.setSeed(12345L);
         
         // This test will fail without proper test setup
@@ -35,7 +35,7 @@ public class QuizServiceTest {
         // For now, just verify the request object is created correctly
         assertNotNull(request);
         assertEquals(1, request.getCollectionId());
-        assertEquals(5, request.getTotalQuestions());
+        assertEquals(5, request.getQuestionCount());
         assertEquals(12345L, request.getSeed());
     }
     
@@ -45,16 +45,16 @@ public class QuizServiceTest {
         
         // Test default values
         assertNull(request.getCollectionId());
-        assertNull(request.getTotalQuestions());
+        assertNull(request.getQuestionCount());
         assertNull(request.getSeed());
         
         // Test setters
         request.setCollectionId(10);
-        request.setTotalQuestions(15);
+        request.setQuestionCount(15);
         request.setSeed(98765L);
         
         assertEquals(10, request.getCollectionId());
-        assertEquals(15, request.getTotalQuestions());
+        assertEquals(15, request.getQuestionCount());
         assertEquals(98765L, request.getSeed());
     }
 }

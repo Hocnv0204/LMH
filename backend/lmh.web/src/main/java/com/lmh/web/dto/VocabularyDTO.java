@@ -15,4 +15,5 @@ public class VocabularyDTO {
     private String audioUrl;
     private Integer collectionId;
     private Integer userId;
+    private String imageUrl ;
 } 

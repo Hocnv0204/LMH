@@ -17,6 +17,8 @@ import { Route as VocabIndexRouteImport } from './routes/vocab/index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as VocabFlashcardRouteImport } from './routes/vocab/flashcard'
+import { Route as QuizSetupRouteImport } from './routes/quiz/setup'
+import { Route as QuizCollectionIdRouteImport } from './routes/quiz/$collectionId'
 import { Route as AuthenticationVerifyRouteImport } from './routes/authentication/verify'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -72,6 +74,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const VocabFlashcardRoute = VocabFlashcardRouteImport.update({
   id: '/vocab/flashcard',
   path: '/vocab/flashcard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizSetupRoute = QuizSetupRouteImport.update({
+  id: '/quiz/setup',
+  path: '/quiz/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizCollectionIdRoute = QuizCollectionIdRouteImport.update({
+  id: '/quiz/$collectionId',
+  path: '/quiz/$collectionId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticationVerifyRoute = AuthenticationVerifyRouteImport.update({
@@ -167,6 +179,8 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/authentication/verify': typeof AuthenticationVerifyRoute
+  '/quiz/$collectionId': typeof QuizCollectionIdRoute
+  '/quiz/setup': typeof QuizSetupRoute
   '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin/': typeof AdminIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -192,6 +206,8 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/authentication/verify': typeof AuthenticationVerifyRoute
+  '/quiz/$collectionId': typeof QuizCollectionIdRoute
+  '/quiz/setup': typeof QuizSetupRoute
   '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin': typeof AdminIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -219,6 +235,8 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/authentication/verify': typeof AuthenticationVerifyRoute
+  '/quiz/$collectionId': typeof QuizCollectionIdRoute
+  '/quiz/setup': typeof QuizSetupRoute
   '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin/': typeof AdminIndexRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -247,6 +265,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/authentication/verify'
+    | '/quiz/$collectionId'
+    | '/quiz/setup'
     | '/vocab/flashcard'
     | '/admin/'
     | '/collections'
@@ -272,6 +292,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/authentication/verify'
+    | '/quiz/$collectionId'
+    | '/quiz/setup'
     | '/vocab/flashcard'
     | '/admin'
     | '/collections'
@@ -298,6 +320,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/register'
     | '/authentication/verify'
+    | '/quiz/$collectionId'
+    | '/quiz/setup'
     | '/vocab/flashcard'
     | '/admin/'
     | '/collections/'
@@ -320,6 +344,8 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   UserRouteRoute: typeof UserRouteRouteWithChildren
   AuthenticationVerifyRoute: typeof AuthenticationVerifyRoute
+  QuizCollectionIdRoute: typeof QuizCollectionIdRoute
+  QuizSetupRoute: typeof QuizSetupRoute
   VocabFlashcardRoute: typeof VocabFlashcardRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
   VocabIndexRoute: typeof VocabIndexRoute
@@ -381,6 +407,20 @@ declare module '@tanstack/react-router' {
       path: '/vocab/flashcard'
       fullPath: '/vocab/flashcard'
       preLoaderRoute: typeof VocabFlashcardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz/setup': {
+      id: '/quiz/setup'
+      path: '/quiz/setup'
+      fullPath: '/quiz/setup'
+      preLoaderRoute: typeof QuizSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz/$collectionId': {
+      id: '/quiz/$collectionId'
+      path: '/quiz/$collectionId'
+      fullPath: '/quiz/$collectionId'
+      preLoaderRoute: typeof QuizCollectionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/authentication/verify': {
@@ -566,6 +606,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   UserRouteRoute: UserRouteRouteWithChildren,
   AuthenticationVerifyRoute: AuthenticationVerifyRoute,
+  QuizCollectionIdRoute: QuizCollectionIdRoute,
+  QuizSetupRoute: QuizSetupRoute,
   VocabFlashcardRoute: VocabFlashcardRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
   VocabIndexRoute: VocabIndexRoute,

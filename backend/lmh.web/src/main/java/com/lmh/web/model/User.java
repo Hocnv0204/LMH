@@ -83,7 +83,10 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<History> histories;
-    
+
+    @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+    private List<CollectionVoca> collectionVocabList ;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<StatusLessonUser> statusLessonUsers;
 

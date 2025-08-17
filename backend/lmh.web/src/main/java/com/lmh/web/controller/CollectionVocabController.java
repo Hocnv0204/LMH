@@ -1,11 +1,14 @@
 package com.lmh.web.controller;
 
+import com.lmh.web.common.utils.PageableUtils;
 import com.lmh.web.dto.CollectionVocabDTO;
 import com.lmh.web.dto.request.collection.CreateCollectionRequest;
 import com.lmh.web.dto.request.collection.UpdateCollectionRequest;
 import com.lmh.web.dto.response.ApiResponse;
 import com.lmh.web.service.CollectionVocabService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +45,21 @@ public class CollectionVocabController {
                         .build()
         ) ;
     }
-    
+    @GetMapping("/user/{id}")
+    public ResponseEntity<ApiResponse<?>> getCollectionByUserId(@PathVariable Integer id ,
+                                                                @RequestParam(defaultValue = "10") int size,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "id") String sortBy
+    ){
+        Pageable pageable = PageableUtils.createPageable(size , page , sortBy) ;
+        Page<CollectionVocabDTO> response = collectionVocabService.findByUserId(id , pageable) ;
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(response)
+                        .success(true)
+                        .build()
+        ) ;
+    }
     // POST: Tạo collection mới
     @PostMapping
     public ResponseEntity<ApiResponse<?>> createCollection(@RequestBody CreateCollectionRequest request) {

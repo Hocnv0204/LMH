@@ -5,21 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuizQuestionResponse {
-    private String questionId;
-    private String question;
-    private List<String> options;
-    private String correctAnswer;
-    private boolean isCorrect;
+public class AnswerResponse {
+    private boolean correct;
     private String message;
+    private QuizQuestionResponse nextQuestion;
     private boolean isCompleted;
     private Integer currentQuestionNumber;
     private Integer totalQuestions;
 }
-

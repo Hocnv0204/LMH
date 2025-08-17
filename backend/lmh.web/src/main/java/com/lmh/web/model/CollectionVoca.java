@@ -26,6 +26,10 @@ public class CollectionVoca {
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vocabulary> vocabularies;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+
+    private User user ;
     public CollectionVoca() {}
 
 

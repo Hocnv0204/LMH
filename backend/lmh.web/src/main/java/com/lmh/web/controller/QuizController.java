@@ -1,9 +1,10 @@
 package com.lmh.web.controller;
 
 import com.lmh.web.dto.request.quiz.StartQuizRequest;
-import com.lmh.web.dto.request.quiz.AnswerQuizRequest;
+import com.lmh.web.dto.request.quiz.AnswerRequest;
 import com.lmh.web.dto.response.quiz.QuizQuestionResponse;
 import com.lmh.web.dto.response.quiz.QuizSessionResponse;
+import com.lmh.web.dto.response.quiz.AnswerResponse;
 import com.lmh.web.dto.response.ApiResponse;
 import com.lmh.web.service.QuizService;
 import jakarta.validation.Valid;
@@ -18,10 +19,10 @@ public class QuizController {
     
     private final QuizService quizService;
     
-    @PostMapping("/start/{userId}")
+    @PostMapping("/start")
     public ResponseEntity<ApiResponse<?>> startQuiz(
             @Valid @RequestBody StartQuizRequest request,
-            @PathVariable Integer userId) {
+            @RequestParam Integer userId) {
         
         QuizSessionResponse response = quizService.startQuiz(request, userId);
         
@@ -35,11 +36,10 @@ public class QuizController {
     
     @PostMapping("/answer")
     public ResponseEntity<ApiResponse<?>> answerQuestion(
-            @Valid @RequestBody AnswerQuizRequest request,
-            @RequestParam String sessionId,
-            @RequestHeader("User-Id") Integer userId) {
+            @Valid @RequestBody AnswerRequest request,
+            @RequestParam Integer userId) {
         
-        QuizQuestionResponse response = quizService.answerQuestion(request, sessionId, userId);
+        AnswerResponse response = quizService.answerQuestion(request, userId);
         
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
@@ -51,10 +51,10 @@ public class QuizController {
     
     @GetMapping("/question")
     public ResponseEntity<ApiResponse<?>> getCurrentQuestion(
-            @RequestParam String sessionId,
-            @RequestHeader("User-Id") Integer userId) {
+            @RequestParam String quizId,
+            @RequestParam Integer userId) {
         
-        QuizQuestionResponse response = quizService.getCurrentQuestion(sessionId, userId);
+        QuizQuestionResponse response = quizService.getCurrentQuestion(quizId, userId);
         
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
@@ -64,12 +64,12 @@ public class QuizController {
         );
     }
     
-    @PostMapping("/end")
-    public ResponseEntity<ApiResponse<?>> endQuiz(
-            @RequestParam String sessionId,
-            @RequestHeader("User-Id") Integer userId) {
+    @PostMapping("/finish")
+    public ResponseEntity<ApiResponse<?>> finishQuiz(
+            @RequestParam String quizId,
+            @RequestParam Integer userId) {
         
-        quizService.endQuiz(sessionId, userId);
+        quizService.finishQuiz(quizId, userId);
         
         return ResponseEntity.ok().body(
                 ApiResponse.builder()

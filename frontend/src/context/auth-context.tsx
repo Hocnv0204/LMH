@@ -6,6 +6,7 @@ import {
   AuthResponse,
   RegisterResponse,
 } from '@/api/auth'
+import { tokenManager } from '@/utils/token-manager'
 
 interface User {
   username: string
@@ -23,6 +24,7 @@ interface AuthContextType {
   register: (userData: RegisterRequest) => Promise<RegisterResponse>
   logout: () => Promise<void>
   forgotPassword: (email: string) => Promise<void>
+  refreshUserState: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -33,10 +35,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Kiểm tra authentication khi component mount
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
-        const currentUser = authService.getCurrentUser()
-        if (currentUser && authService.isAuthenticated()) {
+        const currentUser = await authService.getCurrentUser()
+        const isAuth = await authService.isAuthenticated()
+        if (currentUser && isAuth) {
           setUser(currentUser)
         }
       } catch (error) {
@@ -49,6 +52,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     checkAuth()
+
+    // Lắng nghe token refresh event từ response interceptor
+    const handleTokenRefreshed = (event: CustomEvent) => {
+      console.log('🎯 Token refreshed event received:', event.detail)
+      setUser(event.detail.user)
+    }
+
+    window.addEventListener(
+      'tokenRefreshed',
+      handleTokenRefreshed as EventListener
+    )
+
+    return () => {
+      window.removeEventListener(
+        'tokenRefreshed',
+        handleTokenRefreshed as EventListener
+      )
+    }
   }, [])
 
   const login = async (credentials: LoginRequest): Promise<void> => {
@@ -84,13 +105,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true)
       await authService.logout()
-      setUser(null)
     } catch (error) {
       console.error('Logout error:', error)
-      // Clear user state even if API call fails
-      setUser(null)
+      // Continue with logout even if API call fails
     } finally {
-      setIsLoading(false)
+      // Clear user state
+      setUser(null)
+
+      // Clear tokens và redirect về trang đăng nhập
+      tokenManager.logoutAndRedirect()
     }
   }
 
@@ -103,6 +126,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const refreshUserState = async () => {
+    try {
+      const currentUser = await authService.getCurrentUser()
+      if (currentUser && (await authService.isAuthenticated())) {
+        setUser(currentUser)
+      } else {
+        // If no user returned, clear user state
+        setUser(null)
+      }
+    } catch (error) {
+      console.error('Error refreshing user state:', error)
+      setUser(null)
+    }
+  }
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -111,6 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     forgotPassword,
+    refreshUserState,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

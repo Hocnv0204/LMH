@@ -11,3 +11,4 @@ public interface QuizSessionManager {
     Map<String, QuizSession> getAllSessions();
     void cleanupExpiredSessions();
 }
+

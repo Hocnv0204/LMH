@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react'
-import { authService } from '@/api/auth'
+import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  RotateCcw,
+  Image as ImageIcon,
+} from 'lucide-react'
 import { vocabApi, type VocabularyDTO } from '@/api/vocab'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -9,6 +14,9 @@ import { IndexTopBar } from '@/components/layout/index-top-bar'
 
 export const Route = createFileRoute('/vocab/flashcard')({
   component: FlashcardPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    collection: search.collection as string | undefined,
+  }),
 })
 
 function FlashcardPage() {
@@ -16,30 +24,54 @@ function FlashcardPage() {
   const [current, setCurrent] = useState(0)
   const [flip, setFlip] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [collectionName, setCollectionName] = useState<string>('')
+  const [imageLoading, setImageLoading] = useState<{
+    [key: number]: boolean | undefined
+  }>({})
+
+  // Lấy collection ID từ URL search params
+  const search = useSearch({ from: '/vocab/flashcard' })
+  const collectionId = (search as { collection?: string }).collection
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!collectionId) {
+        setError('Không có collection được chọn')
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(true)
+      setError(null)
+
       try {
-        const user = authService.getCurrentUser()
-        if (!user || !user.id) {
-          throw new Error('User not authenticated')
+        // Lấy vocab theo collection ID
+        const vocabList = await vocabApi.getByCollectionId(Number(collectionId))
+        setItems(vocabList)
+
+        // Lấy tên collection để hiển thị
+        if (vocabList.length > 0 && vocabList[0].collectionName) {
+          setCollectionName(vocabList[0].collectionName)
         }
-        const userId = parseInt(user.id)
-        const list = await vocabApi.list(userId)
-        setItems(list)
       } catch (error) {
         console.error('Failed to load vocabulary:', error)
+        setError('Không thể tải từ vựng của collection này')
       } finally {
         setIsLoading(false)
       }
     }
     fetchData()
-  }, [])
+  }, [collectionId])
 
   const next = () => {
     setFlip(false)
     setCurrent((i) => (i + 1) % Math.max(items.length || 1, 1))
+    // Reset image loading for next card
+    if (items.length > 0) {
+      const nextIndex = (current + 1) % items.length
+      setImageLoading((prev) => ({ ...prev, [items[nextIndex].id]: undefined }))
+    }
   }
 
   const prev = () => {
@@ -49,11 +81,18 @@ function FlashcardPage() {
         (i - 1 + Math.max(items.length || 1, 1)) %
         Math.max(items.length || 1, 1)
     )
+    // Reset image loading for previous card
+    if (items.length > 0) {
+      const prevIndex = (current - 1 + items.length) % items.length
+      setImageLoading((prev) => ({ ...prev, [items[prevIndex].id]: undefined }))
+    }
   }
 
   const reset = () => {
     setFlip(false)
     setCurrent(0)
+    // Reset all image loading states
+    setImageLoading({})
   }
 
   const item = items[current]
@@ -76,12 +115,21 @@ function FlashcardPage() {
       <IndexTopBar />
       <main className='mx-auto max-w-3xl px-4 py-8'>
         <div className='mb-6 flex items-center justify-between'>
-          <Link to='/vocab'>
-            <Button variant='ghost'>
-              <ArrowLeft className='mr-2 h-4 w-4' />
-              Quay lại Vocab
-            </Button>
-          </Link>
+          <div className='flex items-center gap-4'>
+            <Link to='/vocab'>
+              <Button variant='ghost'>
+                <ArrowLeft className='mr-2 h-4 w-4' />
+                Quay lại Vocab
+              </Button>
+            </Link>
+
+            {collectionName && (
+              <div className='text-muted-foreground text-sm'>
+                Collection:{' '}
+                <span className='font-medium'>{collectionName}</span>
+              </div>
+            )}
+          </div>
 
           {items.length > 0 && (
             <div className='text-muted-foreground text-sm'>
@@ -90,18 +138,25 @@ function FlashcardPage() {
           )}
         </div>
 
-        {items.length === 0 ? (
-          <div className='text-muted-foreground rounded-lg border p-8 text-center'>
-            <p className='mb-4'>Chưa có từ vựng nào.</p>
+        {error ? (
+          <div className='text-destructive border-destructive/50 rounded-lg border p-8 text-center'>
+            <p className='mb-4'>{error}</p>
             <Link to='/vocab'>
-              <Button>Thêm từ vựng đầu tiên</Button>
+              <Button>Quay lại Vocab</Button>
+            </Link>
+          </div>
+        ) : items.length === 0 ? (
+          <div className='text-muted-foreground rounded-lg border p-8 text-center'>
+            <p className='mb-4'>Collection này chưa có từ vựng nào.</p>
+            <Link to='/vocab'>
+              <Button>Quay lại Vocab</Button>
             </Link>
           </div>
         ) : (
           <div className='flex flex-col items-center gap-6'>
             {/* Flashcard */}
             <div
-              className={`border-border bg-card relative h-80 w-full max-w-2xl cursor-pointer rounded-2xl border-2 p-8 text-center shadow-lg transition-all duration-500 [transform-style:preserve-3d] hover:shadow-xl ${
+              className={`border-border bg-card relative h-96 w-full max-w-2xl cursor-pointer rounded-2xl border-2 p-8 text-center shadow-lg transition-all duration-500 [transform-style:preserve-3d] hover:shadow-xl ${
                 flip ? '[transform:rotateY(180deg)]' : ''
               }`}
               onClick={() => setFlip((f) => !f)}
@@ -109,6 +164,49 @@ function FlashcardPage() {
             >
               {/* Front side - English term */}
               <div className='absolute inset-0 flex flex-col items-center justify-center backface-hidden'>
+                {/* Image display */}
+                {item.imageUrl && (
+                  <div className='mb-4 w-full max-w-xs'>
+                    {imageLoading[item.id] !== false && (
+                      <div className='border-border/20 bg-muted/20 mx-auto flex h-36 w-32 items-center justify-center rounded-xl border'>
+                        <ImageIcon className='text-muted-foreground h-8 w-8 animate-pulse' />
+                      </div>
+                    )}
+                    <img
+                      src={item.imageUrl}
+                      alt={`Image for ${item.term}`}
+                      className={`border-border/20 mx-auto h-36 w-auto rounded-xl border object-contain shadow-lg transition-opacity duration-300 ${
+                        imageLoading[item.id] === false
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      }`}
+                      onError={(e) => {
+                        // Hide image if it fails to load
+                        const target = e.target as HTMLImageElement
+                        target.style.display = 'none'
+                        setImageLoading((prev) => ({
+                          ...prev,
+                          [item.id]: false,
+                        }))
+                      }}
+                      onLoad={() => {
+                        // Show image when loaded
+                        setImageLoading((prev) => ({
+                          ...prev,
+                          [item.id]: false,
+                        }))
+                      }}
+                      onLoadStart={() => {
+                        // Set loading state
+                        setImageLoading((prev) => ({
+                          ...prev,
+                          [item.id]: true,
+                        }))
+                      }}
+                    />
+                  </div>
+                )}
+
                 <div className='text-primary mb-4 text-4xl font-bold'>
                   {item.term}
                 </div>

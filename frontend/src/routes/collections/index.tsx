@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import type { PageResponse } from '@/types/common'
 import { Plus, Trash2, Pencil, ArrowLeft } from 'lucide-react'
+import { authService } from '@/api/auth'
+import { api } from '@/api/client'
 import { collectionApi, type CollectionDTO } from '@/api/collection'
 import { useToast } from '@/hooks/use-toast'
 import {
@@ -51,21 +54,27 @@ function CollectionsPage() {
     fetchCollections()
   }, [])
 
-  const fetchCollections = async () => {
+  const fetchCollections = async (page = 0, size = 10) => {
     setIsLoading(true)
     setError(null)
     try {
-      const list = await collectionApi.list()
-      console.log('Collections data from API:', list)
+      const currentUser = await authService.getCurrentUser()
+      const userId = Number(currentUser?.id)
+      if (!userId) {
+        throw new Error('Không xác định được người dùng từ token')
+      }
 
-      // Transform data để match với expected CollectionDTO structure
-      const transformedCollections = list.map((collection) => ({
+      const { data } = await api.get<PageResponse<CollectionDTO>>(
+        `/api/collection/user/${userId}`,
+        { params: { page, size } }
+      )
+
+      const transformedCollections = (data.content || []).map((collection) => ({
         id: collection.id,
-        collectionName: collection.collectionName, // Map collectionName -> collectionName
-        vocabularyDTOList: collection.vocabularyDTOList || [], // Map vocabularyDTOList -> vocabularyDTOList
+        collectionName: collection.collectionName,
+        vocabularyDTOList: collection.vocabularyDTOList || [],
       }))
 
-      console.log('Transformed collections:', transformedCollections)
       setCollections(transformedCollections)
     } catch (e) {
       const msg = (e as Error)?.message || 'Không thể tải danh sách chủ đề.'
@@ -77,7 +86,10 @@ function CollectionsPage() {
 
   const handleCreate = async (collectionName: string) => {
     try {
-      const created = await collectionApi.create({ collectionName })
+      const currentUser = await authService.getCurrentUser()
+      const userId = Number(currentUser?.id)
+      if (!userId) throw new Error('Không xác định được người dùng từ token')
+      const created = await collectionApi.create({ userId, collectionName })
       // Transform created collection too
       const transformedCreated = {
         id: created.id,
@@ -86,10 +98,6 @@ function CollectionsPage() {
       }
       setCollections((prev) => [transformedCreated, ...prev])
       setShowCreateDialog(false)
-      toast({
-        title: 'Thành công',
-        description: 'Tạo chủ đề thành công',
-      })
     } catch (e) {
       const msg = (e as Error).message
       if (msg?.includes('COLLECTION_EXISTS')) {
