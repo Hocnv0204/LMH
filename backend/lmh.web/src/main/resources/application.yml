@@ -74,7 +74,7 @@ gemini:
 
 app:
 #  base-url: http://localhost:5173
-  base-url : https://api-lmh-writting-practice.id.vn
+  base-url : https://lmh-writting-practice.web.app
   verification:
     token:
       expiry: 86400000
