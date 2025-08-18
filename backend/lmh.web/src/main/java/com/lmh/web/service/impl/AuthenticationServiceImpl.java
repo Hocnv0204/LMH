@@ -88,7 +88,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 () -> new AppException(ErrorCode.USER_NOT_EXISTS)
         );
         if(!user.isEnable()){
-            throw new AppException(ErrorCode.UNAUTHORIZED) ; 
+            throw new AppException(ErrorCode.UNAUTHORIZED) ;
         }
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!authenticated) {
