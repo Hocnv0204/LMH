@@ -58,7 +58,7 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
                 .refreshToken(refreshToken)
                 .build() ;
 //        String frontendUrl = "http://localhost:5173";
-        String frontendUrl = "https://api-lmh-writting-practice.id.vn" ;
+        String frontendUrl = "https://lmh-writting-practice.web.app" ;
         String redirectUrl = String.format("%s/auth/google-callback?accessToken=%s&refreshToken=%s&authenticated=true",
                 frontendUrl, accessToken, refreshToken);
 
