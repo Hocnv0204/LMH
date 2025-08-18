@@ -87,11 +87,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userRepository.findByUsername(request.getUsername()).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTS)
         );
-
+        if(!user.isEnable()){
+            throw new AppException(ErrorCode.UNAUTHORIZED) ; 
+        }
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+
         var accessToken = generateAccessToken(user) ;
         var refreshToken = generateRefreshToken(user) ;
         redisService.savedRefreshToken(user.getId() , refreshToken);

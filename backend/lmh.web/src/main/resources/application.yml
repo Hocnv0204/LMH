@@ -32,6 +32,8 @@ spring:
           google:
             client-id: 35790031845-c8n8krgp3rs5464q0dt7tlj74ps79kmb.apps.googleusercontent.com
             client-secret: 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
+            redirect-uri: https://api-lmh-writting-practice.id.vn/login/oauth2/code/google
+
             scope:
               - openid
               - profile

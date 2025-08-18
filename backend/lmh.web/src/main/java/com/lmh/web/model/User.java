@@ -97,6 +97,9 @@ public class User {
     private List<StatusLessonUser> statusLessonUsers;
 
     public User() {}
+    public boolean isEnable(){
+        return this.enable ;
+    }
    
     @Override
     public String toString() {
