@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { CreateLessonRequest, UpdateLessonRequest } from '@/api/lesson'
 import { useLessons } from '@/hooks/use-lessons'
+import { useAuth } from '@/context/auth-context'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -59,6 +60,7 @@ export default function LessonsPage({
   userId,
 }: LessonsPageProps) {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const {
     lessons,
     loading,
@@ -85,7 +87,7 @@ export default function LessonsPage({
     note: '',
   })
 
-  const currentUsername = 'minh' // TODO: Get from auth context
+  const currentUsername = user?.username || ''
 
   useEffect(() => {
     fetchLessons({
@@ -128,6 +130,11 @@ export default function LessonsPage({
       return
     }
 
+    if (!currentUsername) {
+      alert('Bạn cần đăng nhập để tạo bài học')
+      return
+    }
+
     try {
       const lessonData: CreateLessonRequest = {
         name: formData.name,
@@ -149,6 +156,11 @@ export default function LessonsPage({
     e.preventDefault()
     if (!editingLesson) return
 
+    if (!currentUsername) {
+      alert('Bạn cần đăng nhập để cập nhật bài học')
+      return
+    }
+
     try {
       const lessonData: UpdateLessonRequest = {
         name: formData.name,
@@ -168,6 +180,11 @@ export default function LessonsPage({
 
   const handleDeleteLesson = async () => {
     if (!deletingLesson) return
+
+    if (!currentUsername) {
+      alert('Bạn cần đăng nhập để xóa bài học')
+      return
+    }
 
     try {
       await deleteLesson(currentUsername, deletingLesson.name)
