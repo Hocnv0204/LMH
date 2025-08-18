@@ -87,7 +87,8 @@ export default function LoginPage() {
 
     try {
       const API_BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'
+        import.meta.env.VITE_API_BASE_URL ||
+        'https://api-lmh-writting-practice.id.vn'
 
       // Mở popup window cho Google OAuth
       const popup = window.open(

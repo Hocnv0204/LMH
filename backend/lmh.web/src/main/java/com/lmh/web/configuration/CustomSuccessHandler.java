@@ -57,7 +57,8 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build() ;
-        String frontendUrl = "http://localhost:5173"; // Hoặc lấy từ config
+//        String frontendUrl = "http://localhost:5173";
+        String frontendUrl = "https://api-lmh-writting-practice.id.vn" ;
         String redirectUrl = String.format("%s/auth/google-callback?accessToken=%s&refreshToken=%s&authenticated=true",
                 frontendUrl, accessToken, refreshToken);
 
