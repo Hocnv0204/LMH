@@ -1,7 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Mail, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react'
-import { authService } from '@/api/auth'
+import {
+  Mail,
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle,
+  RefreshCw,
+  Clock,
+} from 'lucide-react'
+import { authService, TypeToken } from '@/api/auth'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,6 +25,31 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState(false)
+  const [isResending, setIsResending] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const [message, setMessage] = useState('')
+
+  const isMounted = useRef(true)
+
+  // Cleanup proper
+  useEffect(() => {
+    isMounted.current = true
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        if (isMounted.current) {
+          setResendCooldown(resendCooldown - 1)
+        }
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [resendCooldown])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,21 +58,29 @@ export default function ForgotPasswordPage() {
 
     try {
       await authService.forgotPassword({ email })
-      setSuccess(true)
+      if (isMounted.current) {
+        setSuccess(true)
+        setMessage('Email đặt lại mật khẩu đã được gửi!')
+        setResendCooldown(60)
+      }
       console.log('✅ Forgot password email sent successfully')
     } catch (error) {
       console.error('❌ Forgot password error:', error)
-      if (error instanceof Error) {
-        if (error.message.includes('EMAIL_NOT_EXISTS')) {
-          setError('Email này không tồn tại trong hệ thống')
+      if (isMounted.current) {
+        if (error instanceof Error) {
+          if (error.message.includes('EMAIL_NOT_EXISTS')) {
+            setError('Email này không tồn tại trong hệ thống')
+          } else {
+            setError(error.message)
+          }
         } else {
-          setError(error.message)
+          setError('Có lỗi xảy ra. Vui lòng thử lại')
         }
-      } else {
-        setError('Có lỗi xảy ra. Vui lòng thử lại')
       }
     } finally {
-      setIsLoading(false)
+      if (isMounted.current) {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -49,6 +89,92 @@ export default function ForgotPasswordPage() {
     // Clear error when user starts typing
     if (error) {
       setError('')
+    }
+  }
+
+  const handleResendEmail = async () => {
+    if (!email) return
+
+    try {
+      setIsResending(true)
+      setError('')
+
+      // Thử gọi API resend-reset-password trước
+      try {
+        const response = await authService.resendResetPassword({
+          email,
+          typeToken: TypeToken.RESET_PASSWORD_TOKEN,
+        })
+        if (isMounted.current) {
+          setMessage(
+            response.message || 'Email đặt lại mật khẩu đã được gửi lại!'
+          )
+          setResendCooldown(60)
+        }
+        return
+      } catch (resendError) {
+        console.log(
+          'Resend API failed, trying fallback to forgot-password:',
+          resendError
+        )
+
+        // Nếu resend-reset-password thất bại, fallback về forgot-password
+        if (
+          resendError instanceof Error &&
+          (resendError.message.includes('500') ||
+            resendError.message.includes('Internal Server Error'))
+        ) {
+          console.log('Using fallback: calling forgot-password API')
+          try {
+            await authService.forgotPassword({ email })
+            if (isMounted.current) {
+              setMessage(
+                'Email đặt lại mật khẩu đã được gửi lại! (sử dụng phương thức dự phòng)'
+              )
+              setResendCooldown(60)
+            }
+            return
+          } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError)
+            // Nếu fallback cũng thất bại, throw error để xử lý bên dưới
+            throw fallbackError
+          }
+        }
+
+        // Nếu không phải lỗi 500, throw lại để xử lý error handling bên dưới
+        throw resendError
+      }
+    } catch (error) {
+      if (isMounted.current) {
+        let errorMessage = 'Gửi lại email thất bại'
+
+        if (error instanceof Error) {
+          const errorText = error.message.toLowerCase()
+
+          if (
+            errorText.includes('user_not_exists') ||
+            errorText.includes('email_not_exists')
+          ) {
+            errorMessage = 'Email này không tồn tại trong hệ thống'
+          } else if (errorText.includes('token_not_exists')) {
+            errorMessage =
+              'Không tìm thấy yêu cầu đặt lại mật khẩu. Vui lòng thử gửi yêu cầu mới.'
+          } else if (errorText.includes('token_exists')) {
+            errorMessage =
+              'Email đặt lại mật khẩu vẫn còn hiệu lực. Vui lòng kiểm tra hộp thư của bạn.'
+          } else if (errorText.includes('500')) {
+            errorMessage = 'Lỗi server tạm thời. Vui lòng thử lại sau.'
+          } else {
+            errorMessage = error.message
+          }
+        }
+
+        setError(errorMessage)
+      }
+    } finally {
+      if (isMounted.current) {
+        setIsResending(false)
+      }
     }
   }
 
@@ -80,16 +206,46 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
 
+              {/* Success Message */}
+              {message && (
+                <div className='rounded-md bg-green-50 p-3 dark:bg-green-950'>
+                  <p className='text-sm text-green-700 dark:text-green-300'>
+                    {message}
+                  </p>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className='flex items-center space-x-2 rounded-md border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400'>
+                  <AlertCircle className='h-4 w-4 flex-shrink-0' />
+                  <span className='text-sm'>{error}</span>
+                </div>
+              )}
+
               <div className='flex space-x-2'>
                 <Button
                   variant='outline'
                   className='flex-1'
-                  onClick={() => {
-                    setSuccess(false)
-                    setEmail('')
-                  }}
+                  onClick={handleResendEmail}
+                  disabled={isResending || resendCooldown > 0}
                 >
-                  Gửi lại email
+                  {isResending ? (
+                    <>
+                      <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
+                      Đang gửi lại...
+                    </>
+                  ) : resendCooldown > 0 ? (
+                    <>
+                      <Clock className='mr-2 h-4 w-4' />
+                      Gửi lại sau {resendCooldown}s
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className='mr-2 h-4 w-4' />
+                      Gửi lại email
+                    </>
+                  )}
                 </Button>
                 <Link to='/auth/login' className='flex-1'>
                   <Button className='w-full'>Quay lại đăng nhập</Button>

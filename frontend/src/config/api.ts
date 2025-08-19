@@ -17,8 +17,9 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: '/api/auth/refresh',
     FORGOT_PASSWORD: '/api/auth/forgot-password',
     VERIFY_EMAIL: '/api/auth/verify',
-    RESEND_VERIFICATION: '/api/auth/resend-verification',
+    RESEND_VERIFICATION: '/api/auth/resend-register',
     RESET_PASSWORD: '/api/auth/reset-password',
+    RESEND_RESET_PASSWORD: '/api/auth/resend-reset-password',
   },
 } as const
 

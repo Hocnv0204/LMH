@@ -83,9 +83,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse login(LoginRequest request) {
-        var user = userRepository.findByUsername(request.getUsername()).orElseThrow(
-                () -> new AppException(ErrorCode.USER_NOT_EXISTS)
-        );
+        User user = new User() ;
+        if(request.getUsername().contains("@")){
+            user = userRepository.findByEmailIgnoreCase(request.getUsername()).orElseThrow(
+                    () -> new AppException(ErrorCode.USER_NOT_EXISTS)
+            ) ;
+        }
+        else {
+            user = userRepository.findByUsername(request.getUsername()).orElseThrow(
+                    () -> new AppException(ErrorCode.USER_NOT_EXISTS)
+            );
+        }
+
         if(!user.isEnable()){
             throw new AppException(ErrorCode.UNAUTHORIZED) ;
         }
