@@ -196,7 +196,7 @@ export default function LoginPage() {
                   id='username'
                   name='username'
                   type='text'
-                  placeholder='Nhập tên đăng nhập'
+                  placeholder='Nhập tên đăng nhập hoặc email'
                   value={formData.username}
                   onChange={handleInputChange}
                   className='pl-10'

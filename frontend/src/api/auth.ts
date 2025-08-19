@@ -1,6 +1,4 @@
-import axios from 'axios'
 import { API_ENDPOINTS } from '@/config/api'
-import { API_CONFIG } from '@/config/api'
 import { api, handleApiError } from './client'
 
 // Types
@@ -59,6 +57,18 @@ export interface RefreshTokenRequest {
   refreshToken: string
 }
 
+export const TypeToken = {
+  VERIFICATION_TOKEN: 'VERIFICATION_TOKEN',
+  RESET_PASSWORD_TOKEN: 'RESET_PASSWORD_TOKEN',
+} as const
+
+export type TypeToken = (typeof TypeToken)[keyof typeof TypeToken]
+
+export interface ResendTokenRequest {
+  email: string
+  typeToken: TypeToken
+}
+
 // Auth service
 export const authService = {
   // Login user
@@ -115,6 +125,22 @@ export const authService = {
     try {
       const response = await api.post<{ message: string }>(
         API_ENDPOINTS.AUTH.RESEND_VERIFICATION,
+        data
+      )
+
+      return response.data
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // Resend reset password email
+  async resendResetPassword(
+    data: ResendTokenRequest
+  ): Promise<{ message: string }> {
+    try {
+      const response = await api.post<{ message: string }>(
+        API_ENDPOINTS.AUTH.RESEND_RESET_PASSWORD,
         data
       )
 

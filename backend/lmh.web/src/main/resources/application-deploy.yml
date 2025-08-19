@@ -68,7 +68,7 @@ gemini:
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
 
 app:
-#  base-url: http://localhost:8081
+#  base-url: http://localhost:5173
   base-url : https://lmh-writting-practice.web.app
   verification:
     token:
