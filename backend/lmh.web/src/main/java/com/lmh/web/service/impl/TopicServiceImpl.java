@@ -73,6 +73,7 @@ public class TopicServiceImpl implements TopicService {
         topic.setUser(user);
         topic.setLevel(level);
         topic.setType(TypeTopic.USER_CREATION);
+        topic.setDeleteFlag(false);
         return topicMapper.toResponse(topicRepository.save(topic));
     }
 
