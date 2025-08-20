@@ -89,7 +89,7 @@ export const useLessons = (): UseLessonsReturn => {
       }
 
       const data = await response.json();
-      
+      console.log(userId, levelName, languageName, topicName, data);
       if (data && data.data) {
         setLessons(data.data.content || []);
         setTotalPages(data.data.totalPages || 0);

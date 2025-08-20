@@ -4,12 +4,14 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.lmh.web.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
@@ -76,7 +78,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         // Kiểm tra subDirectory (nếu có)
         if (subDirectory != null && !subDirectory.isEmpty() && !publicId.startsWith(subDirectory + "/")) {
-            System.out.println("Warning: Public ID does not match expected subDirectory. Public ID: " + publicId + ", Expected subDirectory: " + subDirectory + ". URL: " + fileUrl);
+            log.warn("Public ID does not match expected subDirectory. Public ID: {}, Expected subDirectory: {}, URL: {}", 
+                    publicId, subDirectory, fileUrl);
         }
 
         return publicId;

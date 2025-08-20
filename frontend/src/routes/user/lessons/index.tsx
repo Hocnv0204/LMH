@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import LessonsPage from '@/features/user/lessons'
+import { useAuth } from '@/context/auth-context'
 
 interface LessonsSearch {
   levelId: number
@@ -10,6 +11,15 @@ interface LessonsSearch {
 }
 
 export const Route = createFileRoute('/user/lessons/')({
+  beforeLoad: ({ search }) => {
+    const s = search as Record<string, unknown>
+    const levelId = Number(s.levelId)
+    const levelName = String(s.levelName || '')
+    const languageName = String(s.languageName || '')
+    if (!languageName || !levelName || !Number.isFinite(levelId)) {
+      throw redirect({ to: '/user/level' })
+    }
+  },
   component: LessonsPageComponent,
   validateSearch: (search: Record<string, unknown>): LessonsSearch => {
     return {
@@ -24,7 +34,10 @@ export const Route = createFileRoute('/user/lessons/')({
 
 function LessonsPageComponent() {
   const { levelId, levelName, languageName, topicId, topicName } = Route.useSearch()
-  
+  const { user, isLoading } = useAuth()
+
+  if (isLoading || !user?.id) return null
+
   return (
     <LessonsPage 
       levelId={levelId}
@@ -32,8 +45,7 @@ function LessonsPageComponent() {
       languageName={languageName}
       topicId={topicId}
       topicName={topicName}
-      userId={1} // Replace with actual user ID from auth context
+      userId={Number(user.id)}
     />
   )
 }
-
