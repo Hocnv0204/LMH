@@ -81,6 +81,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final VerificationTokenRepository verificationTokenRepository ;
 
+    private final Integer INIT_CREDIT = 10;
+
 
     @Override
     public AuthenticationResponse login(LoginRequest request) {
@@ -260,6 +262,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .school(request.getSchool())
                 .phoneNumber(request.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
+                .credit(INIT_CREDIT)
                 .enable(false)
                 .build() ;
         User savedUser = userRepository.save(user) ;
