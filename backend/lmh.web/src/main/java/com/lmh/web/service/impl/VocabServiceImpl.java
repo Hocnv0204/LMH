@@ -19,6 +19,7 @@ import com.lmh.web.repository.VocabularyRepository;
 import com.lmh.web.service.FileStorageService;
 import com.lmh.web.service.VocabService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VocabServiceImpl implements VocabService {
@@ -60,7 +62,7 @@ public class VocabServiceImpl implements VocabService {
         DictionaryApiResponse[] apiResponse = callDictionaryApi(request.getTerm());
         boolean isInvalid = (apiResponse == null || apiResponse.length == 0 ) ;
         if (isInvalid && !request.isForceAdd()) {
-            System.out.println(request.isForceAdd());
+            log.debug("Force add flag: {}", request.isForceAdd());
             throw new AppException(ErrorCode.WORD_INVALID) ;
         }
         

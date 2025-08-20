@@ -1,20 +1,18 @@
 import { apiClient } from './client';
+import { HistoryResponse } from './history';
 
 export interface GeminiRequest {
   question: string;
   answer: string;
 }
 
-export interface GeminiValidationResponse {
-  score: number;
-  status: 'perfect' | 'good' | 'needs_improvement';
+export interface GeminiAskResponse {
+  data: HistoryResponse;
   message?: string;
-  comment?: string;
-  improvement_suggestions?: string;
-  correct_answer?: string;
+  httpStatus?: string;
 }
 
 export const geminiApi = {
   askGemini: (username: string, lessonId: number, request: GeminiRequest) =>
-    apiClient.post<GeminiValidationResponse>(`/user/gemini/ask/${username}/${lessonId}`, request)
+    apiClient.post<GeminiAskResponse>(`/user/gemini/ask/${username}/${lessonId}`, request)
 };

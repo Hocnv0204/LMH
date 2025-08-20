@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import TopicsPage from '@/features/user/topics'
 
 interface TopicsSearch {
@@ -8,6 +8,15 @@ interface TopicsSearch {
 }
 
 export const Route = createFileRoute('/user/topics/')({
+  beforeLoad: ({ search }) => {
+    const s = search as Record<string, unknown>
+    const levelId = Number(s.levelId)
+    const levelName = String(s.levelName || '')
+    const languageName = String(s.languageName || '')
+    if (!languageName || !levelName || !Number.isFinite(levelId)) {
+      throw redirect({ to: '/user/level' })
+    }
+  },
   component: TopicsPageComponent,
   validateSearch: (search: Record<string, unknown>): TopicsSearch => {
     return {

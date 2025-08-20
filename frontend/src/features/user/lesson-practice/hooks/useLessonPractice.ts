@@ -68,6 +68,15 @@ export function useLessonPractice(lessonId: number, username: string) {
     
     setIsValidating(true);
     setError(null);
+
+    const parseResult = (result: string): ValidationResult | null => {
+      try {
+        const cleaned = result.replace(/```json\n?|\n?```/g, '').trim();
+        return JSON.parse(cleaned) as ValidationResult;
+      } catch {
+        return null;
+      }
+    };
     
     try {
       const response = await geminiApi.askGemini(username, lessonId, {
@@ -75,7 +84,14 @@ export function useLessonPractice(lessonId: number, username: string) {
         answer: userAnswer.trim()
       });
       
-      setValidationResult(response.data);
+      const history = response.data.data; // CustomResponse<HistoryResponse>
+      const parsed = parseResult(history.result);
+      if (parsed) {
+        setValidationResult(parsed);
+      } else {
+        setValidationResult(null);
+        setError('Phản hồi không hợp lệ từ máy chấm');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi kiểm tra câu trả lời');
     } finally {

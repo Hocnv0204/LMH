@@ -142,6 +142,8 @@ export default function LessonsPage({
         paragraph: formData.paragraph,
         note: formData.note,
         topicName: selectedTopic,
+        languageRequest: { name: languageName },
+        levelRequest: { name: levelName },
       }
 
       await createLesson(currentUsername, lessonData)

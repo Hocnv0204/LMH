@@ -5,6 +5,7 @@ import com.lmh.web.dto.response.ApiResponse;
 import com.lmh.web.exception.ErrorCode;
 import com.lmh.web.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/upload")
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class FileUploadController {
                             .build()
             ) ;
         }catch(IOException e){
-            e.printStackTrace();
+            log.error("Failed to upload file: {}", e.getMessage(), e);
             return ResponseEntity.ok().body(
                     ApiResponse.builder()
                             .success(false)

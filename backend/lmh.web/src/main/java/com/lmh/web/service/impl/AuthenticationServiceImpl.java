@@ -188,7 +188,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             verifiedToken(token, false);
         } catch (AppException e) {
-            e.printStackTrace();
+            log.error("Token introspection failed: {}", e.getMessage(), e);
             valid = false;
         }
         return IntrospectResponse.builder()

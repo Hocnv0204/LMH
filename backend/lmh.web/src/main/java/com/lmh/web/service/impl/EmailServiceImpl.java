@@ -2,11 +2,13 @@ package com.lmh.web.service.impl;
 
 import com.lmh.web.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
@@ -32,7 +34,7 @@ public class EmailServiceImpl implements EmailService {
                     "Trân trọng!");
             mailSender.send(message);
         }catch(Exception e){
-            e.printStackTrace();
+            log.error("Failed to send verification email to {}: {}", toEmail, e.getMessage(), e);
         }
     }
 

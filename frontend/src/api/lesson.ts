@@ -19,6 +19,8 @@ export interface CreateLessonRequest {
   paragraph: string
   note?: string
   topicName: string
+  languageRequest: { name: string }
+  levelRequest: { name: string }
 }
 
 export interface UpdateLessonRequest {
@@ -26,6 +28,7 @@ export interface UpdateLessonRequest {
   description: string
   paragraph: string
   note?: string
+  topicName?: string
 }
 
 export const lessonApi = {

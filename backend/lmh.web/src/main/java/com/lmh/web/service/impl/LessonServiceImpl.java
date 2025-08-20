@@ -8,13 +8,9 @@ import com.lmh.web.common.utils.PageableUtils;
 import com.lmh.web.dto.request.lesson.LessonRequest;
 import com.lmh.web.dto.request.lesson.UpdateLessonUser;
 import com.lmh.web.dto.response.lesson.LessonResponse;
-import com.lmh.web.model.Lesson;
-import com.lmh.web.model.Topic;
-import com.lmh.web.model.User;
+import com.lmh.web.model.*;
 import com.lmh.web.repository.LessonRepository;
-import com.lmh.web.service.LessonService;
-import com.lmh.web.service.TopicService;
-import com.lmh.web.service.UserService;
+import com.lmh.web.service.*;
 import com.lmh.web.utils.mapper.lesson.LessonMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,9 +27,16 @@ import java.util.Optional;
 public class LessonServiceImpl implements LessonService {
     
     private final UserService userService;
+
     private final TopicService topicService;
+
     private final LessonRepository lessonRepository;
+
     private final LessonMapper lessonMapper;
+
+    private final LanguageService languageService;
+
+    private final LevelService levelService;
 
     @Override
     public Page<LessonResponse> getLessonByUserLanguageLevelTopic(Integer userId, String levelName
@@ -50,21 +53,26 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public LessonResponse addLessonUser(String username, LessonRequest lessonRequest) {
-        User user = userService.getUserByUsername(username);
-        Topic topic = topicService.findByName(lessonRequest.getTopicName());
-        
         boolean isExistLessonName = lessonRepository.existsByName(lessonRequest.getName());
         if (isExistLessonName) {
             throw new DataExistedException("Existed name lesson - " + lessonRequest.getName());
         }
+
+        User user = userService.getUserByUsername(username);
+        Topic topic = topicService.findByName(lessonRequest.getTopicName());
+        Language language = languageService.findByName(lessonRequest.getLanguageRequest().getName());
+        Level level = levelService.findByName(lessonRequest.getLevelRequest().getName());
         
         Lesson lesson = lessonMapper.toEntity(lessonRequest);
         lesson.setTopic(topic);
+        lesson.setLanguage(language);
+        lesson.setLevel(level);
         lesson.setType(TypeLesson.USER_CREATION);
         lesson.setCreatedAt(LocalDateTime.now());
         lesson.setUpdatedAt(LocalDateTime.now());
         lesson.setStatus("ACTIVE");
         lesson.setUser(user);
+        lesson.setDeleteFlag(false);
         
         return lessonMapper.toResponse(lessonRepository.save(lesson));
     }
