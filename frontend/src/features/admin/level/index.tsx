@@ -28,9 +28,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Header } from '@/components/layout/header'
+import { Header } from '@/features/admin/components/header'
 import { LevelForm } from './level-form'
-import { LevelsPagination } from './levels-pagination'
+import { AdminPagination } from '@/features/admin/components/admin-pagination'
 import { LevelsTable } from './levels-table'
 
 export default function LevelsManagementPage() {
@@ -198,7 +198,7 @@ export default function LevelsManagementPage() {
 
           {data?.data && (
             <div className='mt-4'>
-              <LevelsPagination
+              <AdminPagination
                 pageData={data.data}
                 currentPage={filters.page}
                 pageSize={filters.size}

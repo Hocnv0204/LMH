@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Home, LogOut, BookOpen, Target, LogIn, Settings } from 'lucide-react'
+import { Home, LogOut, BookOpen, Target, LogIn, Settings, User, Shield } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,10 @@ import { Separator } from '@/components/ui/separator'
 
 export function IndexTopBar() {
   const { user, isAuthenticated, logout } = useAuth()
+  
+  // Kiểm tra xem user có phải là admin không
+  const isAdmin = user?.role === 'ADMIN'
+  
   return (
     <header className='bg-background border-b px-6 py-4'>
       <div className='flex w-full items-center justify-between'>
@@ -93,6 +97,12 @@ export function IndexTopBar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
+                  <Link to='/user/profile'>
+                    <User className='mr-2 h-4 w-4' />
+                    Hồ sơ cá nhân
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to='/user/level'>
                     <BookOpen className='mr-2 h-4 w-4' />
                     Bài học của tôi
@@ -111,6 +121,17 @@ export function IndexTopBar() {
                     Chủ đề của tôi
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to='/admin'>
+                        <Shield className='mr-2 h-4 w-4' />
+                        Trang quản trị
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Settings className='mr-2 h-4 w-4' />

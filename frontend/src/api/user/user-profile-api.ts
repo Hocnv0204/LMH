@@ -6,7 +6,7 @@ import type {
   UserHistoryResponse,
 } from '@/types/user-profile'
 import { authService } from '@/api/auth.ts'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 const getAuthHeadersAndUserId = async () => {
   // Bước 1: Gọi và chờ hàm getCurrentUser xử lý xong (bao gồm cả refresh token nếu cần)

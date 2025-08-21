@@ -5,7 +5,7 @@ import type {
   AdminUpdateTopicRequest,
   TopicFilters,
 } from '@/types/topic.ts'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 export const topicApi = {
   getAllTopics: async (

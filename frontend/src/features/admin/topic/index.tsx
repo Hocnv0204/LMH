@@ -30,9 +30,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Header } from '@/components/layout/header'
+import { Header } from '@/features/admin/components/header'
 import { TopicForm } from './topic-form'
-import { TopicsPagination } from './topics-pagination'
+import { AdminPagination } from '@/features/admin/components/admin-pagination'
 import { TopicsTable } from './topics-table'
 
 export default function TopicsManagementPage() {
@@ -201,7 +201,7 @@ export default function TopicsManagementPage() {
 
           {data?.data && (
             <div className='mt-4'>
-              <TopicsPagination
+              <AdminPagination
                 pageData={data.data}
                 currentPage={filters.page}
                 pageSize={filters.size}

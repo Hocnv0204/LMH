@@ -5,7 +5,7 @@ import type {
   AdminUpdateLevelRequest,
   LevelFilters,
 } from '@/types/level.ts'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 export const levelApi = {
   getAllLevels: async (

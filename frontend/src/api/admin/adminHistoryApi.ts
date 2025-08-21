@@ -4,7 +4,7 @@ import type {
   TopLessonStatsResponse,
   TopUserStatsResponse,
 } from '@/types/history'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 export const historyApi = {
   // History list endpoints

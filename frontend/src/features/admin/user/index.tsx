@@ -29,9 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Header } from '@/components/layout/header'
+import { Header } from '@/features/admin/components/header'
 import { UserForm } from './user-form'
-import { UsersPagination } from './users-pagination'
+import { AdminPagination } from '@/features/admin/components/admin-pagination'
 import { UsersTable } from './users-table'
 
 export default function UsersManagementPage() {
@@ -221,7 +221,7 @@ export default function UsersManagementPage() {
 
           {data?.data && (
             <div className='mt-4'>
-              <UsersPagination
+              <AdminPagination
                 pageData={data.data}
                 currentPage={filters.page}
                 pageSize={filters.size}

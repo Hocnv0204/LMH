@@ -27,9 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Header } from '@/components/layout/header'
+import { Header } from '@/features/admin/components/header'
 import { LanguageForm } from '@/features/admin/language/language-form'
-import { LanguagesPagination } from '@/features/admin/language/languages-pagination.tsx'
+import { AdminPagination } from '@/features/admin/components/admin-pagination'
 import { LanguagesTable } from '@/features/admin/language/languages-table.tsx'
 
 export default function LanguagesManagementPage() {
@@ -161,7 +161,7 @@ export default function LanguagesManagementPage() {
 
           {data?.data && (
             <div className='mt-4'>
-              <LanguagesPagination
+              <AdminPagination
                 pageData={data.data}
                 currentPage={filters.page}
                 pageSize={filters.size}

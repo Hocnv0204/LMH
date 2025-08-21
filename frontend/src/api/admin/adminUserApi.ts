@@ -5,7 +5,7 @@ import type {
   AdminUpdateUserRequest,
   UserFilters,
 } from '@/types/user.ts'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 export const userApi = {
   getAllUsers: async (

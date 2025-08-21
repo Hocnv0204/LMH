@@ -2,8 +2,7 @@
 const isDevelopment = import.meta.env.DEV
 
 export const API_CONFIG = {
-  // BASE_URL: 'http://localhost:8081',
-  BASE_URL: 'https://api-lmh-writting-practice.id.vn',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL,
   TIMEOUT: 10000, // 10 seconds timeout
 } as const
 

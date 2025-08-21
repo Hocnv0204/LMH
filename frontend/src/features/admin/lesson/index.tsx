@@ -27,9 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Header } from '@/components/layout/header'
+import { Header } from '@/features/admin/components/header'
 import { LessonForm } from './lesson-form'
-import { LessonsPagination } from './lessons-pagination'
+import { AdminPagination } from '@/features/admin/components/admin-pagination'
 import { LessonsTable } from './lessons-table'
 
 export default function LessonsManagementPage() {
@@ -289,7 +289,7 @@ export default function LessonsManagementPage() {
 
           {data?.data && (
             <div className='mt-4'>
-              <LessonsPagination
+              <AdminPagination
                 pageData={data.data}
                 currentPage={filters.page}
                 pageSize={filters.size}

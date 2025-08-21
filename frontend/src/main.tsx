@@ -5,6 +5,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from './context/theme-context'
+import { AuthProvider } from './context/auth-context'
 import './index.css'
 import { routeTree } from './routeTree.gen'
 
@@ -33,9 +34,11 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <RouterProvider router={router} />
-          <Toaster />
-          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <AuthProvider>
+            <RouterProvider router={router} />
+            <Toaster />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>

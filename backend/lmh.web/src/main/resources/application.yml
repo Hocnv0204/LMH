@@ -32,13 +32,12 @@ spring:
           google:
             client-id: 35790031845-c8n8krgp3rs5464q0dt7tlj74ps79kmb.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: https://api-lmh-writting-practice.id.vn/login/oauth2/code/google
+            redirect-uri: http://localhost:8081/login/oauth2/code/google
 
             scope:
               - openid
               - profile
               - email
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -50,9 +49,8 @@ spring:
           auth: true
           starttls:
             enable: true
-  spring:
-    profiles:
-      active: deploy
+  profiles:
+    active: default
 
 # Cloudinary Configuration
 cloudinary:
@@ -69,12 +67,10 @@ jwt:
 gemini:
   api:
     key: AIzaSyA1tQwG9IdRqEXHU-kmlhX-YbOWyXUkQL4
-
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
 
 app:
-#  base-url: http://localhost:5173
-  base-url : https://lmh-writting-practice.web.app
+  base-url: http://localhost:5173
   verification:
     token:
       expiry: 86400000

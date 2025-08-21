@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/user/languages")
 @RequiredArgsConstructor
-public class UserLanguageController {
+public class LanguageController {
     private final LanguageService languageService;
 
     @GetMapping()
