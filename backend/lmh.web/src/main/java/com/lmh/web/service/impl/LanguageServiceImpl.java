@@ -8,6 +8,7 @@ import com.lmh.web.repository.LanguageRepository;
 import com.lmh.web.service.LanguageService;
 import com.lmh.web.utils.mapper.language.LanguageMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LanguageServiceImpl implements LanguageService {
@@ -24,17 +26,21 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public Language findByName(String name) {
+        log.debug("Tìm kiếm ngôn ngữ theo tên: {}", name);
         Optional<Language> languageOptional = languageRepository.findByName(name);
         if (languageOptional.isEmpty()){
+            log.warn("Không tìm thấy ngôn ngữ: {}", name);
             throw new NotFoundException("Not found language - " + name);
         }
+        log.debug("Tìm thấy ngôn ngữ: {}", name);
         return languageOptional.get();
     }
 
     @Override
     public List<AllLanguageResponse> getLanguages() {
-        return languageMapper.toResponseList(languageRepository.findAll());
+        log.info("Lấy danh sách tất cả ngôn ngữ");
+        List<AllLanguageResponse> languages = languageMapper.toResponseList(languageRepository.findAll());
+        log.info("Lấy danh sách ngôn ngữ thành công: {} ngôn ngữ được tìm thấy", languages.size());
+        return languages;
     }
-
-
 }

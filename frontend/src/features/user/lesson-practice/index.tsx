@@ -318,7 +318,7 @@ export default function LessonPracticePage({
             <Card className='mb-6'>
               <CardHeader>
                 <CardTitle className='text-lg'>
-                  Dịch câu sau sang tiếng Anh:
+                  Dịch câu sau:
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -330,7 +330,7 @@ export default function LessonPracticePage({
 
                 <div className='space-y-4'>
                   <Input
-                    placeholder='Nhập bản dịch tiếng Anh của bạn...'
+                    placeholder='Nhập bản dịch của bạn...'
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     disabled={isValidating || !!validationResult}

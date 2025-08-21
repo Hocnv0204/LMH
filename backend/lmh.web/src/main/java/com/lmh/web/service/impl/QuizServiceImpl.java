@@ -14,6 +14,7 @@ import com.lmh.web.repository.CollectionVocaRepository;
 import com.lmh.web.repository.VocabularyRepository;
 import com.lmh.web.service.QuizService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuizServiceImpl implements QuizService {
@@ -33,25 +35,37 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public QuizSessionResponse startQuiz(StartQuizRequest request, Integer userId) {
+        log.info("Bắt đầu quiz cho user ID: {}, collection ID: {}, số câu hỏi: {}", 
+                userId, request.getCollectionId(), request.getQuestionCount());
+                
         // Validate collection exists and user has access
         CollectionVoca collection = collectionVocaRepository.findById(request.getCollectionId())
-                .orElseThrow(() -> new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS));
+                .orElseThrow(() -> {
+                    log.warn("Bắt đầu quiz thất bại: Không tìm thấy collection ID: {}", request.getCollectionId());
+                    return new AppException(ErrorCode.COLLECTION_IS_NOT_EXISTS);
+                });
         
         // Check if user owns this collection
         if (!collection.getUser().getId().equals(userId)) {
+            log.warn("Bắt đầu quiz thất bại: User ID {} không có quyền truy cập collection ID {}", 
+                    userId, request.getCollectionId());
             throw new AppException(ErrorCode.UNAUTHORIZED, "Bạn không có quyền truy cập collection này");
         }
 
         // Get vocabularies from the collection
         List<Vocabulary> vocabularies = vocabularyRepository.findByCollectionId(request.getCollectionId());
+        log.debug("Tìm thấy {} từ vựng trong collection ID: {}", vocabularies.size(), request.getCollectionId());
 
         if (vocabularies.size() < request.getQuestionCount()) {
+            log.warn("Bắt đầu quiz thất bại: Collection chỉ có {} từ vựng, yêu cầu {} câu hỏi", 
+                    vocabularies.size(), request.getQuestionCount());
             throw new AppException(ErrorCode.INVALID_DATA,
                 "Collection không có đủ từ vựng. Có sẵn: " + vocabularies.size());
         }
         
         // Generate session ID
         String sessionId = generateSessionId();
+        log.debug("Tạo session quiz với ID: {}", sessionId);
         
         // Generate quiz questions with random selection
         List<QuizSession.QuizQuestion> questions = generateQuizQuestions(vocabularies, request.getQuestionCount(), request.getSeed());
@@ -70,6 +84,8 @@ public class QuizServiceImpl implements QuizService {
                 .build();
         
         quizSessions.put(sessionId, session);
+        log.info("Tạo quiz session thành công: {} cho user ID: {}, collection ID: {}", 
+                sessionId, userId, request.getCollectionId());
 
         return QuizSessionResponse.builder()
                 .sessionId(sessionId)
@@ -82,12 +98,14 @@ public class QuizServiceImpl implements QuizService {
     
     @Override
     public AnswerResponse answerQuestion(AnswerRequest request, Integer userId) {
+        log.info("User ID {} trả lời câu hỏi {} trong quiz {}", userId, request.getQuestionId(), request.getQuizId());
         QuizSession session = getAndValidateSession(request.getQuizId(), userId);
 
         // Find the current question
         QuizSession.QuizQuestion currentQuestion = session.getQuestions().get(session.getCurrentQuestionIndex());
 
         if (!currentQuestion.getQuestionId().equals(request.getQuestionId())) {
+            log.warn("Question ID không khớp: expect {} nhưng nhận {}", currentQuestion.getQuestionId(), request.getQuestionId());
             throw new AppException(ErrorCode.INVALID_DATA, "Question ID không khớp");
         }
         
@@ -96,6 +114,8 @@ public class QuizServiceImpl implements QuizService {
         session.setLastActivityAt(LocalDateTime.now());
         
         boolean isCorrect = currentQuestion.getCorrectAnswer().equals(request.getSelectedAnswer());
+        log.debug("Câu trả lời {} cho câu hỏi {}: {}", request.getSelectedAnswer(), request.getQuestionId(), 
+                isCorrect ? "Đúng" : "Sai");
 
         if (isCorrect) {
             // Mark question as answered and move to next
@@ -104,6 +124,7 @@ public class QuizServiceImpl implements QuizService {
             
             // Check if quiz is completed
             if (session.getCurrentQuestionIndex() >= session.getTotalQuestions()) {
+                log.info("Quiz hoàn thành cho user ID: {}, session: {}", userId, request.getQuizId());
                 return AnswerResponse.builder()
                         .correct(true)
                         .message("Chính xác! Quiz hoàn thành!")
@@ -115,6 +136,7 @@ public class QuizServiceImpl implements QuizService {
             
             // Get next question
             QuizSession.QuizQuestion nextQuestion = session.getQuestions().get(session.getCurrentQuestionIndex());
+            log.debug("Chuyển sang câu hỏi tiếp theo: {}", nextQuestion.getQuestionId());
 
             return AnswerResponse.builder()
                     .correct(true)
@@ -126,6 +148,7 @@ public class QuizServiceImpl implements QuizService {
                     .build();
         } else {
             // Wrong answer - reinsert question after 2-3 questions
+            log.debug("Câu trả lời sai, đưa câu hỏi {} vào lại sau", request.getQuestionId());
             reinsertQuestion(session, currentQuestion);
 
             return AnswerResponse.builder()
@@ -141,20 +164,25 @@ public class QuizServiceImpl implements QuizService {
     
     @Override
     public QuizQuestionResponse getCurrentQuestion(String quizId, Integer userId) {
+        log.info("Lấy câu hỏi hiện tại cho quiz {} của user ID: {}", quizId, userId);
         QuizSession session = getAndValidateSession(quizId, userId);
 
         if (session.getCurrentQuestionIndex() >= session.getTotalQuestions()) {
+            log.warn("Quiz {} đã hoàn thành, không có câu hỏi hiện tại", quizId);
             throw new AppException(ErrorCode.INVALID_DATA, "Quiz đã hoàn thành");
         }
 
         QuizSession.QuizQuestion currentQuestion = session.getQuestions().get(session.getCurrentQuestionIndex());
+        log.debug("Trả về câu hỏi hiện tại: {}", currentQuestion.getQuestionId());
         return createQuizQuestionResponse(currentQuestion, session);
     }
 
     @Override
     public void finishQuiz(String quizId, Integer userId) {
+        log.info("Kết thúc quiz {} cho user ID: {}", quizId, userId);
         QuizSession session = getAndValidateSession(quizId, userId);
         quizSessions.remove(quizId);
+        log.info("Quiz session {} đã được xóa khỏi bộ nhớ", quizId);
     }
 
     private void reinsertQuestion(QuizSession session, QuizSession.QuizQuestion question) {
@@ -170,6 +198,7 @@ public class QuizServiceImpl implements QuizService {
 
         // Reset question state
         question.setAnswered(false);
+        log.debug("Đã đưa câu hỏi {} vào vị trí {}", question.getQuestionId(), insertPosition);
     }
 
     private QuizQuestionResponse createQuizQuestionResponse(QuizSession.QuizQuestion question, QuizSession session) {
@@ -187,29 +216,36 @@ public class QuizServiceImpl implements QuizService {
     }
     
     private QuizSession getAndValidateSession(String quizId, Integer userId) {
+        log.debug("Validate quiz session {} cho user ID: {}", quizId, userId);
         QuizSession session = quizSessions.get(quizId);
         if (session == null) {
+            log.warn("Quiz session {} không tồn tại", quizId);
             throw new AppException(ErrorCode.INVALID_DATA, "Quiz session không tồn tại");
         }
         if (!session.getUserId().equals(userId)) {
+            log.warn("User ID {} không có quyền truy cập quiz session {}", userId, quizId);
             throw new AppException(ErrorCode.UNAUTHORIZED, "Bạn không có quyền truy cập quiz này");
         }
         return session;
     }
     
     private List<QuizSession.QuizQuestion> generateQuizQuestions(List<Vocabulary> vocabularies, int questionCount, Long seed) {
+        log.debug("Tạo {} câu hỏi từ {} từ vựng", questionCount, vocabularies.size());
         // Random selection of vocabularies
         List<Vocabulary> selectedVocabularies = new ArrayList<>(vocabularies);
         if (seed != null) {
             Collections.shuffle(selectedVocabularies, new Random(seed));
+            log.debug("Sử dụng seed {} để shuffle câu hỏi", seed);
         } else {
             Collections.shuffle(selectedVocabularies);
         }
         
-        return selectedVocabularies.subList(0, questionCount)
+        List<QuizSession.QuizQuestion> questions = selectedVocabularies.subList(0, questionCount)
                 .stream()
                 .map(this::createQuizQuestion)
                 .collect(Collectors.toList());
+        log.debug("Đã tạo thành công {} câu hỏi", questions.size());
+        return questions;
     }
     
     private QuizSession.QuizQuestion createQuizQuestion(Vocabulary vocabulary) {
@@ -223,6 +259,8 @@ public class QuizServiceImpl implements QuizService {
         
         // Shuffle options
         Collections.shuffle(options);
+        
+        log.debug("Tạo câu hỏi: {} với {} lựa chọn", question, options.size());
         
         return QuizSession.QuizQuestion.builder()
                 .questionId(questionId)
@@ -272,6 +310,7 @@ public class QuizServiceImpl implements QuizService {
             }
         }
         
+        log.debug("Tạo {} lựa chọn sai cho từ {}", distractors.size(), currentVocab.getTerm());
         return distractors.subList(0, Math.min(3, distractors.size()));
     }
     

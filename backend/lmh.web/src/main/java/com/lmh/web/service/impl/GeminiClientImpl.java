@@ -40,12 +40,12 @@ public class GeminiClientImpl implements GeminiClient {
 
     private final ObjectMapper objectMapper;
 
-//    @Value("${gemini.api-key}")
-    private String geminiKey = "AIzaSyD6xUo5Q1Kck023hOhXutwjmMKe8XJPUL4";
+    @Value("${gemini.api.key}")
+    private String geminiKey;
 
     private final ResourceLoader loader;
 
-    public static final String FLOW_PROMPT_PATH = "classpath:prompt/user_submit_prompt.txt";
+    public static final String FLOW_PROMPT_PATH = "classpath:prompt/practice_prompt.md";
 
     private final UserService userService;
 
