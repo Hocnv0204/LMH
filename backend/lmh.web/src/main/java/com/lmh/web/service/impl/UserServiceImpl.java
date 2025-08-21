@@ -8,10 +8,12 @@ import com.lmh.web.repository.UserRepository;
 import com.lmh.web.service.UserService;
 import com.lmh.web.utils.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -21,34 +23,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
+        log.debug("Tìm kiếm user theo username: {}", username);
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()){
+            log.warn("Không tìm thấy user với username: {}", username);
             throw new NotFoundException("Not found user - " + username);
         }
+        log.debug("Tìm thấy user với username: {}", username);
         return userOptional.get();
     }
 
     @Override
     public UserResponse getUserById(Integer id) {
+        log.info("Lấy thông tin user theo ID: {}", id);
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
+            log.warn("Không tìm thấy user với ID: {}", id);
             throw new NotFoundException("Not found user with id - " + id);
         }
+        log.info("Lấy thông tin user thành công ID: {}", id);
         return userMapper.toResponse(userOptional.get());
     }
 
     @Override
     public UserResponse updateUser(Integer id, UserRequest userRequest) {
+        log.info("Bắt đầu cập nhật thông tin user ID: {}", id);
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
+            log.warn("Cập nhật user thất bại: Không tìm thấy user với ID: {}", id);
             throw new NotFoundException("Not found user with id - " + id);
         }
-        userOptional.get().setName(userRequest.getName());
-        userOptional.get().setEmail(userRequest.getEmail());
-        userOptional.get().setPhoneNumber(userRequest.getPhoneNumber());
-        userOptional.get().setDateOfBirth(userRequest.getDateOfBirth());
-        userOptional.get().setSchool(userRequest.getSchool());
+        User user = userOptional.get();
+        user.setName(userRequest.getName());
+        user.setEmail(userRequest.getEmail());
+        user.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setDateOfBirth(userRequest.getDateOfBirth());
+        user.setSchool(userRequest.getSchool());
         
-        return userMapper.toResponse(userRepository.save(userOptional.get()));
+        UserResponse result = userMapper.toResponse(userRepository.save(user));
+        log.info("Cập nhật thông tin user thành công ID: {}, tên: {}", id, userRequest.getName());
+        return result;
     }
 }

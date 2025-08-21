@@ -18,8 +18,10 @@ public class EmailServiceImpl implements EmailService {
     private String baseUrl ;
 
     private final JavaMailSender mailSender ;
+    
     @Override
     public void sendVerificationEmail(String toEmail , String token){
+        log.info("Bắt đầu gửi email xác nhận đến: {}", toEmail);
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -33,24 +35,31 @@ public class EmailServiceImpl implements EmailService {
                     "Link này sẽ hết hạn sau 24 giờ.\n\n" +
                     "Trân trọng!");
             mailSender.send(message);
+            log.info("Gửi email xác nhận thành công đến: {}", toEmail);
         }catch(Exception e){
-            log.error("Failed to send verification email to {}: {}", toEmail, e.getMessage(), e);
+            log.error("Gửi email xác nhận thất bại đến {}: {}", toEmail, e.getMessage(), e);
         }
     }
 
     @Override
     public void sendResetPasswordEmail(String toEmail , String token){
-        SimpleMailMessage message = new SimpleMailMessage() ;
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject("Reset Password");
-        String verificationUrl = baseUrl + "/auth/reset-password/" + token ;
-        message.setText("Chào bạn,\n\n" +
-                "Đây là mail xác nhận đặt lại mật khẩu" +
-                "Vui lòng click vào link sau để xác nhận tài khoản và đặt lại mật khẩu:\n\n" +
-                verificationUrl + "\n\n" +
-                "Link này sẽ hết hạn sau 24 giờ.\n\n" +
-                "Trân trọng!");
-        mailSender.send(message);
+        log.info("Bắt đầu gửi email reset password đến: {}", toEmail);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage() ;
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("Reset Password");
+            String verificationUrl = baseUrl + "/auth/reset-password/" + token ;
+            message.setText("Chào bạn,\n\n" +
+                    "Đây là mail xác nhận đặt lại mật khẩu" +
+                    "Vui lòng click vào link sau để xác nhận tài khoản và đặt lại mật khẩu:\n\n" +
+                    verificationUrl + "\n\n" +
+                    "Link này sẽ hết hạn sau 24 giờ.\n\n" +
+                    "Trân trọng!");
+            mailSender.send(message);
+            log.info("Gửi email reset password thành công đến: {}", toEmail);
+        } catch(Exception e) {
+            log.error("Gửi email reset password thất bại đến {}: {}", toEmail, e.getMessage(), e);
+        }
     }
 }
