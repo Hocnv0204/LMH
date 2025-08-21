@@ -1,17 +1,15 @@
-package com.lmh.web.controller;
+package com.lmh.web.controller.topic;
 
 import com.lmh.web.dto.request.topic.TopicRequest;
 import com.lmh.web.dto.request.topic.UpdateTopicUser;
 import com.lmh.web.dto.response.CustomResponse;
 import com.lmh.web.dto.response.topic.TopicResponse;
 import com.lmh.web.service.TopicService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController

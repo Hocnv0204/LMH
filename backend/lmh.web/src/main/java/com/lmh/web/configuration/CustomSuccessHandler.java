@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -27,6 +28,9 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
     private final UserRepository userRepository ;
     private final AuthenticationService authenticationService ;
     private final RedisService redisService ;
+
+    @Value("${app.base-url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest , HttpServletResponse response ,
@@ -57,8 +61,6 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build() ;
-//        String frontendUrl = "http://localhost:5173";
-        String frontendUrl = "https://lmh-writting-practice.web.app" ;
         String redirectUrl = String.format("%s/auth/google-callback?accessToken=%s&refreshToken=%s&authenticated=true",
                 frontendUrl, accessToken, refreshToken);
 

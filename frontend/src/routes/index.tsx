@@ -48,13 +48,6 @@ function Index() {
       icon: Target,
       color: 'purple',
     },
-    {
-      title: 'Admin',
-      description: 'Quản lý hệ thống',
-      href: '/admin',
-      icon: Shield,
-      color: 'orange',
-    },
   ]
 
   const getColorClasses = (color: string) => {

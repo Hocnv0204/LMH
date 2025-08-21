@@ -6,7 +6,7 @@ import type {
   LanguageFilters,
   LanguageOption,
 } from '@/types/language.ts'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 export const languageApi = {
   getAllLanguages: async (

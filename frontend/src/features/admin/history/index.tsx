@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Header } from '@/components/layout/header'
-import { HistoryPagination } from './history-pagination'
+import { AdminPagination } from '@/features/admin/components/admin-pagination'
+import { Header } from '@/features/admin/components/header'
 import { HistoryStatsOverview } from './history-stats-overview'
 import { HistoryTable } from './history-table'
 import { TopLessonsCard } from './top-lessons-card'
@@ -106,7 +106,7 @@ export default function HistoryPage() {
           <HistoryTable filters={filters} />
 
           {data?.data && (
-            <HistoryPagination
+            <AdminPagination
               pageData={data.data}
               currentPage={filters.page}
               pageSize={filters.size}

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-interface HistoryPaginationProps {
+interface AdminPaginationProps {
   pageData: PageResponse<any>
   currentPage: number
   pageSize: number
@@ -19,13 +19,13 @@ interface HistoryPaginationProps {
   onPageSizeChange: (size: number) => void
 }
 
-export function HistoryPagination({
+export function AdminPagination({
   pageData,
   currentPage,
   pageSize,
   onPageChange,
   onPageSizeChange,
-}: HistoryPaginationProps) {
+}: AdminPaginationProps) {
   const { totalElements, totalPages, first, last } = pageData
 
   return (
@@ -85,3 +85,4 @@ export function HistoryPagination({
     </div>
   )
 }
+

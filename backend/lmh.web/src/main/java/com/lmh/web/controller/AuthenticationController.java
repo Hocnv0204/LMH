@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.text.ParseException;
-//@CrossOrigin(origins = "http://localhost:5173")
-@CrossOrigin(origins = "https://lmh-writting-practice.web.app")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

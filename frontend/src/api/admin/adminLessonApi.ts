@@ -11,7 +11,7 @@ import type {
   LevelOption,
   LanguageOption,
 } from '@/types/lesson'
-import { fetchApi } from '../apiClient.ts'
+import { fetchApi } from '../api.ts'
 
 export const lessonApi = {
   getAllLessons: async (

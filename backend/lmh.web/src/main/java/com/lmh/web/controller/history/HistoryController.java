@@ -1,4 +1,4 @@
-package com.lmh.web.controller;
+package com.lmh.web.controller.history;
 
 import com.lmh.web.dto.response.CustomResponse;
 import com.lmh.web.service.HistoryService;
