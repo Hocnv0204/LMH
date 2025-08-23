@@ -25,9 +25,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      working-directory: backend/lmh.web
-      run: mvn clean install -Dspring.profiles.active=test -DskipTests 
+    # - name: Build with Maven
+    #   working-directory: backend/lmh.web
+    #   run: mvn clean install -Dspring.profiles.active=test -DskipTests 
     - name: Login
       run: |
         echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
