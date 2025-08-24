@@ -161,6 +161,98 @@ export default function LessonPracticePage({
     }
   }
 
+  // Format suggestion string with ~~strike~~ and **highlight** markup into styled HTML
+  const formatSuggestion = (text: string) => {
+    // Escape HTML first
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+    const html = escaped
+      .replace(/~~(.*?)~~/g, '<span class="line-through text-red-600">$1</span>')
+      .replace(/\*\*(.*?)\*\*/g, '<span class="font-semibold text-green-700">$1</span>')
+    return { __html: html }
+  }
+
+  // Sanitize limited HTML from model output: allow only whitelisted tags and safe style/class attributes
+  const sanitizeHtml = (html: string) => {
+    const allowed = new Set([
+      'DIV',
+      'P',
+      'SPAN',
+      'STRONG',
+      'B',
+      'EM',
+      'I',
+      'H4',
+      'UL',
+      'LI',
+      'U',
+      'S',
+      'MARK',
+    ])
+    const allowedStyleProps = new Set([
+      'color',
+      'text-decoration',
+      'font-weight',
+      'font-style',
+      'background-color',
+    ])
+    const container = document.createElement('div')
+    container.innerHTML = html
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT)
+    const removeNodes: Element[] = []
+    let node = walker.nextNode() as Element | null
+    while (node) {
+      const currentEl: Element = node
+      if (!allowed.has(currentEl.tagName)) {
+        removeNodes.push(currentEl)
+      } else {
+        // allow only safe class and limited style attributes
+        const classAttr = currentEl.getAttribute('class')
+        if (currentEl.tagName === 'DIV' && classAttr === 'feedback') {
+          currentEl.setAttribute('class', 'feedback')
+        } else if (classAttr) {
+          currentEl.removeAttribute('class')
+        }
+
+        const styleAttr = currentEl.getAttribute('style') || ''
+        if (styleAttr) {
+          const safeCss: string[] = []
+          styleAttr
+            .split(';')
+            .map((d) => d.trim())
+            .filter(Boolean)
+            .forEach((declaration) => {
+              const [propRaw, valueRaw] = declaration.split(':')
+              if (!propRaw || !valueRaw) return
+              const prop = propRaw.trim().toLowerCase()
+              const value = valueRaw.trim()
+              const safeValuePattern = /^[#a-zA-Z0-9(),.%\s-]+$/
+              if (allowedStyleProps.has(prop) && safeValuePattern.test(value)) {
+                safeCss.push(`${prop}: ${value}`)
+              }
+            })
+          if (safeCss.length > 0) {
+            currentEl.setAttribute('style', safeCss.join('; '))
+          } else {
+            currentEl.removeAttribute('style')
+          }
+        }
+
+        // remove any other attributes
+        Array.from(currentEl.attributes).forEach((attr) => {
+          if (attr.name !== 'class' && attr.name !== 'style') {
+            currentEl.removeAttribute(attr.name)
+          }
+        })
+      }
+      node = walker.nextNode() as Element | null
+    }
+    removeNodes.forEach((el) => el.replaceWith(...Array.from(el.childNodes)))
+    return { __html: container.innerHTML }
+  }
+
   const handleBackToLessons = () => {
     if (
       searchParams &&
@@ -428,15 +520,7 @@ export default function LessonPracticePage({
             {validationResult && (
               <Card>
                 <CardContent className='pt-6'>
-                  <div
-                    className={`rounded-lg border p-4 ${
-                      validationResult.status === 'perfect'
-                        ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
-                        : validationResult.status === 'good'
-                          ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950'
-                          : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'
-                    }`}
-                  >
+                  <div className='rounded-lg border p-4 border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900'>
                     <div className='mb-2 flex items-center gap-2'>
                       {validationResult.status === 'perfect' ? (
                         <CheckCircle className='h-5 w-5 text-green-700 dark:text-green-400' />
@@ -470,6 +554,44 @@ export default function LessonPracticePage({
                       >
                         {validationResult.message}
                       </p>
+                    )}
+
+                    {(validationResult.rich_html || validationResult.suggestion_html || validationResult.suggestion_markdown) && (
+                      <div className='mb-3'>
+                        <p
+                          className={`font-medium ${
+                            validationResult.status === 'perfect'
+                              ? 'text-green-800 dark:text-green-200'
+                              : validationResult.status === 'good'
+                                ? 'text-yellow-800 dark:text-yellow-200'
+                                : 'text-red-800 dark:text-red-200'
+                          }`}
+                        >
+                          Suggestion:
+                        </p>
+                        {validationResult.rich_html ? (
+                          <div
+                            className='text-sm'
+                            dangerouslySetInnerHTML={sanitizeHtml(
+                              validationResult.rich_html
+                            )}
+                          />
+                        ) : validationResult.suggestion_html ? (
+                          <p
+                            className='text-sm'
+                            dangerouslySetInnerHTML={sanitizeHtml(
+                              validationResult.suggestion_html
+                            )}
+                          />
+                        ) : (
+                          <p
+                            className='text-sm'
+                            dangerouslySetInnerHTML={formatSuggestion(
+                              validationResult.suggestion_markdown as string
+                            )}
+                          />
+                        )}
+                      </div>
                     )}
 
                     {validationResult.comment && (
@@ -512,6 +634,36 @@ export default function LessonPracticePage({
                         </p>
                       </div>
                     )}
+
+                    {validationResult.improvements &&
+                      validationResult.improvements.length > 0 && (
+                        <div className='mb-3'>
+                          <p
+                            className={`font-medium ${
+                              validationResult.status === 'perfect'
+                                ? 'text-green-800 dark:text-green-200'
+                                : validationResult.status === 'good'
+                                  ? 'text-yellow-800 dark:text-yellow-200'
+                                  : 'text-red-800 dark:text-red-200'
+                            }`}
+                          >
+                            Suggested improvements:
+                          </p>
+                          <ul
+                            className={`list-disc pl-5 text-sm ${
+                              validationResult.status === 'perfect'
+                                ? 'text-green-700 dark:text-green-300'
+                                : validationResult.status === 'good'
+                                  ? 'text-yellow-700 dark:text-yellow-300'
+                                  : 'text-red-700 dark:text-red-300'
+                            }`}
+                          >
+                            {validationResult.improvements.map((tip, idx) => (
+                              <li key={idx}>{tip}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
                     {validationResult.correct_answer && (
                       <div>
