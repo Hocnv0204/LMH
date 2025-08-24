@@ -18,6 +18,11 @@ interface ValidationResult {
   comment?: string;
   improvement_suggestions?: string;
   correct_answer?: string;
+  // New fields to support suggestion-like UI rendering
+  suggestion_markdown?: string;
+  improvements?: string[];
+  suggestion_html?: string;
+  rich_html?: string;
 }
 
 export function useLessonPractice(lessonId: number, username: string) {

@@ -68,6 +68,7 @@ export const lessonApi = {
 
   createLesson: async (username: string, lessonData: CreateLessonRequest) => {
     try {
+      console.log(lessonData)
       const url = buildApiUrl(`/user/lesson/${username}/add-lesson`)
       const response = await fetch(url, {
         method: 'POST',

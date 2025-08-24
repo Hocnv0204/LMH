@@ -19,6 +19,10 @@ export interface ParsedHistoryResult {
   comment?: string;
   improvement_suggestions?: string;
   correct_answer?: string;
+  suggestion_markdown?: string;
+  improvements?: string[];
+  suggestion_html?: string;
+  rich_html?: string;
 }
 
 export const historyApi = {
