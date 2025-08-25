@@ -30,6 +30,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,6 +81,7 @@ public class GeminiClientImpl implements GeminiClient {
         history.setQuestion(geminiRequest.getQuestion());
         history.setAnswer(geminiRequest.getAnswer());
         history.setResult((String) responseGemini.get("response"));
+        history.setCreatedAt(LocalDateTime.now());
         return historyMapper.toResponse(historyRepository.save(history));
     }
 
