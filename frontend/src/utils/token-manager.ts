@@ -49,16 +49,12 @@ class TokenManager {
   }
 
   async refreshToken(): Promise<string> {
-    console.log('🔄 TokenManager.refreshToken() called')
-
     if (this.isRefreshing) {
-      console.log('⏳ Token refresh already in progress, queuing request...')
       return new Promise((resolve, reject) => {
         this.failedQueue.push({ resolve, reject })
       })
     }
 
-    console.log('🚀 Starting token refresh process...')
     this.isRefreshing = true
 
     try {
@@ -69,19 +65,12 @@ class TokenManager {
         throw new Error('No tokens available')
       }
 
-      console.log('📱 Decoding access token to get userId...')
       const payload = JSON.parse(atob(accessToken.split('.')[1]))
       const userId = payload.id
-      console.log('👤 User ID from token:', userId)
 
       if (!userId) {
         throw new Error('Cannot determine user ID')
       }
-
-      console.log('Sending refresh request:', {
-        refreshToken: refreshToken.substring(0, 20) + '...',
-        userId,
-      })
 
       const response = await fetch(`${API_CONFIG.BASE_URL}/api/auth/refresh`, {
         method: 'POST',
@@ -91,15 +80,12 @@ class TokenManager {
         body: JSON.stringify({ refreshToken, userId }),
       })
 
-      console.log('📡 Response status:', response.status)
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         console.error('❌ Backend error:', errorData)
         throw new Error(errorData.error?.message || 'Failed to refresh token')
       }
 
-      console.log('✅ Backend response received, parsing...')
       const data: ApiResponse<TokenResponse> = await response.json()
 
       if (!data.success || !data.data) {
@@ -109,13 +95,10 @@ class TokenManager {
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
         data.data
 
-      console.log('💾 Saving new tokens to localStorage...')
       localStorage.setItem('accessToken', newAccessToken)
       localStorage.setItem('refreshToken', newRefreshToken)
 
-      console.log('🔄 Processing queued requests...')
       this.processQueue(null, newAccessToken)
-      console.log('✅ Token refresh completed successfully')
 
       return newAccessToken
     } catch (error) {

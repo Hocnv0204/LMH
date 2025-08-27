@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Lắng nghe token refresh event từ response interceptor
     const handleTokenRefreshed = (event: CustomEvent) => {
-      console.log('🎯 Token refreshed event received:', event.detail)
       setUser(event.detail.user)
     }
 
@@ -76,7 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true)
       const response: AuthResponse = await authService.login(credentials)
-      console.log('Login successful:', response)
       setUser(response.user as User)
     } catch (error) {
       console.error('Login error:', error)

@@ -15,7 +15,6 @@ export const useToast = () => {
       // Có thể thay thế bằng alert hoặc notification system khác
       alert(`Lỗi: ${title}\n${description}`)
     } else {
-      console.log(`[${title}] ${description}`)
       // Có thể thay thế bằng alert hoặc notification system khác
       alert(`Thành công: ${title}\n${description}`)
     }
