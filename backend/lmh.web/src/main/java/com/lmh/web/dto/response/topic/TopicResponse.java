@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,6 +15,8 @@ import lombok.Setter;
 public class TopicResponse {
     private int id;
     private String name;
-    private TypeTopic type;
     private String description;
+    private LocalDateTime createdAt;
+    private Boolean deleteFlag;
+    private String languageName;
 }

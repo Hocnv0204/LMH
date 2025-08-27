@@ -1,5 +1,14 @@
 import { Link } from '@tanstack/react-router'
-import { Home, LogOut, BookOpen, Target, LogIn, Settings, User, Shield } from 'lucide-react'
+import {
+  Home,
+  LogOut,
+  BookOpen,
+  Target,
+  LogIn,
+  Settings,
+  User,
+  Shield,
+} from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,10 +24,10 @@ import { Separator } from '@/components/ui/separator'
 
 export function IndexTopBar() {
   const { user, isAuthenticated, logout } = useAuth()
-  
+
   // Kiểm tra xem user có phải là admin không
   const isAdmin = user?.role === 'ADMIN'
-  
+
   return (
     <header className='bg-background border-b px-6 py-4'>
       <div className='flex w-full items-center justify-between'>
@@ -38,12 +47,7 @@ export function IndexTopBar() {
         <div className='flex items-center space-x-4'>
           <nav className='hidden items-center space-x-4 md:flex lg:space-x-6'>
             <Link
-              to='/user/lessons'
-              search={{
-                levelId: 1,
-                levelName: 'Beginner',
-                languageName: 'English',
-              }}
+              to='/user/lesson-discovery'
               className='text-muted-foreground hover:text-primary text-sm font-medium transition-colors'
             >
               WRITING

@@ -5,6 +5,7 @@ import com.lmh.web.dto.request.lesson.LessonRequest;
 import com.lmh.web.dto.response.lesson.AdminLessonDetailResponse;
 import com.lmh.web.dto.response.lesson.AdminLessonSummaryResponse;
 import com.lmh.web.dto.response.lesson.LessonResponse;
+import com.lmh.web.dto.response.lesson.LessonSummaryResponse;
 import com.lmh.web.model.Lesson;
 import com.lmh.web.utils.mapper.suggest.SuggestVocabularyMapper;
 import org.mapstruct.Mapper;
@@ -21,10 +22,15 @@ import java.util.stream.Collectors;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface LessonMapper {
+    // USER //
     LessonResponse toResponse(Lesson lesson);
     Lesson toEntity(LessonRequest request);
     List<LessonResponse> toResponseList(List<Lesson> lessons);
 
+    @Mapping(target = "levelName", source = "level.name")
+    LessonSummaryResponse toSummaryResponse(Lesson lesson);
+
+    // ADMIN //
     @Mapping(target = "topicName", source = "topic.name")
     @Mapping(target = "levelName", source = "level.name")
     @Mapping(target = "languageName", source = "language.name")

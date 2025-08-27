@@ -16,7 +16,4 @@ public class LessonResponse {
     private String name;
     private String paragraph;
     private String description;
-    private String status;
-    private String type;
-    private LocalDateTime lastPractice;
 } 

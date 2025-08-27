@@ -5,6 +5,8 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,6 +29,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @NonNull
@@ -41,8 +44,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().permitAll()
+                                .requestMatchers("/api/auth/**").permitAll() //Cho phép tất cả
+                                .requestMatchers(HttpMethod.GET, "/user/languages").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user/topics").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user/levels").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user/lessons").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user/lessons/*").permitAll()
+                                .anyRequest().authenticated() // yêu cầu đăng nhập
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login

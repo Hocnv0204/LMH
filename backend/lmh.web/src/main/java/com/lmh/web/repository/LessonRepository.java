@@ -18,17 +18,4 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer>, JpaSpe
     Optional<Lesson> findByName(String name);
     
     boolean existsByName(String name);
-    
-    @Query("SELECT l FROM Lesson l " +
-           "WHERE l.deleteFlag = false " +
-           "AND (l.type = 'DEFAULT' OR " +
-           "(l.type = 'USER_CREATION' AND l.topic.user.id = :userId)) " +
-           "AND l.topic.level.name = :levelName " +
-           "AND l.topic.language.name = :languageName " +
-           "AND (:topicName IS NULL OR l.topic.name = :topicName)")
-    Page<Lesson> findLessonsIncludingDefault(@Param("userId") Integer userId,
-                                            @Param("levelName") String levelName,
-                                            @Param("languageName") String languageName,
-                                            @Param("topicName") String topicName,
-                                            Pageable pageable);
 } 

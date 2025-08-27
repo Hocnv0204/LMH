@@ -11,4 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AllLanguageResponse {
     private String name;
+    private String id;
 }

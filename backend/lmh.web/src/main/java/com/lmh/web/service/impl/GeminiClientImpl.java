@@ -12,8 +12,8 @@ import com.lmh.web.model.Lesson;
 import com.lmh.web.model.User;
 import com.lmh.web.repository.HistoryRepository;
 import com.lmh.web.service.GeminiClient;
-import com.lmh.web.service.LessonService;
-import com.lmh.web.service.UserService;
+import com.lmh.web.service.lesson.LessonService;
+import com.lmh.web.service.user.UserService;
 import com.lmh.web.utils.mapper.history.HistoryMapper;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +70,7 @@ public class GeminiClientImpl implements GeminiClient {
         if (user.getCredit()<=0){
             throw new InvalidDataException("Don't enough credit! - " + username);
         }
-        Lesson lesson = lessonService.findLessonById(lessonId);
+        Lesson lesson = lessonService.findById(lessonId);
         Map<String, Object> responseGemini = callGemini(geminiRequest);
         if (!(boolean) responseGemini.get("isValid")){
             throw new GeminiException("No generated text");
