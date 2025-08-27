@@ -1,12 +1,14 @@
 package com.lmh.web.dto.response.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class UserDto {
     private Integer id;
     private String name;

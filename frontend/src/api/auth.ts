@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '@/config/api'
-import { api, handleApiError } from './client'
+import { api, handleApiError, handleApiErrorMessage } from './client'
 
 // Types
 export interface LoginRequest {
@@ -84,7 +84,12 @@ export const authService = {
 
       return response.data
     } catch (error) {
-      throw new Error(handleApiError(error))
+      const errorInfo = handleApiError(error)
+      const errorWithStatus = new Error(errorInfo.message) as Error & {
+        status?: number
+      }
+      errorWithStatus.status = errorInfo.status
+      throw errorWithStatus
     }
   },
 
@@ -98,7 +103,7 @@ export const authService = {
 
       return response.data
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiErrorMessage(error))
     }
   },
 
@@ -114,7 +119,7 @@ export const authService = {
 
       return response.data
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiErrorMessage(error))
     }
   },
 
@@ -130,7 +135,7 @@ export const authService = {
 
       return response.data
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiErrorMessage(error))
     }
   },
 
@@ -146,7 +151,7 @@ export const authService = {
 
       return response.data
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiErrorMessage(error))
     }
   },
 
@@ -167,7 +172,7 @@ export const authService = {
     try {
       await api.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, data)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiErrorMessage(error))
     }
   },
 
@@ -176,7 +181,7 @@ export const authService = {
     try {
       await api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data)
     } catch (error) {
-      throw new Error(handleApiError(error))
+      throw new Error(handleApiErrorMessage(error))
     }
   },
 

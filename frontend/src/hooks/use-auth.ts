@@ -9,9 +9,13 @@ export const useAuthHook = () => {
       await auth.login(credentials)
       return { success: true }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Đăng nhập thất bại'
+      const status = (error as Error & { status?: number })?.status
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Đăng nhập thất bại',
+        error: errorMessage,
+        status: status,
       }
     }
   }

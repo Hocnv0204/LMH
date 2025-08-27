@@ -44,6 +44,6 @@ public interface UserRepository  extends JpaRepository<User, Integer>, JpaSpecif
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.topics LEFT JOIN FETCH u.lessons WHERE u.id = :userId")
     Optional<User> findByIdWithDetails(@Param("userId") Integer userId);
-
+    Page<User> findAll(Pageable pageable) ;
 }
 

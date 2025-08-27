@@ -46,17 +46,6 @@ export function UserTopBar() {
               WRITING
             </Link>
             <Link
-              to='/user/lessons'
-              search={{
-                levelId: 1,
-                levelName: 'Beginner',
-                languageName: 'English',
-              }}
-              className='text-muted-foreground hover:text-primary text-sm font-medium transition-colors'
-            >
-              SPEAKING
-            </Link>
-            <Link
               to='/user/topics'
               search={{
                 levelId: 1,

@@ -26,7 +26,8 @@ public class ApplicationInitConfiguration {
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .role(Role.ADMIN.name())
-
+                        .point(0)
+                        .credit(10000)
                         .enable(true)
                         .createdAt(LocalDateTime.now())
 

@@ -52,17 +52,7 @@ export function IndexTopBar() {
             >
               WRITING
             </Link>
-            <Link
-              to='/user/topics'
-              search={{
-                levelId: 1,
-                levelName: 'Beginner',
-                languageName: 'English',
-              }}
-              className='text-muted-foreground hover:text-primary text-sm font-medium transition-colors'
-            >
-              SPEAKING
-            </Link>
+
             <Link
               to='/vocab'
               className='text-muted-foreground hover:text-primary text-sm font-medium transition-colors'
@@ -70,7 +60,7 @@ export function IndexTopBar() {
               VOCABULARY
             </Link>
             <Link
-              to='/user/level'
+              to='/leaderboard'
               className='text-muted-foreground hover:text-primary text-sm font-medium transition-colors'
             >
               RANK
@@ -85,7 +75,7 @@ export function IndexTopBar() {
                   size='sm'
                   className='flex items-center gap-2'
                 >
-                  <span>Xin chào, {user?.name}</span>
+                  <span>Xin chào, {user?.username}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='w-56'>

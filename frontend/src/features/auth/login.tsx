@@ -52,22 +52,18 @@ export default function LoginPage() {
         // Sử dụng window.location để force reload
         window.location.href = '/'
       } else {
-        console.error('❌ Login failed:', result.error)
-        // Handle different error types
-        if (
-          result.error?.includes('401') ||
-          result.error?.includes('Unauthorized')
-        ) {
+        console.error(
+          '❌ Login failed:',
+          result.error,
+          'Status:',
+          result.status
+        )
+        // Handle different error types based on HTTP status codes
+        if (result.status === 401) {
           setError('Tên đăng nhập hoặc mật khẩu không chính xác')
-        } else if (
-          result.error?.includes('404') ||
-          result.error?.includes('not found')
-        ) {
+        } else if (result.status === 404) {
           setError('Tài khoản không tồn tại')
-        } else if (
-          result.error?.includes('network') ||
-          result.error?.includes('fetch')
-        ) {
+        } else if (!result.status || result.status >= 500) {
           setError('Không thể kết nối đến server. Vui lòng thử lại')
         } else {
           setError(result.error || 'Có lỗi xảy ra. Vui lòng thử lại')

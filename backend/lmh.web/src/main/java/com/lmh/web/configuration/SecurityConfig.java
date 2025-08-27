@@ -50,6 +50,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/user/levels").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/user/lessons").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/user/lessons/*").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user/leader_board").permitAll()
                                 .anyRequest().authenticated() // yêu cầu đăng nhập
                 )
                 .oauth2Login(oauth2Login ->
