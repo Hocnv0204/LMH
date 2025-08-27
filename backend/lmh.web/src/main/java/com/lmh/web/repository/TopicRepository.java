@@ -16,18 +16,6 @@ import java.util.Optional;
 
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Integer>, JpaSpecificationExecutor<Topic> {
-
-    @Query("SELECT t FROM Topic t " +
-            "WHERE t.level.name = :levelName AND t.language.name = :languageName AND t.deleteFlag = false " +
-            "AND t.user.id = :userId AND t.type = :type OR t.type = 'DEFAULT' AND t.deleteFlag = false")
-    Page<Topic> findTopicsIncludingDefault(@Param("userId") Integer userId,
-                                           @Param("levelName") String levelName,
-                                           @Param("type")TypeTopic typeTopic,
-                                           @Param("languageName") String languageName,
-                                           Pageable pageable);
-
     boolean existsByName(String name);
     Optional<Topic> findByName(String name);
-    
-
 }

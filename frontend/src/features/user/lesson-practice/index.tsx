@@ -261,24 +261,24 @@ export default function LessonPracticePage({
       searchParams.languageName
     ) {
       navigate({
-        to: '/user/lessons',
-        search: {
-          levelId: searchParams.levelId,
-          levelName: searchParams.levelName,
-          languageName: searchParams.languageName,
-          ...(searchParams.topicId && { topicId: searchParams.topicId }),
-          ...(searchParams.topicName && { topicName: searchParams.topicName }),
-        },
+        to: '/user/lesson-discovery',
+        // search: {
+        //   levelId: searchParams.levelId,
+        //   levelName: searchParams.levelName,
+        //   languageName: searchParams.languageName,
+        //   ...(searchParams.topicId && { topicId: searchParams.topicId }),
+        //   ...(searchParams.topicName && { topicName: searchParams.topicName }),
+        // },
       })
     } else {
       // Fallback to lessons page without search params
       navigate({
-        to: '/user/lessons',
-        search: {
-          levelId: 1,
-          levelName: '',
-          languageName: '',
-        },
+        to: '/user/lesson-discovery',
+        // search: {
+        //   levelId: 1,
+        //   levelName: '',
+        //   languageName: '',
+        // },
       })
     }
   }
@@ -409,9 +409,7 @@ export default function LessonPracticePage({
             {/* Current Sentence */}
             <Card className='mb-6'>
               <CardHeader>
-                <CardTitle className='text-lg'>
-                  Dịch câu sau:
-                </CardTitle>
+                <CardTitle className='text-lg'>Dịch câu sau:</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className='mb-4 rounded-lg bg-blue-50 p-4'>

@@ -34,7 +34,7 @@ export interface UpdateLessonRequest {
 export const lessonApi = {
   getLessonById: async (lessonId: number) => {
     try {
-      const url = buildApiUrl(`/user/lesson/${lessonId}`)
+      const url = buildApiUrl(`/user/lessons/${lessonId}`)
       const response = await fetch(url, {
         method: 'GET',
         headers: {

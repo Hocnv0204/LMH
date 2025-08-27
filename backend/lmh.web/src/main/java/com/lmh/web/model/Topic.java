@@ -83,7 +83,6 @@ public class Topic {
     @JoinColumn(name = "language_id")
     private Language language;
 
-
     /**
      * Mối quan hệ một-nhiều với Lesson.
      * Một topic có thể chứa nhiều bài học.
@@ -92,9 +91,9 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Lesson> lessons;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "level_id")
-    private Level level;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "level_id")
+//    private Level level;
 
     public Topic() {
     }

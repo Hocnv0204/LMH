@@ -47,6 +47,9 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
                             .email(email)
                             .role(Role.USER.name())
                             .username(username)
+                            .deleteFlag(false)
+                            .credit(10)
+                            .point(0)
                             .enable(true)
                             .createdAt(LocalDateTime.now())
                             .build();

@@ -11,7 +11,6 @@ import com.lmh.web.model.Language;
 import com.lmh.web.model.Topic;
 import com.lmh.web.repository.LanguageRepository;
 import com.lmh.web.repository.TopicRepository;
-import com.lmh.web.service.LanguageService;
 import com.lmh.web.service.cloudinary.CloudinaryService;
 import com.lmh.web.utils.mapper.topic.TopicMapper;
 import jakarta.persistence.criteria.Predicate;
@@ -105,7 +104,7 @@ public class AdminTopicServiceImpl implements AdminTopicService {
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy ngôn ngữ với tên: " + languageName));
 
         // 3. Chuyển đổi DTO sang Entity
-        Topic topic = topicMapper.toEntity(request);
+        Topic topic = topicMapper.toAdminEntity(request);
 
         // 4. Nếu có file đính kèm, upload lên Cloudinary
         if (file != null && !file.isEmpty()) {

@@ -44,7 +44,7 @@ function Index() {
     {
       title: 'Chọn cấp độ',
       description: 'Bắt đầu học tập',
-      href: '/user/level',
+      href: '/user/lesson-discovery',
       icon: Target,
       color: 'purple',
     },

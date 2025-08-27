@@ -31,8 +31,8 @@ public class Level {
     @Column(name = "delete_flag")
     private Boolean deleteFlag;
     
-    @OneToMany(mappedBy = "level", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Topic> topics;
+//    @OneToMany(mappedBy = "level", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<Topic> topics;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id")

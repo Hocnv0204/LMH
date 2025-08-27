@@ -29,6 +29,7 @@ import { Route as UserTopicsIndexRouteImport } from './routes/user/topics/index'
 import { Route as UserProfileIndexRouteImport } from './routes/user/profile/index'
 import { Route as UserLevelIndexRouteImport } from './routes/user/level/index'
 import { Route as UserLessonsIndexRouteImport } from './routes/user/lessons/index'
+import { Route as UserLessonDiscoveryIndexRouteImport } from './routes/user/lesson-discovery/index'
 import { Route as AdminUserIndexRouteImport } from './routes/admin/user/index'
 import { Route as AdminTopicIndexRouteImport } from './routes/admin/topic/index'
 import { Route as AdminLevelIndexRouteImport } from './routes/admin/level/index'
@@ -36,6 +37,7 @@ import { Route as AdminLessonIndexRouteImport } from './routes/admin/lesson/inde
 import { Route as AdminLanguageIndexRouteImport } from './routes/admin/language/index'
 import { Route as AdminHistoryIndexRouteImport } from './routes/admin/history/index'
 import { Route as UserLessonPracticeLessonIdRouteImport } from './routes/user/lesson-practice/$lessonId'
+import { Route as UserLessonDiscoveryLessonRouteImport } from './routes/user/lesson-discovery/lesson'
 import { Route as AuthVerifyEmailTokenRouteImport } from './routes/auth/verify-email/$token'
 import { Route as AuthResetPasswordTokenRouteImport } from './routes/auth/reset-password/$token'
 
@@ -139,6 +141,12 @@ const UserLessonsIndexRoute = UserLessonsIndexRouteImport.update({
   path: '/lessons/',
   getParentRoute: () => UserRouteRoute,
 } as any)
+const UserLessonDiscoveryIndexRoute =
+  UserLessonDiscoveryIndexRouteImport.update({
+    id: '/lesson-discovery/',
+    path: '/lesson-discovery/',
+    getParentRoute: () => UserRouteRoute,
+  } as any)
 const AdminUserIndexRoute = AdminUserIndexRouteImport.update({
   id: '/user/',
   path: '/user/',
@@ -175,6 +183,12 @@ const UserLessonPracticeLessonIdRoute =
     path: '/lesson-practice/$lessonId',
     getParentRoute: () => UserRouteRoute,
   } as any)
+const UserLessonDiscoveryLessonRoute =
+  UserLessonDiscoveryLessonRouteImport.update({
+    id: '/lesson-discovery/lesson',
+    path: '/lesson-discovery/lesson',
+    getParentRoute: () => UserRouteRoute,
+  } as any)
 const AuthVerifyEmailTokenRoute = AuthVerifyEmailTokenRouteImport.update({
   id: '/verify-email/$token',
   path: '/verify-email/$token',
@@ -205,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/vocab': typeof VocabIndexRoute
   '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
   '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
+  '/user/lesson-discovery/lesson': typeof UserLessonDiscoveryLessonRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/history': typeof AdminHistoryIndexRoute
   '/admin/language': typeof AdminLanguageIndexRoute
@@ -212,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/admin/level': typeof AdminLevelIndexRoute
   '/admin/topic': typeof AdminTopicIndexRoute
   '/admin/user': typeof AdminUserIndexRoute
+  '/user/lesson-discovery': typeof UserLessonDiscoveryIndexRoute
   '/user/lessons': typeof UserLessonsIndexRoute
   '/user/level': typeof UserLevelIndexRoute
   '/user/profile': typeof UserProfileIndexRoute
@@ -235,6 +251,7 @@ export interface FileRoutesByTo {
   '/vocab': typeof VocabIndexRoute
   '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
   '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
+  '/user/lesson-discovery/lesson': typeof UserLessonDiscoveryLessonRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/history': typeof AdminHistoryIndexRoute
   '/admin/language': typeof AdminLanguageIndexRoute
@@ -242,6 +259,7 @@ export interface FileRoutesByTo {
   '/admin/level': typeof AdminLevelIndexRoute
   '/admin/topic': typeof AdminTopicIndexRoute
   '/admin/user': typeof AdminUserIndexRoute
+  '/user/lesson-discovery': typeof UserLessonDiscoveryIndexRoute
   '/user/lessons': typeof UserLessonsIndexRoute
   '/user/level': typeof UserLevelIndexRoute
   '/user/profile': typeof UserProfileIndexRoute
@@ -267,6 +285,7 @@ export interface FileRoutesById {
   '/vocab/': typeof VocabIndexRoute
   '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
   '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
+  '/user/lesson-discovery/lesson': typeof UserLessonDiscoveryLessonRoute
   '/user/lesson-practice/$lessonId': typeof UserLessonPracticeLessonIdRoute
   '/admin/history/': typeof AdminHistoryIndexRoute
   '/admin/language/': typeof AdminLanguageIndexRoute
@@ -274,6 +293,7 @@ export interface FileRoutesById {
   '/admin/level/': typeof AdminLevelIndexRoute
   '/admin/topic/': typeof AdminTopicIndexRoute
   '/admin/user/': typeof AdminUserIndexRoute
+  '/user/lesson-discovery/': typeof UserLessonDiscoveryIndexRoute
   '/user/lessons/': typeof UserLessonsIndexRoute
   '/user/level/': typeof UserLevelIndexRoute
   '/user/profile/': typeof UserProfileIndexRoute
@@ -300,6 +320,7 @@ export interface FileRouteTypes {
     | '/vocab'
     | '/auth/reset-password/$token'
     | '/auth/verify-email/$token'
+    | '/user/lesson-discovery/lesson'
     | '/user/lesson-practice/$lessonId'
     | '/admin/history'
     | '/admin/language'
@@ -307,6 +328,7 @@ export interface FileRouteTypes {
     | '/admin/level'
     | '/admin/topic'
     | '/admin/user'
+    | '/user/lesson-discovery'
     | '/user/lessons'
     | '/user/level'
     | '/user/profile'
@@ -330,6 +352,7 @@ export interface FileRouteTypes {
     | '/vocab'
     | '/auth/reset-password/$token'
     | '/auth/verify-email/$token'
+    | '/user/lesson-discovery/lesson'
     | '/user/lesson-practice/$lessonId'
     | '/admin/history'
     | '/admin/language'
@@ -337,6 +360,7 @@ export interface FileRouteTypes {
     | '/admin/level'
     | '/admin/topic'
     | '/admin/user'
+    | '/user/lesson-discovery'
     | '/user/lessons'
     | '/user/level'
     | '/user/profile'
@@ -361,6 +385,7 @@ export interface FileRouteTypes {
     | '/vocab/'
     | '/auth/reset-password/$token'
     | '/auth/verify-email/$token'
+    | '/user/lesson-discovery/lesson'
     | '/user/lesson-practice/$lessonId'
     | '/admin/history/'
     | '/admin/language/'
@@ -368,6 +393,7 @@ export interface FileRouteTypes {
     | '/admin/level/'
     | '/admin/topic/'
     | '/admin/user/'
+    | '/user/lesson-discovery/'
     | '/user/lessons/'
     | '/user/level/'
     | '/user/profile/'
@@ -529,6 +555,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserLessonsIndexRouteImport
       parentRoute: typeof UserRouteRoute
     }
+    '/user/lesson-discovery/': {
+      id: '/user/lesson-discovery/'
+      path: '/lesson-discovery'
+      fullPath: '/user/lesson-discovery'
+      preLoaderRoute: typeof UserLessonDiscoveryIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
     '/admin/user/': {
       id: '/admin/user/'
       path: '/user'
@@ -576,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/lesson-practice/$lessonId'
       fullPath: '/user/lesson-practice/$lessonId'
       preLoaderRoute: typeof UserLessonPracticeLessonIdRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/user/lesson-discovery/lesson': {
+      id: '/user/lesson-discovery/lesson'
+      path: '/lesson-discovery/lesson'
+      fullPath: '/user/lesson-discovery/lesson'
+      preLoaderRoute: typeof UserLessonDiscoveryLessonRouteImport
       parentRoute: typeof UserRouteRoute
     }
     '/auth/verify-email/$token': {
@@ -644,7 +684,9 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 )
 
 interface UserRouteRouteChildren {
+  UserLessonDiscoveryLessonRoute: typeof UserLessonDiscoveryLessonRoute
   UserLessonPracticeLessonIdRoute: typeof UserLessonPracticeLessonIdRoute
+  UserLessonDiscoveryIndexRoute: typeof UserLessonDiscoveryIndexRoute
   UserLessonsIndexRoute: typeof UserLessonsIndexRoute
   UserLevelIndexRoute: typeof UserLevelIndexRoute
   UserProfileIndexRoute: typeof UserProfileIndexRoute
@@ -652,7 +694,9 @@ interface UserRouteRouteChildren {
 }
 
 const UserRouteRouteChildren: UserRouteRouteChildren = {
+  UserLessonDiscoveryLessonRoute: UserLessonDiscoveryLessonRoute,
   UserLessonPracticeLessonIdRoute: UserLessonPracticeLessonIdRoute,
+  UserLessonDiscoveryIndexRoute: UserLessonDiscoveryIndexRoute,
   UserLessonsIndexRoute: UserLessonsIndexRoute,
   UserLevelIndexRoute: UserLevelIndexRoute,
   UserProfileIndexRoute: UserProfileIndexRoute,

@@ -260,6 +260,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(request.getEmail())
                 .role(Role.USER.name())
                 .school(request.getSchool())
+                .deleteFlag(false)
+                .point(0)
                 .phoneNumber(request.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
                 .credit(INIT_CREDIT)
