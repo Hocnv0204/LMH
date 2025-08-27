@@ -26,6 +26,7 @@ public class LessonGenerationListener {
         // Gọi service bất đồng bộ với dữ liệu từ sự kiện
         generatorService.generateAndSaveLessonContent(
                 event.getLessonId(),
+                event.getUserId(),
                 event.getTopicDescription(),
                 event.getLevelName(),
                 event.getDescription(),

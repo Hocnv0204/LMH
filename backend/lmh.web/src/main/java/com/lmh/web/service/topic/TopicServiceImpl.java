@@ -231,7 +231,13 @@ public class TopicServiceImpl implements TopicService {
 
         Integer ownerId = topic.getUser().getId();
         Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        Integer currentUserId = (Integer) jwtPrincipal.getClaim("id");
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer currentUserId;
+        try {
+            currentUserId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
 
         return ownerId.equals(currentUserId);
     }

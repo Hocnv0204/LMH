@@ -13,7 +13,9 @@ import com.lmh.web.utils.mapper.history.HistoryMapper;
 import com.lmh.web.utils.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,12 +61,20 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<HistoryResponse> getHistoryForUser(int userId, Pageable pageable) {
-        // Kiểm tra xem user có tồn tại không
+    // THAY ĐỔI: Nhận các tham số tường minh thay vì Pageable
+    public Page<HistoryResponse> getHistoryForUser(int userId, int page, int size, String sortBy, String sortDir) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Không tìm thấy người dùng với ID: " + userId);
         }
-        // Dùng userId để truy vấn trực tiếp
+
+        // Bước 1: Tạo đối tượng Sort từ sortBy và sortDir
+        Sort.Direction direction = sortDir.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+
+        // Bước 2: Tạo đối tượng Pageable (cụ thể là PageRequest) từ thông tin trang, kích thước và sắp xếp
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Bước 3: Gọi repository với đối tượng Pageable vừa tạo (giống như cũ)
         return historyRepository.findByUserId(userId, pageable)
                 .map(historyMapper::toResponse);
     }

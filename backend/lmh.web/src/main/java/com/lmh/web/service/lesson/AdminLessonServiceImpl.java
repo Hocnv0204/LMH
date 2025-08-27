@@ -46,7 +46,7 @@ public class AdminLessonServiceImpl implements AdminLessonService {
 
     @Override
     @Transactional
-    public LessonGenerationResponse requestLessonGeneration(AdminCreateLessonRequest request) {
+    public LessonGenerationResponse requestLessonGeneration(Integer userId, AdminCreateLessonRequest request) {
         // 1. Tìm các thực thể liên quan
         Topic topic = topicRepository.findById(request.getTopicId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy chủ đề với ID: " + request.getTopicId()));
@@ -72,6 +72,7 @@ public class AdminLessonServiceImpl implements AdminLessonService {
         LessonGenerationRequestedEvent event = new LessonGenerationRequestedEvent(
                 this,
                 savedLesson.getId(),
+                userId,
                 topic.getDescription(),
                 level.getName(),
                 request.getDescription(),

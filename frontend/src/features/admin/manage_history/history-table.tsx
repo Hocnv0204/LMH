@@ -77,7 +77,6 @@ export function HistoryTable({ filters }: HistoryTableProps) {
                 <TableHead>Lesson</TableHead>
                 <TableHead>Question</TableHead>
                 <TableHead>Answer</TableHead>
-                <TableHead>Result</TableHead>
                 <TableHead>Created At</TableHead>
               </TableRow>
             </TableHeader>
@@ -127,11 +126,6 @@ export function HistoryTable({ filters }: HistoryTableProps) {
                           {history.answer}
                         </p>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getResultBadgeVariant(history.result)}>
-                        {history.result}
-                      </Badge>
                     </TableCell>
                     <TableCell>
                       {new Date(history.createdAt).toLocaleString()}

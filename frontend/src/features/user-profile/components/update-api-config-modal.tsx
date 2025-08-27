@@ -4,12 +4,7 @@ import React from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { UpdateApiConfigRequest } from '@/types/user-profile'
 import { Eye, EyeOff } from 'lucide-react'
-import {
-  useCurrentUserProfile,
-  useUpdateUserApiConfig,
-} from '@/hooks/use-user-profile'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,6 +14,11 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  useCurrentUserProfile,
+  useUpdateUserApiConfig,
+} from '@/features/user-profile/hooks/useProfile'
+import type { UpdateApiConfigRequest } from '@/features/user-profile/types/user-profile'
 
 const apiConfigSchema = z.object({
   apiKey: z.string().optional().or(z.literal('')),

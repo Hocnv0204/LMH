@@ -4,13 +4,13 @@ import {
   useQueryClient,
   keepPreviousData,
 } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { userProfileApi } from '@/features/user-profile/api/profileApi'
 import type {
   UpdateProfileRequest,
   UpdateApiConfigRequest,
   UserHistoryFilters,
-} from '@/types/user-profile'
-import { toast } from 'sonner'
-import { userProfileApi } from '@/api/user/user-profile-api'
+} from '@/features/user-profile/types/user-profile'
 
 export const useCurrentUserProfile = () => {
   return useQuery({

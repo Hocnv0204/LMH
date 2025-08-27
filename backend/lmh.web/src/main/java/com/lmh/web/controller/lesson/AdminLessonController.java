@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -27,9 +29,19 @@ public class AdminLessonController {
 
     @PostMapping("/generate-with-ai")
     public CustomResponse<LessonGenerationResponse> createLessonWithAi(
-            @Valid @RequestBody AdminCreateLessonRequest request
+            @Valid @RequestBody AdminCreateLessonRequest request,
+            Authentication authentication
     ) {
-        LessonGenerationResponse response = adminLessonService.requestLessonGeneration(request);
+        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer userId;
+        try {
+            userId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
+
+        LessonGenerationResponse response = adminLessonService.requestLessonGeneration(userId, request);
         // Sử dụng HttpStatus.ACCEPTED (202) để chỉ ra rằng yêu cầu đã được chấp nhận
         // nhưng việc xử lý chưa hoàn tất.
         return new CustomResponse<>(response, HttpStatus.ACCEPTED);

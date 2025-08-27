@@ -4,11 +4,6 @@ import React from 'react'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { UpdateProfileRequest } from '@/types/user-profile'
-import {
-  useCurrentUserProfile,
-  useUpdateUserProfile,
-} from '@/hooks/use-user-profile'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -18,6 +13,11 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  useCurrentUserProfile,
+  useUpdateUserProfile,
+} from '@/features/user-profile/hooks/useProfile'
+import type { UpdateProfileRequest } from '@/features/user-profile/types/user-profile'
 
 const profileSchema = z.object({
   name: z

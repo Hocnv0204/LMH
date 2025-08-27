@@ -98,7 +98,7 @@ export const lessonApi = {
     languageId: number
   ): Promise<CustomResponse<TopicOption[]>> => {
     return fetchApi(
-      `/admin/topics?languageName=${encodeURIComponent('')}&size=100&isDeleted=false`
+      `/admin/topics?languageId=${languageId}&size=100&isDeleted=false`
     ).then((response: any) => ({
       data: response.data.content
         .filter((topic: any) => topic.languageName)

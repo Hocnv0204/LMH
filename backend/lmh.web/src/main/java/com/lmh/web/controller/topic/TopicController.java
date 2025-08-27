@@ -65,7 +65,14 @@ public class TopicController {
             @RequestParam(value = "file", required = false) MultipartFile file
     ) throws JsonProcessingException {
         Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        Integer userId = (Integer) jwtPrincipal.getClaim("id");
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer userId;
+        try {
+            userId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
+
         TopicRequest request = objectMapper.readValue(requestJson, TopicRequest.class);
         TopicResponse newTopic = topicService.createTopicForUser(userId, request, file);
         return new CustomResponse<>(newTopic, HttpStatus.CREATED);
