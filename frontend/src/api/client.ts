@@ -94,10 +94,13 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as ExtendedAxiosRequestConfig
 
     // If 401 and we haven't already tried to refresh
+    // BUT skip refresh for auth login/register endpoints (they should fail naturally)
     if (
       error.response?.status === 401 &&
       originalRequest &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/register')
     ) {
       console.log('🚨 401 Unauthorized detected, attempting token refresh...')
       originalRequest._retry = true
@@ -220,13 +223,22 @@ export const api = {
       }),
 }
 
-// Error handling utility
-export const handleApiError = (error: unknown): string => {
+// Error handling utility - trả về object chứa cả message và status
+export const handleApiError = (
+  error: unknown
+): { message: string; status?: number } => {
   if (axios.isAxiosError(error)) {
     const apiResponse = error.response?.data as ApiResponse
-    return (
+    const message =
       apiResponse?.error?.message || error.message || 'Network error occurred'
-    )
+    const status = error.response?.status
+    return { message, status }
   }
-  return (error as Error).message || 'An unexpected error occurred'
+  return { message: (error as Error).message || 'An unexpected error occurred' }
+}
+
+// Backward compatibility - trả về string như cũ
+export const handleApiErrorMessage = (error: unknown): string => {
+  const result = handleApiError(error)
+  return result.message
 }

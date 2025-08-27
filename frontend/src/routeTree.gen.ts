@@ -14,6 +14,7 @@ import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VocabIndexRouteImport } from './routes/vocab/index'
+import { Route as LeaderboardIndexRouteImport } from './routes/leaderboard/index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as VocabFlashcardRouteImport } from './routes/vocab/flashcard'
@@ -64,6 +65,11 @@ const IndexRoute = IndexRouteImport.update({
 const VocabIndexRoute = VocabIndexRouteImport.update({
   id: '/vocab/',
   path: '/vocab/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardIndexRoute = LeaderboardIndexRouteImport.update({
+  id: '/leaderboard/',
+  path: '/leaderboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
@@ -216,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin/': typeof AdminIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/leaderboard': typeof LeaderboardIndexRoute
   '/vocab': typeof VocabIndexRoute
   '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
   '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
@@ -248,6 +255,7 @@ export interface FileRoutesByTo {
   '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin': typeof AdminIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/leaderboard': typeof LeaderboardIndexRoute
   '/vocab': typeof VocabIndexRoute
   '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
   '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/vocab/flashcard': typeof VocabFlashcardRoute
   '/admin/': typeof AdminIndexRoute
   '/collections/': typeof CollectionsIndexRoute
+  '/leaderboard/': typeof LeaderboardIndexRoute
   '/vocab/': typeof VocabIndexRoute
   '/auth/reset-password/$token': typeof AuthResetPasswordTokenRoute
   '/auth/verify-email/$token': typeof AuthVerifyEmailTokenRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/vocab/flashcard'
     | '/admin/'
     | '/collections'
+    | '/leaderboard'
     | '/vocab'
     | '/auth/reset-password/$token'
     | '/auth/verify-email/$token'
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/vocab/flashcard'
     | '/admin'
     | '/collections'
+    | '/leaderboard'
     | '/vocab'
     | '/auth/reset-password/$token'
     | '/auth/verify-email/$token'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/vocab/flashcard'
     | '/admin/'
     | '/collections/'
+    | '/leaderboard/'
     | '/vocab/'
     | '/auth/reset-password/$token'
     | '/auth/verify-email/$token'
@@ -410,6 +422,7 @@ export interface RootRouteChildren {
   QuizSetupRoute: typeof QuizSetupRoute
   VocabFlashcardRoute: typeof VocabFlashcardRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
+  LeaderboardIndexRoute: typeof LeaderboardIndexRoute
   VocabIndexRoute: typeof VocabIndexRoute
 }
 
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/vocab'
       fullPath: '/vocab'
       preLoaderRoute: typeof VocabIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard/': {
+      id: '/leaderboard/'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collections/': {
@@ -717,6 +737,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizSetupRoute: QuizSetupRoute,
   VocabFlashcardRoute: VocabFlashcardRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
+  LeaderboardIndexRoute: LeaderboardIndexRoute,
   VocabIndexRoute: VocabIndexRoute,
 }
 export const routeTree = rootRouteImport

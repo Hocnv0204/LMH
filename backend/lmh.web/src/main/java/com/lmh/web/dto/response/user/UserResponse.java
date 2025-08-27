@@ -1,10 +1,12 @@
 package com.lmh.web.dto.response.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+@Data
 public class UserResponse {
     private Integer id;
     private String name;
@@ -16,4 +18,5 @@ public class UserResponse {
     private String school;
     private Integer point;
     private Integer credit;
+    private LocalDateTime createdAt ;
 }

@@ -2,12 +2,15 @@ package com.lmh.web.service.user;
 
 import com.lmh.web.common.exception.NotFoundException;
 import com.lmh.web.dto.request.user.UserRequest;
+import com.lmh.web.dto.response.user.UserDto;
 import com.lmh.web.dto.response.user.UserResponse;
 import com.lmh.web.model.User;
 import com.lmh.web.repository.UserRepository;
 import com.lmh.web.utils.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,6 +22,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
 
     @Override
     public User getUserByUsername(String username) {
@@ -60,5 +64,12 @@ public class UserServiceImpl implements UserService {
         UserResponse result = userMapper.toResponse(userRepository.save(user));
         log.info("Cập nhật thông tin user thành công ID: {}, tên: {}", id, userRequest.getName());
         return result;
+    }
+
+    @Override
+    public Page<UserResponse> getAllUsers(Pageable pageable){
+        Page<User> pages = userRepository.findAll(pageable) ;
+        Page<UserResponse> pagesResponse = pages.map(userMapper::toResponse) ;
+        return pagesResponse ;
     }
 }
