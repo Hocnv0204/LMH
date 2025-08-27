@@ -1,12 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type {
-  UserHistoryFilters,
-  UserHistoryResponse,
-} from '@/types/user-profile'
 import { History, Eye, BookOpen } from 'lucide-react'
-import { useUserHistory } from '@/hooks/use-user-profile'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useUserHistory } from '@/features/user-profile/hooks/useProfile'
+import type {
+  UserHistoryFilters,
+  UserHistoryResponse,
+} from '@/features/user-profile/types/user-profile'
 import { HistoryDetailsModal } from './history-details-modal'
 
 interface UserHistoryTableProps {
@@ -92,8 +92,8 @@ export function UserHistoryTable({
               <TableHeader>
                 <TableRow>
                   <TableHead>Lesson</TableHead>
-                  <TableHead>Question Preview</TableHead>
-                  <TableHead>Result</TableHead>
+                  <TableHead>Question</TableHead>
+                  <TableHead>Answer</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className='w-[100px]'>Actions</TableHead>
                 </TableRow>
@@ -115,13 +115,17 @@ export function UserHistoryTable({
                   </TableRow>
                 ) : (
                   histories.map((history) => (
-                    <TableRow key={history.id}>
+                    <TableRow
+                      key={history.id}
+                      onClick={() => handleViewDetails(history)}
+                      className='hover:bg-muted/50 cursor-pointer'
+                    >
                       <TableCell>
                         <div>
                           <p className='font-medium'>{history.lessonName}</p>
-                          <p className='text-muted-foreground text-xs'>
+                          {/* <p className='text-muted-foreground text-xs'>
                             ID: {history.lessonId}
-                          </p>
+                          </p> */}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -135,9 +139,14 @@ export function UserHistoryTable({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getResultBadgeVariant(history.result)}>
-                          {history.result}
-                        </Badge>
+                        <div className='max-w-xs'>
+                          <p
+                            className='truncate text-sm'
+                            title={history.answer}
+                          >
+                            {history.answer}
+                          </p>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className='text-sm'>

@@ -1,6 +1,6 @@
 'use client'
 
-import type { UserHistoryResponse } from '@/types/user-profile'
+import { useNavigate } from '@tanstack/react-router'
 import {
   BookOpen,
   MessageSquare,
@@ -8,7 +8,6 @@ import {
   Calendar,
   ExternalLink,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -18,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import type { UserHistoryResponse } from '@/features/user-profile/types/user-profile'
 
 interface HistoryDetailsModalProps {
   history: UserHistoryResponse | null
@@ -31,6 +31,7 @@ export function HistoryDetailsModal({
   onOpenChange,
 }: HistoryDetailsModalProps) {
   if (!history) return null
+  const navigate = useNavigate()
 
   const getResultBadgeVariant = (result: string) => {
     switch (result.toLowerCase()) {
@@ -58,14 +59,12 @@ export function HistoryDetailsModal({
   }
 
   const handleGoToLesson = () => {
-    // For now, just show a toast or placeholder action
-    console.log(`Navigate to lesson ${history.lessonId}`)
-    // You can implement navigation logic here later
+    navigate({ to: `/user/lesson-practice/${history.lessonId}` })
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] max-w-4xl'>
+      <DialogContent className='max-w-10xl max-h-[90vh] w-full'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <MessageSquare className='h-5 w-5' />

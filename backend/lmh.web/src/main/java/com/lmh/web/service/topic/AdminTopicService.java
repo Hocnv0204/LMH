@@ -11,6 +11,7 @@ public interface AdminTopicService {
     Page<AdminTopicResponse> getAllTopicsForAdmin(
             String searchTerm,
             String languageName,
+            Integer languageId,
             Boolean isDeleted,
             int page,
             int size,

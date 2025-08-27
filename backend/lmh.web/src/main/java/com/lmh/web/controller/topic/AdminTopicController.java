@@ -27,6 +27,7 @@ public class AdminTopicController {
     public CustomResponse<Page<AdminTopicResponse>> getAllTopics(
             @RequestParam(required = false) String searchTerm,
             @RequestParam(required = false) String languageName,
+            @RequestParam(required = false) Integer languageId,
             @RequestParam(required = false) Boolean isDeleted,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -34,7 +35,7 @@ public class AdminTopicController {
             @RequestParam(defaultValue = "DESC") String sortDir
     ) {
         Page<AdminTopicResponse> topicPage = adminTopicService.getAllTopicsForAdmin(
-                searchTerm, languageName, isDeleted, page, size, sortBy, sortDir
+                searchTerm, languageName, languageId, isDeleted, page, size, sortBy, sortDir
         );
         return new CustomResponse<>(topicPage, HttpStatus.OK);
     }

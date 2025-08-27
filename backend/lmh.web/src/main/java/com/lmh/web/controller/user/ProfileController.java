@@ -78,9 +78,12 @@ public class ProfileController {
     public CustomResponse<Page<HistoryResponse>> getHistoryForUser(
             @PathVariable int userId,
             @RequestHeader("Authorization") String authorizationHeader,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir) {
         verifyUser(authorizationHeader, userId); // Xác thực danh tính
-        Page<HistoryResponse> historyPage = userProfileService.getHistoryForUser(userId, pageable);
+        Page<HistoryResponse> historyPage = userProfileService.getHistoryForUser(userId, page, size, sortBy, sortDir);
         return new CustomResponse<>(historyPage, HttpStatus.OK);
     }
 }

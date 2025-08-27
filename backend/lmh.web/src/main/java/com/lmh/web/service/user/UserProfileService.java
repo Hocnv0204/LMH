@@ -15,5 +15,5 @@ public interface UserProfileService {
 
     UserProfileResponse updateUserApiConfig(int userId, UpdateApiConfigRequest request);
 
-    Page<HistoryResponse> getHistoryForUser(int userId, Pageable pageable);
+    Page<HistoryResponse> getHistoryForUser(int userId, int page, int size, String sortBy, String sortDir);
 }

@@ -41,7 +41,14 @@ public class LessonController {
         if (authentication != null && authentication.isAuthenticated()) {
             // User đã đăng nhập: Lấy cả default và của riêng user
             Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            Integer userId = ((Number) jwtPrincipal.getClaim("id")).intValue();
+            Long userIdLong = jwtPrincipal.getClaim("id");
+            Integer userId;
+            try {
+                userId = Math.toIntExact(userIdLong);
+            } catch (ArithmeticException e) {
+                throw new IllegalArgumentException("User ID from token is too large.", e);
+            }
+
             lessonPage = lessonService.getAllLessonsForUser(
                     userId, searchTerm, topicId, levelId, languageId, page, size, sortBy, sortDir
             );
@@ -61,11 +68,21 @@ public class LessonController {
             @PathVariable Integer lessonId,
             Authentication authentication
     ) {
-        Integer userId = null;
+        Integer userId = null; // Mặc định userId là null (cho người dùng vãng lai)
+
+        // Chỉ lấy userId nếu người dùng đã đăng nhập và được xác thực
         if (authentication != null && authentication.isAuthenticated()) {
             Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            userId = ((Number) jwtPrincipal.getClaim("id")).intValue();
+            Long userIdLong = jwtPrincipal.getClaim("id");
+            try {
+                userId = Math.toIntExact(userIdLong);
+            } catch (ArithmeticException e) {
+                // Ghi log lỗi sẽ tốt hơn là chỉ throw exception
+                // log.error("User ID from token is too large: {}", userIdLong);
+                throw new IllegalArgumentException("User ID from token is too large.", e);
+            }
         }
+
         LessonResponse lesson = lessonService.getLessonDetails(lessonId, userId);
         return new CustomResponse<>(lesson, HttpStatus.OK);
     }
@@ -77,7 +94,14 @@ public class LessonController {
             @RequestBody @Validated LessonRequest lessonRequest
     ) {
         Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        Integer userId = ((Number) jwtPrincipal.getClaim("id")).intValue();
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer userId;
+        try {
+            userId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
+
         LessonResponse newLesson = lessonService.createLessonForUser(userId, lessonRequest);
         return new CustomResponse<>(newLesson, HttpStatus.CREATED);
     }

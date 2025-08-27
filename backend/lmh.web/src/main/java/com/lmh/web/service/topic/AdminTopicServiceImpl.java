@@ -43,7 +43,7 @@ public class AdminTopicServiceImpl implements AdminTopicService {
 
     @Override
     public Page<AdminTopicResponse> getAllTopicsForAdmin(
-            String searchTerm, String languageName, Boolean isDeleted,
+            String searchTerm, String languageName, Integer languageId, Boolean isDeleted,
             int page, int size, String sortBy, String sortDir) {
 
         // 1. Tạo Pageable để phân trang và sắp xếp (ĐÃ SỬA LỖI)
@@ -73,6 +73,10 @@ public class AdminTopicServiceImpl implements AdminTopicService {
             // Điều kiện ĐỘNG: Lọc theo ngôn ngữ
             if (languageName != null && !languageName.isBlank()) {
                 predicates.add(criteriaBuilder.equal(root.join("language").get("name"), languageName));
+            }
+
+            if (languageId != null && languageId > 0) {
+                predicates.add(criteriaBuilder.equal(root.join("language").get("id"), languageId));
             }
 
             // Điều kiện ĐỘNG: Lọc theo trạng thái xóa

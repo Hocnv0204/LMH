@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface AdminLessonService {
 
-    LessonGenerationResponse requestLessonGeneration(AdminCreateLessonRequest request);
+    LessonGenerationResponse requestLessonGeneration(Integer userId, AdminCreateLessonRequest request);
 
     Page<AdminLessonSummaryResponse> getAllLessonsForAdmin(
             String searchTerm, Integer topicId, Integer levelId, Integer languageId, Boolean isDeleted,

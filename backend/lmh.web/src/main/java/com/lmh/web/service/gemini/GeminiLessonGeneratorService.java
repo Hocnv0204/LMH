@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmh.web.dto.response.gemini.GeminiCreateLessonResponse;
 import com.lmh.web.model.Lesson;
 import com.lmh.web.model.SuggestVocabulary;
+import com.lmh.web.model.User;
 import com.lmh.web.repository.LessonRepository;
 import com.lmh.web.repository.SuggestVocabularyRepository;
+import com.lmh.web.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -29,10 +31,12 @@ public class GeminiLessonGeneratorService {
     private final ResourceLoader resourceLoader;
     private final ObjectMapper objectMapper;
     private final GeminiApiClient geminiApiClient;
+    private final UserRepository userRepository;
 
     @Async // Đánh dấu phương thức này sẽ chạy trong một luồng riêng
     @Transactional // Đảm bảo tất cả các thao tác DB được thực hiện trong một giao dịch
-    public void generateAndSaveLessonContent(Integer lessonId, String topicDescription, String levelName, String description, String languageCode) {
+    public void generateAndSaveLessonContent(Integer lessonId, Integer userId, String topicDescription, String levelName, String description, String languageCode) {
+
         log.info("Starting lesson generation for lessonId: {}", lessonId);
         Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
         if (lesson == null) {
@@ -41,11 +45,20 @@ public class GeminiLessonGeneratorService {
         }
 
         try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalStateException("Không tìm thấy user với ID: " + userId));
+
+            String userApiKey = user.getApiKey(); // Giả sử User entity có trường `geminiApiKey`
+            String userApiUrl = user.getApiUrl();
+            if (userApiKey == null || userApiKey.isBlank() || userApiUrl == null || userApiUrl.isBlank()) {
+                throw new IllegalStateException("User " + userId + " không có API key/url được cấu hình.");
+            }
+
             // 1. Đọc và chuẩn bị prompt
             String prompt = loadAndFormatPrompt(topicDescription, levelName, description, languageCode);
 
             // 2. Gọi API Gemini
-            String jsonResponse = geminiApiClient.generateContent(prompt);
+            String jsonResponse = geminiApiClient.generateContent(prompt, userApiUrl, userApiKey);
             // String jsonResponse = getMockGeminiResponse(); // Sử dụng mock data để test
 
             // 3. Parse JSON response
@@ -74,13 +87,10 @@ public class GeminiLessonGeneratorService {
             lessonRepository.save(lesson);
             suggestVocabularyRepository.saveAll(vocabularies);
 
-            log.info("Successfully generated and saved content for lessonId: {}", lessonId);
+            log.info("Successfully generated content for lessonId: {}", lessonId);
 
         } catch (Exception e) {
             log.error("Failed to generate lesson content for lessonId: {}", lessonId, e);
-            // Cập nhật trạng thái lỗi cho bài học
-            // lesson.setStatus("FAILED");
-            // lessonRepository.save(lesson);
             lessonRepository.delete(lesson);
         }
     }

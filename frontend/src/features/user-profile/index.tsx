@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import type { UserHistoryFilters } from '@/types/user-profile'
 import { toast } from 'sonner'
-import { useUserHistory } from '@/hooks/use-user-profile'
-import { UpdateApiConfigModal } from './update-api-config-modal'
-import { UpdateProfileModal } from './update-profile-modal'
-import { UserHistoryPagination } from './user-history-pagination'
-import { UserHistoryTable } from './user-history-table'
-import { UserProfileCard } from './user-profile-card'
+import { useUserHistory } from '@/features/user-profile/hooks/useProfile'
+import type { UserHistoryFilters } from '@/features/user-profile/types/user-profile'
+import { UpdateApiConfigModal } from './components/update-api-config-modal'
+import { UpdateProfileModal } from './components/update-profile-modal'
+import { UserHistoryPagination } from './components/user-history-pagination'
+import { UserHistoryTable } from './components/user-history-table'
+import { UserProfileCard } from './components/user-profile-card'
 
 export default function UserProfilePage() {
   const [updateProfileModalOpen, setUpdateProfileModalOpen] = useState(false)

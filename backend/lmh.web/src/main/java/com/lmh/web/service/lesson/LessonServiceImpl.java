@@ -123,14 +123,24 @@ public class LessonServiceImpl implements LessonService {
     public LessonResponse getLessonDetails(Integer lessonId, Integer userId) {
         Lesson lesson = findById(lessonId);
 
-        boolean canView = (lesson.getType() == TypeLesson.DEFAULT) ||
-                (lesson.getType() == TypeLesson.USER_CREATION && lesson.getUser() != null && lesson.getUser().getId().equals(userId));
-
-        if (!canView && userId != null) {
-            throw new ForbiddenException("Bạn không có quyền xem bài học này.");
+        // Trường hợp 1: Nếu bài học là DEFAULT, bất kỳ ai cũng có thể xem
+        if (lesson.getType() == TypeLesson.DEFAULT) {
+            return lessonMapper.toResponse(lesson);
         }
 
-        return lessonMapper.toResponse(lesson);
+        // Trường hợp 2: Nếu là bài học do người dùng tạo (USER_CREATION)
+        if (lesson.getType() == TypeLesson.USER_CREATION) {
+            // Nếu người dùng đã đăng nhập (userId không null) VÀ là chủ sở hữu của bài học
+            if (userId != null && lesson.getUser() != null && lesson.getUser().getId().equals(userId)) {
+                return lessonMapper.toResponse(lesson);
+            }
+        }
+
+        // Nếu không rơi vào các trường hợp được phép ở trên, ném ra lỗi.
+        // Lỗi này sẽ xảy ra khi:
+        // - Người dùng chưa đăng nhập (userId == null) xem bài USER_CREATION.
+        // - Người dùng đã đăng nhập nhưng xem bài USER_CREATION của người khác.
+        throw new ForbiddenException("Bạn không có quyền xem bài học này.");
     }
 
     // THAY ĐỔI: Logic thêm lesson, nhận userId thay vì username
@@ -217,8 +227,13 @@ public class LessonServiceImpl implements LessonService {
 
         Integer ownerId = lesson.getUser().getId();
         Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        // Lấy claim "id" từ JWT, có thể cần ép kiểu sang Long rồiintValue() nếu cần
-        Integer currentUserId = ((Number) jwtPrincipal.getClaim("id")).intValue();
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer currentUserId;
+        try {
+            currentUserId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
 
         return ownerId.equals(currentUserId);
     }

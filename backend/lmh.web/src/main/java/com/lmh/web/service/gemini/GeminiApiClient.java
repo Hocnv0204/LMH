@@ -19,13 +19,13 @@ public class GeminiApiClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${gemini.api.key}")
-    private String apiKey;
+//    @Value("${gemini.api.key}")
+//    private String apiKey;
+//
+//    @Value("${gemini.api.url}")
+//    private String apiUrl;
 
-    @Value("${gemini.api.url}")
-    private String apiUrl;
-
-    public String generateContent(String prompt) {
+    public String generateContent(String prompt, String apiUrl, String apiKey) {
         log.info("Sending request to Gemini API...");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

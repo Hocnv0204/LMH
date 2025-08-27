@@ -1,12 +1,12 @@
 import { CustomResponse, PageResponse } from '@/types/common.ts'
+import { fetchApi } from '@/api/api.ts'
+import { authService } from '@/api/auth.ts'
 import type {
   UserProfileResponse,
   UpdateProfileRequest,
   UpdateApiConfigRequest,
   UserHistoryResponse,
-} from '@/types/user-profile'
-import { authService } from '@/api/auth.ts'
-import { fetchApi } from '../api.ts'
+} from '@/features/user-profile/types/user-profile'
 
 const getAuthHeadersAndUserId = async () => {
   // Bước 1: Gọi và chờ hàm getCurrentUser xử lý xong (bao gồm cả refresh token nếu cần)
@@ -92,6 +92,5 @@ export const userProfileApi = {
     return fetchApi(`/user/profile/${userId}/history?${params.toString()}`, {
       headers,
     })
-    //return fetchApi(`/user/profile/${userId}/history?${params.toString()}`)
   },
 }
