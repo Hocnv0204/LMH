@@ -49,6 +49,12 @@ spring:
           auth: true
           starttls:
             enable: true
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+  properties:
+    hibernate:
+      jdbc:
+        time_zone: Asia/Ho_Chi_Minh
 
 LOG_FILE: /var/log/springboot/app.log
 

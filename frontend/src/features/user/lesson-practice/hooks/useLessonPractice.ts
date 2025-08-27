@@ -1,17 +1,19 @@
 import { useState, useCallback } from 'react';
 import { lessonApi } from '@/api/lesson';
 import { geminiApi } from '@/api/gemini';
-import { suggestVocabularyApi, SuggestVocabularyResponse, VocabularyItem } from '@/api/suggestVocabulary';
+import { VocabularyItem } from '@/api/suggestVocabulary';
 import { historyApi, HistoryResponse, ParsedHistoryResult } from '@/api/history';
+import { GeminiValidationResult } from '@/components/gemini-validation-result'
 
 interface LessonData {
   id: number;
   name: string;
   description: string;
   paragraph: string;
+  suggestVocabularies?: VocabularyItem[];
 }
 
-interface ValidationResult {
+export interface ValidationResult {
   score: number;
   status: 'perfect' | 'good' | 'needs_improvement';
   message?: string;
@@ -57,6 +59,8 @@ export function useLessonPractice(lessonId: number, username: string) {
     try {
       const response = await lessonApi.getLessonById(lessonId);
       setLesson(response.data);
+      
+      setSuggestedVocabulary(response.data.suggestVocabularies || []);
       
       const sentenceList = splitIntoSentences(response.data.paragraph);
       setSentences(sentenceList);
@@ -133,8 +137,8 @@ export function useLessonPractice(lessonId: number, username: string) {
     setError(null);
     
     try {
-      const response = await suggestVocabularyApi.getSuggestVocabulariesByLesson(lessonId);
-      setSuggestedVocabulary(response.data.content || []);
+      const list = lesson?.suggestVocabularies || [];
+      setSuggestedVocabulary(list);
       setShowVocabulary(true);
     } catch (err: any) {
       setError('Không thể tải từ vựng gợi ý');
@@ -143,7 +147,7 @@ export function useLessonPractice(lessonId: number, username: string) {
     } finally {
       setIsLoadingVocabulary(false);
     }
-  }, [lessonId]);
+  }, [lesson]);
 
   const toggleVocabulary = useCallback(() => {
     setShowVocabulary(prev => !prev);

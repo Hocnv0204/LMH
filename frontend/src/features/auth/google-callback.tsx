@@ -11,8 +11,6 @@ export default function GoogleCallback() {
         const authenticated = urlParams.get('authenticated')
 
         if (accessToken && refreshToken) {
-          console.log('✅ Google OAuth callback - tokens received')
-
           // Nếu đây là popup window, gửi message về parent window
           if (window.opener) {
             window.opener.postMessage(
@@ -34,7 +32,6 @@ export default function GoogleCallback() {
             localStorage.setItem('refreshToken', refreshToken)
             localStorage.setItem('authenticated', authenticated || 'true')
 
-            console.log('✅ Google login successful - redirecting to home')
             window.location.href = '/'
           }
         } else {

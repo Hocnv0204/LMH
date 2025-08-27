@@ -63,7 +63,6 @@ export default function ForgotPasswordPage() {
         setMessage('Email đặt lại mật khẩu đã được gửi!')
         setResendCooldown(60)
       }
-      console.log('✅ Forgot password email sent successfully')
     } catch (error) {
       console.error('❌ Forgot password error:', error)
       if (isMounted.current) {
@@ -113,18 +112,12 @@ export default function ForgotPasswordPage() {
         }
         return
       } catch (resendError) {
-        console.log(
-          'Resend API failed, trying fallback to forgot-password:',
-          resendError
-        )
-
         // Nếu resend-reset-password thất bại, fallback về forgot-password
         if (
           resendError instanceof Error &&
           (resendError.message.includes('500') ||
             resendError.message.includes('Internal Server Error'))
         ) {
-          console.log('Using fallback: calling forgot-password API')
           try {
             await authService.forgotPassword({ email })
             if (isMounted.current) {

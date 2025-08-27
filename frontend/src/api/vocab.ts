@@ -74,16 +74,12 @@ export const vocabApi = {
   ): Promise<VocabularyListResponse> {
     try {
       // Tạo URL với thứ tự parameters: page, size, sortBy
-      console.log(
-        `Calling API: ${BASE_PATH}/${userId}?page=${page}&size=${size}&sortBy=${sortBy}`
-      )
 
       // Backend trả về direct Page object, không wrap trong ApiResponse
       const { data } = await api.get<VocabularyListResponse>(
         `${BASE_PATH}/${userId}?page=${page}&size=${size}&sortBy=${sortBy}`
       )
 
-      console.log('API Response:', data)
 
       // Backend trả về Spring Boot Page structure trực tiếp
       return data
@@ -162,10 +158,6 @@ export const vocabApi = {
         },
       })
 
-      console.log('Create vocabulary raw response:', response)
-      console.log('Response type:', typeof response)
-      console.log('Response keys:', Object.keys(response || {}))
-
       // Kiểm tra nhiều format response khác nhau
       if (response && typeof response === 'object') {
         // Format 1: ApiResponse wrapper
@@ -182,10 +174,6 @@ export const vocabApi = {
               'Failed to create vocabulary'
             throw new Error(errorMsg)
           }
-          console.log(
-            'Successfully created vocabulary (ApiResponse format):',
-            apiResponse.data
-          )
           return apiResponse.data!
         }
 

@@ -83,7 +83,7 @@ export default function TopicsPage({
     levelName: levelName,
   })
   const { user } = useAuth()
-  console.log('TopicsPage user:', user)
+  
   useEffect(() => {
     fetchTopics({
       levelName,
@@ -201,16 +201,6 @@ export default function TopicsPage({
 
     return canModify
   }
-
-  // Add this useEffect to debug the topics data
-  useEffect(() => {
-    console.log('All topics received:', topics)
-    topics.forEach((topic) => {
-      console.log(
-        `Topic: ${topic.name}, Type: "${topic.type}", Type of type: ${typeof topic.type}`
-      )
-    })
-  }, [topics])
 
   return (
     <div className='container mx-auto max-w-6xl p-6'>
