@@ -97,6 +97,8 @@ public class AdminLessonServiceImpl implements AdminLessonService {
         Specification<Lesson> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            predicates.add(cb.equal(root.get("type"), TypeLesson.DEFAULT));
+
             if (StringUtils.hasText(searchTerm)) {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + searchTerm.toLowerCase() + "%"));
             }

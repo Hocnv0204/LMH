@@ -1,4 +1,5 @@
 import { buildApiUrl } from '@/config/api'
+import { fetchApi } from '@/api/api'
 import { apiClient } from '@/api/client'
 import { VocabularyItem } from './suggestVocabulary'
 
@@ -41,6 +42,7 @@ export const lessonApi = {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`,
         },
       })
 

@@ -12,11 +12,10 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopicResponse {
+public class  TopicResponse {
     private int id;
     private String name;
     private String description;
     private LocalDateTime createdAt;
-    private Boolean deleteFlag;
     private String languageName;
 }

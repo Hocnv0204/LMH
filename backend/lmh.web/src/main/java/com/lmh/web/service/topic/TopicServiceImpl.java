@@ -14,6 +14,7 @@ import com.lmh.web.repository.LanguageRepository;
 import com.lmh.web.repository.TopicRepository;
 import com.lmh.web.repository.UserRepository;
 import com.lmh.web.service.cloudinary.CloudinaryService;
+import com.lmh.web.utils.AuthUtils;
 import com.lmh.web.utils.mapper.topic.TopicMapper;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public Page<TopicResponse> getAllTopicsForUser(
-            Long userId, String searchTerm, String languageName,
+            Integer userId, String searchTerm, String languageName,
             int page, int size, String sortBy, String sortDir) {
 
         Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -64,7 +65,7 @@ public class TopicServiceImpl implements TopicService {
             );
             predicates.add(cb.or(defaultTopics, userTopics));
 
-            // The deleteFlag predicate is removed
+            predicates.add(cb.equal(root.get("deleteFlag"), false));
 
             if (searchTerm != null && !searchTerm.isBlank()) {
                 String likePattern = "%" + searchTerm.toLowerCase() + "%";
@@ -98,6 +99,8 @@ public class TopicServiceImpl implements TopicService {
             // Condition: Only fetch topics where type is DEFAULT
             predicates.add(cb.equal(root.get("type"), TypeTopic.DEFAULT));
 
+            predicates.add(cb.equal(root.get("deleteFlag"), false));
+
             if (searchTerm != null && !searchTerm.isBlank()) {
                 String likePattern = "%" + searchTerm.toLowerCase() + "%";
                 predicates.add(cb.or(
@@ -117,30 +120,42 @@ public class TopicServiceImpl implements TopicService {
         return topicPage.map(topicMapper::toResponse);
     }
 
-
     @Override
-    public TopicResponse getTopicDetailsForUser(Integer topicId, Integer userId) {
-        // This logic remains the same as it checks view permissions, not ownership
-        log.info("User ID: {} is requesting details for topic ID: {}", userId, topicId);
+    public Page<TopicResponse> getUserCreatedTopics(
+            Integer userId, String searchTerm, String languageName,
+            int page, int size, String sortBy, String sortDir) {
 
-        Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy topic với ID: " + topicId));
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        boolean canView = (topic.getType() == TypeTopic.DEFAULT) ||
-                (topic.getType() == TypeTopic.USER_CREATION && topic.getUser() != null && topic.getUser().getId().equals(userId));
+        Specification<Topic> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        if (!canView) {
-            log.warn("Access denied for user ID: {} on topic ID: {}", userId, topicId);
-            throw new ForbiddenException("Bạn không có quyền xem chủ đề này.");
-        }
+            // Điều kiện: Chỉ lấy các topic có type là USER_CREATION và userId khớp
+            predicates.add(cb.equal(root.get("type"), TypeTopic.USER_CREATION));
+            predicates.add(cb.equal(root.get("user").get("id"), userId));
 
-        log.info("Successfully retrieved details for topic ID: {}", topicId);
-        return topicMapper.toResponse(topic);
+            if (searchTerm != null && !searchTerm.isBlank()) {
+                String likePattern = "%" + searchTerm.toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("name")), likePattern),
+                        cb.like(cb.lower(root.get("description")), likePattern)
+                ));
+            }
+
+            if (languageName != null && !languageName.isBlank()) {
+                predicates.add(cb.equal(root.join("language").get("name"), languageName));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Topic> topicPage = topicRepository.findAll(spec, pageable);
+        return topicPage.map(topicMapper::toResponse);
     }
 
     @Override
     public TopicResponse createTopicForUser(Integer userId, TopicRequest request, MultipartFile file) {
-        // Logic remains largely the same, but we must now set the deleteFlag to null or remove it from the entity.
         log.info("User '{}' is creating a new topic named '{}'", userId, request.getName());
         if (topicRepository.existsByName(request.getName())) {
             throw new DataExistedException("Topic name already exists: " + request.getName());
@@ -155,8 +170,8 @@ public class TopicServiceImpl implements TopicService {
         topic.setUser(currentUser);
         topic.setLanguage(language);
         topic.setType(TypeTopic.USER_CREATION);
-        // topic.setDeleteFlag(false); // This line is removed
         topic.setCreatedAt(LocalDateTime.now());
+        topic.setDeleteFlag(false);
 
         if (file != null && !file.isEmpty()) {
             try {
@@ -230,14 +245,7 @@ public class TopicServiceImpl implements TopicService {
         }
 
         Integer ownerId = topic.getUser().getId();
-        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        Long userIdLong = jwtPrincipal.getClaim("id");
-        Integer currentUserId;
-        try {
-            currentUserId = Math.toIntExact(userIdLong);
-        } catch (ArithmeticException e) {
-            throw new IllegalArgumentException("User ID from token is too large.", e);
-        }
+        Integer currentUserId = AuthUtils.getUserIdAsInteger(authentication);
 
         return ownerId.equals(currentUserId);
     }

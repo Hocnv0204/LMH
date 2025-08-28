@@ -1,11 +1,15 @@
 package com.lmh.web.controller.lesson;
 
+import com.lmh.web.dto.request.lesson.AdminCreateLessonRequest;
 import com.lmh.web.dto.request.lesson.LessonRequest;
 import com.lmh.web.dto.request.lesson.UpdateLessonUser;
 import com.lmh.web.dto.response.CustomResponse;
+import com.lmh.web.dto.response.lesson.LessonGenerationResponse;
 import com.lmh.web.dto.response.lesson.LessonResponse;
 import com.lmh.web.dto.response.lesson.LessonSummaryResponse;
+import com.lmh.web.service.lesson.AdminLessonServiceImpl;
 import com.lmh.web.service.lesson.LessonService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -62,6 +66,34 @@ public class LessonController {
         return new CustomResponse<>(lessonPage, HttpStatus.OK);
     }
 
+    @GetMapping("/my-creations")
+    public CustomResponse<Page<LessonSummaryResponse>> getMyCreatedLessons(
+            Authentication authentication,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Integer topicId,
+            @RequestParam(required = false) Integer levelId,
+            @RequestParam Integer languageId, // Bắt buộc
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir
+    ) {
+        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer userId;
+        try {
+            userId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
+
+        Page<LessonSummaryResponse> lessonPage = lessonService.getCreatedLessonsForUser(
+                userId, searchTerm, topicId, levelId, languageId, page, size, sortBy, sortDir
+        );
+
+        return new CustomResponse<>(lessonPage, HttpStatus.OK);
+    }
+
     // THAY ĐỔI: Endpoint lấy chi tiết lesson
     @GetMapping("/{lessonId}")
     public CustomResponse<LessonResponse> getLessonDetails(
@@ -85,6 +117,26 @@ public class LessonController {
 
         LessonResponse lesson = lessonService.getLessonDetails(lessonId, userId);
         return new CustomResponse<>(lesson, HttpStatus.OK);
+    }
+
+    @PostMapping("/generate-with-ai")
+    public CustomResponse<LessonGenerationResponse> createLessonWithAi(
+            @Valid @RequestBody AdminCreateLessonRequest request,
+            Authentication authentication
+    ) {
+        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
+        Long userIdLong = jwtPrincipal.getClaim("id");
+        Integer userId;
+        try {
+            userId = Math.toIntExact(userIdLong);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("User ID from token is too large.", e);
+        }
+
+        LessonGenerationResponse response = lessonService.requestLessonGeneration(userId, request);
+        // Sử dụng HttpStatus.ACCEPTED (202) để chỉ ra rằng yêu cầu đã được chấp nhận
+        // nhưng việc xử lý chưa hoàn tất.
+        return new CustomResponse<>(response, HttpStatus.ACCEPTED);
     }
 
     // THAY ĐỔI: Endpoint tạo lesson mới

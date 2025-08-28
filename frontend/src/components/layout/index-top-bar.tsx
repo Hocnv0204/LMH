@@ -97,19 +97,14 @@ export function IndexTopBar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/user/level'>
+                  <Link to='/user/custom-lessons'>
                     <BookOpen className='mr-2 h-4 w-4' />
                     Bài học của tôi
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    to='/user/topics'
-                    search={{
-                      levelId: 1,
-                      levelName: 'Beginner',
-                      languageName: 'English',
-                    }}
+                    to='/user/custom-topics'
                   >
                     <Target className='mr-2 h-4 w-4' />
                     Chủ đề của tôi

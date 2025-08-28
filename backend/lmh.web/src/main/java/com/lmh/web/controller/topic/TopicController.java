@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.lmh.web.utils.AuthUtils;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,8 +43,7 @@ public class TopicController {
         // Kiểm tra xem người dùng đã đăng nhập hay chưa
         if (authentication != null && authentication.isAuthenticated()) {
             // User đã đăng nhập: Lấy cả topic default và topic của user
-            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            Long userId = jwtPrincipal.getClaim("id");
+            Integer userId = AuthUtils.getUserIdAsInteger(authentication);
             topicPage = topicService.getAllTopicsForUser(
                     userId, searchTerm, languageName, page, size, sortBy, sortDir
             );
@@ -57,6 +57,26 @@ public class TopicController {
         return new CustomResponse<>(topicPage, HttpStatus.OK);
     }
 
+    //Endpoint mới: Chỉ lấy các topic do người dùng đã đăng nhập tạo ra.
+    @GetMapping("/my-topics")
+    public CustomResponse<Page<TopicResponse>> getMyTopics(
+            Authentication authentication,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) String languageName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir
+    ) {
+        Integer userId = AuthUtils.getUserIdAsInteger(authentication);
+
+        Page<TopicResponse> topicPage = topicService.getUserCreatedTopics(
+                userId, searchTerm, languageName, page, size, sortBy, sortDir
+        );
+
+        return new CustomResponse<>(topicPage, HttpStatus.OK);
+    }
+
     // Create a new topic for the authenticated user
     @PostMapping
     public CustomResponse<TopicResponse> createTopic(
@@ -64,14 +84,7 @@ public class TopicController {
             @RequestParam("request") String requestJson,
             @RequestParam(value = "file", required = false) MultipartFile file
     ) throws JsonProcessingException {
-        Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-        Long userIdLong = jwtPrincipal.getClaim("id");
-        Integer userId;
-        try {
-            userId = Math.toIntExact(userIdLong);
-        } catch (ArithmeticException e) {
-            throw new IllegalArgumentException("User ID from token is too large.", e);
-        }
+        Integer userId = AuthUtils.getUserIdAsInteger(authentication);
 
         TopicRequest request = objectMapper.readValue(requestJson, TopicRequest.class);
         TopicResponse newTopic = topicService.createTopicForUser(userId, request, file);
