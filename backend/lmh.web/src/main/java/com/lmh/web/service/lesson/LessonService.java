@@ -1,7 +1,9 @@
 package com.lmh.web.service.lesson;
 
+import com.lmh.web.dto.request.lesson.AdminCreateLessonRequest;
 import com.lmh.web.dto.request.lesson.LessonRequest;
 import com.lmh.web.dto.request.lesson.UpdateLessonUser;
+import com.lmh.web.dto.response.lesson.LessonGenerationResponse;
 import com.lmh.web.dto.response.lesson.LessonResponse;
 // MỚI: Import DTO mới
 import com.lmh.web.dto.response.lesson.LessonSummaryResponse;
@@ -11,7 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 
 public interface LessonService {
-    // THAY ĐỔI: Toàn bộ phương thức được thiết kế lại
+    LessonGenerationResponse requestLessonGeneration(Integer userId, AdminCreateLessonRequest request);
+
+    Page<LessonSummaryResponse> getCreatedLessonsForUser(
+            Integer userId, String searchTerm, Integer topicId, Integer levelId, Integer languageId,
+            int page, int size, String sortBy, String sortDir
+    );
+
     Page<LessonSummaryResponse> getAllLessonsForUser(
             Integer userId, String searchTerm, Integer topicId, Integer levelId, Integer languageId,
             int page, int size, String sortBy, String sortDir

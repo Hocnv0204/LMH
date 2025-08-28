@@ -31,6 +31,8 @@ import { Route as UserProfileIndexRouteImport } from './routes/user/profile/inde
 import { Route as UserLevelIndexRouteImport } from './routes/user/level/index'
 import { Route as UserLessonsIndexRouteImport } from './routes/user/lessons/index'
 import { Route as UserLessonDiscoveryIndexRouteImport } from './routes/user/lesson-discovery/index'
+import { Route as UserCustomTopicsIndexRouteImport } from './routes/user/custom-topics/index'
+import { Route as UserCustomLessonsIndexRouteImport } from './routes/user/custom-lessons/index'
 import { Route as AdminUserIndexRouteImport } from './routes/admin/user/index'
 import { Route as AdminTopicIndexRouteImport } from './routes/admin/topic/index'
 import { Route as AdminLevelIndexRouteImport } from './routes/admin/level/index'
@@ -153,6 +155,16 @@ const UserLessonDiscoveryIndexRoute =
     path: '/lesson-discovery/',
     getParentRoute: () => UserRouteRoute,
   } as any)
+const UserCustomTopicsIndexRoute = UserCustomTopicsIndexRouteImport.update({
+  id: '/custom-topics/',
+  path: '/custom-topics/',
+  getParentRoute: () => UserRouteRoute,
+} as any)
+const UserCustomLessonsIndexRoute = UserCustomLessonsIndexRouteImport.update({
+  id: '/custom-lessons/',
+  path: '/custom-lessons/',
+  getParentRoute: () => UserRouteRoute,
+} as any)
 const AdminUserIndexRoute = AdminUserIndexRouteImport.update({
   id: '/user/',
   path: '/user/',
@@ -234,6 +246,8 @@ export interface FileRoutesByFullPath {
   '/admin/level': typeof AdminLevelIndexRoute
   '/admin/topic': typeof AdminTopicIndexRoute
   '/admin/user': typeof AdminUserIndexRoute
+  '/user/custom-lessons': typeof UserCustomLessonsIndexRoute
+  '/user/custom-topics': typeof UserCustomTopicsIndexRoute
   '/user/lesson-discovery': typeof UserLessonDiscoveryIndexRoute
   '/user/lessons': typeof UserLessonsIndexRoute
   '/user/level': typeof UserLevelIndexRoute
@@ -267,6 +281,8 @@ export interface FileRoutesByTo {
   '/admin/level': typeof AdminLevelIndexRoute
   '/admin/topic': typeof AdminTopicIndexRoute
   '/admin/user': typeof AdminUserIndexRoute
+  '/user/custom-lessons': typeof UserCustomLessonsIndexRoute
+  '/user/custom-topics': typeof UserCustomTopicsIndexRoute
   '/user/lesson-discovery': typeof UserLessonDiscoveryIndexRoute
   '/user/lessons': typeof UserLessonsIndexRoute
   '/user/level': typeof UserLevelIndexRoute
@@ -302,6 +318,8 @@ export interface FileRoutesById {
   '/admin/level/': typeof AdminLevelIndexRoute
   '/admin/topic/': typeof AdminTopicIndexRoute
   '/admin/user/': typeof AdminUserIndexRoute
+  '/user/custom-lessons/': typeof UserCustomLessonsIndexRoute
+  '/user/custom-topics/': typeof UserCustomTopicsIndexRoute
   '/user/lesson-discovery/': typeof UserLessonDiscoveryIndexRoute
   '/user/lessons/': typeof UserLessonsIndexRoute
   '/user/level/': typeof UserLevelIndexRoute
@@ -338,6 +356,8 @@ export interface FileRouteTypes {
     | '/admin/level'
     | '/admin/topic'
     | '/admin/user'
+    | '/user/custom-lessons'
+    | '/user/custom-topics'
     | '/user/lesson-discovery'
     | '/user/lessons'
     | '/user/level'
@@ -371,6 +391,8 @@ export interface FileRouteTypes {
     | '/admin/level'
     | '/admin/topic'
     | '/admin/user'
+    | '/user/custom-lessons'
+    | '/user/custom-topics'
     | '/user/lesson-discovery'
     | '/user/lessons'
     | '/user/level'
@@ -405,6 +427,8 @@ export interface FileRouteTypes {
     | '/admin/level/'
     | '/admin/topic/'
     | '/admin/user/'
+    | '/user/custom-lessons/'
+    | '/user/custom-topics/'
     | '/user/lesson-discovery/'
     | '/user/lessons/'
     | '/user/level/'
@@ -582,6 +606,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserLessonDiscoveryIndexRouteImport
       parentRoute: typeof UserRouteRoute
     }
+    '/user/custom-topics/': {
+      id: '/user/custom-topics/'
+      path: '/custom-topics'
+      fullPath: '/user/custom-topics'
+      preLoaderRoute: typeof UserCustomTopicsIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/user/custom-lessons/': {
+      id: '/user/custom-lessons/'
+      path: '/custom-lessons'
+      fullPath: '/user/custom-lessons'
+      preLoaderRoute: typeof UserCustomLessonsIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
     '/admin/user/': {
       id: '/admin/user/'
       path: '/user'
@@ -706,6 +744,8 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface UserRouteRouteChildren {
   UserLessonDiscoveryLessonRoute: typeof UserLessonDiscoveryLessonRoute
   UserLessonPracticeLessonIdRoute: typeof UserLessonPracticeLessonIdRoute
+  UserCustomLessonsIndexRoute: typeof UserCustomLessonsIndexRoute
+  UserCustomTopicsIndexRoute: typeof UserCustomTopicsIndexRoute
   UserLessonDiscoveryIndexRoute: typeof UserLessonDiscoveryIndexRoute
   UserLessonsIndexRoute: typeof UserLessonsIndexRoute
   UserLevelIndexRoute: typeof UserLevelIndexRoute
@@ -716,6 +756,8 @@ interface UserRouteRouteChildren {
 const UserRouteRouteChildren: UserRouteRouteChildren = {
   UserLessonDiscoveryLessonRoute: UserLessonDiscoveryLessonRoute,
   UserLessonPracticeLessonIdRoute: UserLessonPracticeLessonIdRoute,
+  UserCustomLessonsIndexRoute: UserCustomLessonsIndexRoute,
+  UserCustomTopicsIndexRoute: UserCustomTopicsIndexRoute,
   UserLessonDiscoveryIndexRoute: UserLessonDiscoveryIndexRoute,
   UserLessonsIndexRoute: UserLessonsIndexRoute,
   UserLevelIndexRoute: UserLevelIndexRoute,

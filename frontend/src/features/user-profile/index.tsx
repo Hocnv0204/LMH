@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useUserHistory } from '@/features/user-profile/hooks/useProfile'
 import type { UserHistoryFilters } from '@/features/user-profile/types/user-profile'
@@ -11,6 +12,7 @@ import { UserHistoryTable } from './components/user-history-table'
 import { UserProfileCard } from './components/user-profile-card'
 
 export default function UserProfilePage() {
+  const navigate = useNavigate()
   const [updateProfileModalOpen, setUpdateProfileModalOpen] = useState(false)
   const [updateApiConfigModalOpen, setUpdateApiConfigModalOpen] =
     useState(false)
@@ -38,17 +40,11 @@ export default function UserProfilePage() {
   }
 
   const handleViewCustomLessons = () => {
-    // Sửa thành toast.info()
-    toast.info('Coming Soon', {
-      description: 'Custom lessons feature will be available soon!',
-    })
+    navigate({ to: '/user/custom-lessons' })
   }
 
   const handleViewCustomTopics = () => {
-    // Sửa thành toast.info()
-    toast.info('Coming Soon', {
-      description: 'Custom topics feature will be available soon!',
-    })
+    navigate({ to: '/user/custom-topics' })
   }
 
   const handleHistoryFiltersChange = (

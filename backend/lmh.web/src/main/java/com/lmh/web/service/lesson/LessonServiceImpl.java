@@ -5,20 +5,25 @@ import com.lmh.web.common.exception.DataExistedException;
 import com.lmh.web.common.exception.ForbiddenException;
 import com.lmh.web.common.exception.InvalidDataException;
 import com.lmh.web.common.exception.NotFoundException;
+import com.lmh.web.dto.request.lesson.AdminCreateLessonRequest;
 import com.lmh.web.dto.request.lesson.LessonRequest;
 import com.lmh.web.dto.request.lesson.UpdateLessonUser;
+import com.lmh.web.dto.response.lesson.LessonGenerationResponse;
 import com.lmh.web.dto.response.lesson.LessonResponse;
 import com.lmh.web.dto.response.lesson.LessonSummaryResponse;
+import com.lmh.web.event.lesson.LessonGenerationRequestedEvent;
 import com.lmh.web.model.*;
-import com.lmh.web.repository.LessonRepository;
+import com.lmh.web.repository.*;
 import com.lmh.web.service.language.LanguageService;
 import com.lmh.web.service.level.LevelService;
 import com.lmh.web.service.topic.TopicService;
 import com.lmh.web.service.user.UserService;
 import com.lmh.web.utils.mapper.lesson.LessonMapper;
+import com.lmh.web.utils.mapper.suggest.SuggestVocabularyMapper;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +49,85 @@ public class LessonServiceImpl implements LessonService {
     private final LessonMapper lessonMapper;
     private final LanguageService languageService;
     private final LevelService levelService;
+    private final TopicRepository topicRepository;
+    private final LevelRepository levelRepository;
+    private final LanguageRepository languageRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final UserRepository userRepository;
+
+    @Override
+    @Transactional
+    public LessonGenerationResponse requestLessonGeneration(Integer userId, AdminCreateLessonRequest request) {
+        // 1. Tìm các thực thể liên quan
+        Topic topic = topicRepository.findById(request.getTopicId())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy chủ đề với ID: " + request.getTopicId()));
+        Level level = levelRepository.findById(request.getLevelId())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy trình độ với ID: " + request.getLevelId()));
+        Language language = languageRepository.findById(request.getLanguageId())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy ngôn ngữ với ID: " + request.getLanguageId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy user với ID: " + userId));
+
+        // 2. Tạo Lesson placeholder
+        Lesson lesson = new Lesson();
+        lesson.setName(request.getDraftName()); // Tên tạm thời
+        lesson.setTopic(topic);
+        lesson.setLevel(level);
+        lesson.setLanguage(language);
+        lesson.setUser(user);
+        lesson.setType(TypeLesson.USER_CREATION);
+        lesson.setStatus("GENERATING"); // Trạng thái đang xử lý
+        lesson.setCreatedAt(LocalDateTime.now());
+        lesson.setDeleteFlag(false);
+        Lesson savedLesson = lessonRepository.save(lesson);
+
+        // 3. Bắn ra sự kiện với đầy đủ thông tin cần thiết.
+        // Spring sẽ giữ sự kiện này và chỉ gửi nó đến Listener sau khi transaction này commit thành công.
+        LessonGenerationRequestedEvent event = new LessonGenerationRequestedEvent(
+                this,
+                savedLesson.getId(),
+                userId,
+                topic.getDescription(),
+                level.getName(),
+                request.getDescription(),
+                language.getLanguageCode()
+        );
+        eventPublisher.publishEvent(event);
+
+        // 4. Trả về phản hồi ngay lập tức
+        return new LessonGenerationResponse(
+                savedLesson.getId(),
+                "ACCEPTED",
+                "Yêu cầu tạo bài học đã được chấp nhận và đang được xử lý."
+        );
+    }
+
+    @Override
+    public Page<LessonSummaryResponse> getCreatedLessonsForUser(
+            Integer userId, String searchTerm, Integer topicId, Integer levelId, Integer languageId,
+            int page, int size, String sortBy, String sortDir) {
+
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Specification<Lesson> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // --- Điều kiện chính ---
+            // 1. Chỉ lấy lesson do người dùng tạo
+            predicates.add(cb.equal(root.get("type"), TypeLesson.USER_CREATION));
+            // 2. Phải thuộc về đúng user đang truy vấn
+            predicates.add(cb.equal(root.get("user").get("id"), userId));
+
+            // Thêm các bộ lọc chung (search, topic, level, language, deleteFlag)
+            addCommonFilters(predicates, cb, root, searchTerm, topicId, levelId, languageId);
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Lesson> lessonPage = lessonRepository.findAll(spec, pageable);
+        return lessonPage.map(lessonMapper::toSummaryResponse);
+    }
 
     // MỚI: Logic lấy lesson cho user đã đăng nhập (cả default và của user)
     @Override
@@ -55,6 +140,8 @@ public class LessonServiceImpl implements LessonService {
 
         Specification<Lesson> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.equal(root.get("deleteFlag"), false));
 
             // Điều kiện: (type = DEFAULT) OR (type = USER_CREATION AND user.id = userId)
             Predicate defaultLessons = cb.equal(root.get("type"), TypeLesson.DEFAULT);
@@ -85,6 +172,8 @@ public class LessonServiceImpl implements LessonService {
 
         Specification<Lesson> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.equal(root.get("deleteFlag"), false));
 
             // Điều kiện: chỉ lấy type = DEFAULT
             predicates.add(cb.equal(root.get("type"), TypeLesson.DEFAULT));

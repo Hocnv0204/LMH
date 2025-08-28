@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface TopicService {
 
     Page<TopicResponse> getAllTopicsForUser(
-            Long userId, String searchTerm, String languageName,
+            Integer userId, String searchTerm, String languageName,
             int page, int size, String sortBy, String sortDir
     );
 
@@ -21,7 +21,11 @@ public interface TopicService {
             int page, int size, String sortBy, String sortDir
     );
 
-    TopicResponse getTopicDetailsForUser(Integer topicId, Integer userId);
+    // New service method for user-created topics only
+    Page<TopicResponse> getUserCreatedTopics(
+            Integer userId, String searchTerm, String languageName,
+            int page, int size, String sortBy, String sortDir
+    );
 
     TopicResponse createTopicForUser(Integer userId, TopicRequest request, MultipartFile file);
 

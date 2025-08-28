@@ -90,7 +90,7 @@ function Index() {
                     <ArrowRight className='ml-2 h-4 w-4' />
                   </Button>
                 </Link>
-                <Link to='/user/level'>
+                <Link to='/user/lesson-discovery'>
                   <Button
                     variant='outline'
                     size='lg'
