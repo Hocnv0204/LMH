@@ -1,16 +1,20 @@
 package com.lmh.web.service.gemini;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmh.web.common.exception.ApiException;
 import com.lmh.web.dto.request.gemini.GeminiApiRequest;
 import com.lmh.web.dto.response.gemini.GeminiApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import com.lmh.web.common.exception.GeminiApiException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 public class GeminiApiClient {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
 //    @Value("${gemini.api.key}")
 //    private String apiKey;
@@ -48,7 +53,16 @@ public class GeminiApiClient {
 
             // AI thường trả về JSON trong một khối markdown, cần làm sạch nó.
             return cleanApiResponse(rawText);
-
+        } catch (HttpClientErrorException e) {
+            // Lỗi từ phía client (4xx) -> API Key sai, request không hợp lệ, ...
+            String errorBody = e.getResponseBodyAsString();
+            log.error("Error from Gemini API ({}): {}", e.getStatusCode(), errorBody);
+            String errorMessage = parseGeminiError(errorBody);
+            throw new GeminiApiException(
+                    "Lỗi từ phía client khi gọi AI",
+                    (HttpStatus) e.getStatusCode(),
+                    errorMessage
+            );
         } catch (Exception e) {
             log.error("Error calling Gemini API: {}", e.getMessage());
             throw new ApiException("Có lỗi xảy ra khi giao tiếp với AI.", e);
@@ -74,5 +88,23 @@ public class GeminiApiClient {
         }
 
         return cleanedText.trim();
+    }
+
+    /**
+     * Parse chuỗi JSON lỗi trả về từ Gemini để lấy message.
+     * Cấu trúc lỗi của Gemini thường là: { "error": { "message": "API key not valid..." } }
+     */
+    private String parseGeminiError(String errorBody) {
+        try {
+            JsonNode root = objectMapper.readTree(errorBody);
+            JsonNode errorNode = root.path("error");
+            if (errorNode.isObject() && errorNode.has("message")) {
+                return errorNode.get("message").asText();
+            }
+        } catch (Exception e) {
+            log.error("Could not parse Gemini error response: {}", errorBody);
+        }
+        // Trả về nội dung gốc nếu không parse được
+        return errorBody;
     }
 }
