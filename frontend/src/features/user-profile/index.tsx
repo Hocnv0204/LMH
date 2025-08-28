@@ -31,19 +31,22 @@ export default function UserProfilePage() {
   }
 
   const handleViewVocabCollection = () => {
-    toast('Coming Soon', {
+    // Sửa thành toast.info()
+    toast.info('Coming Soon', {
       description: 'Vocabulary collection feature will be available soon!',
     })
   }
 
   const handleViewCustomLessons = () => {
-    toast('Coming Soon', {
+    // Sửa thành toast.info()
+    toast.info('Coming Soon', {
       description: 'Custom lessons feature will be available soon!',
     })
   }
 
   const handleViewCustomTopics = () => {
-    toast('Coming Soon', {
+    // Sửa thành toast.info()
+    toast.info('Coming Soon', {
       description: 'Custom topics feature will be available soon!',
     })
   }

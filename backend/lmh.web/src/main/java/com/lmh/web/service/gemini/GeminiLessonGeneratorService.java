@@ -20,6 +20,12 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.lmh.web.event.lesson.LessonGenerationCompletionEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import com.lmh.web.common.exception.GeminiApiException;
+import com.lmh.web.event.lesson.LessonGenerationCompletionEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -32,15 +38,19 @@ public class GeminiLessonGeneratorService {
     private final ObjectMapper objectMapper;
     private final GeminiApiClient geminiApiClient;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Async // Đánh dấu phương thức này sẽ chạy trong một luồng riêng
     @Transactional // Đảm bảo tất cả các thao tác DB được thực hiện trong một giao dịch
-    public void generateAndSaveLessonContent(Integer lessonId, Integer userId, String topicDescription, String levelName, String description, String languageCode) {
-
+    public void generateAndSaveLessonContent(Integer lessonId, Integer userId, String topicDescription,
+                                             String levelName, String description, String languageCode)
+    {
         log.info("Starting lesson generation for lessonId: {}", lessonId);
+
         Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
         if (lesson == null) {
             log.error("Placeholder lesson with id {} not found.", lessonId);
+            eventPublisher.publishEvent(new LessonGenerationCompletionEvent(this, userId, lessonId, null, false, "Không tìm thấy bài học placeholder để xử lý."));
             return;
         }
 
@@ -84,14 +94,25 @@ public class GeminiLessonGeneratorService {
                     }).collect(Collectors.toList());
 
             // 6. Lưu vào DB
-            lessonRepository.save(lesson);
+            Lesson savedLesson = lessonRepository.save(lesson);
             suggestVocabularyRepository.saveAll(vocabularies);
 
             log.info("Successfully generated content for lessonId: {}", lessonId);
 
+            eventPublisher.publishEvent(new LessonGenerationCompletionEvent(
+                    this,
+                    userId,
+                    savedLesson.getId(),
+                    savedLesson.getName(),
+                    true,
+                    "Tạo bài học thành công!"
+            ));
+        } catch (GeminiApiException e) {
+            log.error("Gemini API error for lessonId {}: {}", lessonId, e.getApiErrorMessage(), e);
+            handleGenerationFailure(lesson, userId, formatGeminiError(e));
         } catch (Exception e) {
             log.error("Failed to generate lesson content for lessonId: {}", lessonId, e);
-            lessonRepository.delete(lesson);
+            handleGenerationFailure(lesson, userId, "Một lỗi không xác định đã xảy ra trong quá trình tạo bài học.");
         }
     }
 
@@ -115,8 +136,37 @@ public class GeminiLessonGeneratorService {
         }
     }
 
-    // Hàm giả lập phản hồi từ Gemini để test
-    private String getMockGeminiResponse() {
-        return "{\"lessonTitle\":\"Daily Activities at the Supermarket\",\"lessonDescription\":\"A B1 level lesson focusing on vocabulary and phrases for shopping at a supermarket, including asking for prices and finding items.\",\"vietnameseParagraph\":\"Hôm qua, tôi đã đi siêu thị để mua một vài thứ cần thiết cho tuần tới. Đầu tiên, tôi cần mua một ít rau củ tươi như cà rốt, bông cải xanh và khoai tây. Sau đó, tôi đi đến quầy thịt để chọn một ít ức gà không xương. Nhân viên ở đó rất thân thiện và đã giúp tôi cân đúng số lượng tôi cần. Tiếp theo, tôi tìm mua một hộp sữa tươi và một vài hộp sữa chua. Lối đi giữa các gian hàng khá đông đúc, nhưng tôi vẫn xoay sở để đẩy chiếc xe của mình qua. Cuối cùng, trước khi ra quầy thanh toán, tôi nhớ ra mình cần mua một chai dầu gội đầu. Tôi đã phải xếp hàng một lúc, nhưng quá trình thanh toán diễn ra khá nhanh chóng. Đó là một chuyến đi mua sắm hiệu quả.\",\"suggestVocabularyList\":[{\"term\":\"essential\",\"vi\":\"thiết yếu, cần thiết\",\"type\":\"adjective\",\"pronunciation\":\"/ɪˈsɛnʃəl/\",\"example\":\"Fresh vegetables are essential for a healthy diet.\"},{\"term\":\"produce section\",\"vi\":\"quầy rau củ\",\"type\":\"collocation\",\"pronunciation\":\"/ˈproʊduːs ˈsɛkʃən/\",\"example\":\"You can find carrots and broccoli in the produce section.\"},{\"term\":\"boneless\",\"vi\":\"không xương\",\"type\":\"adjective\",\"pronunciation\":\"/ˈboʊnləs/\",\"example\":\"I prefer to buy boneless chicken breast for quick meals.\"},{\"term\":\"get through\",\"vi\":\"xoay sở, đi qua\",\"type\":\"phrasal verb\",\"pronunciation\":\"/ɡɛt θruː/\",\"example\":\"It was difficult to get through the crowded aisle.\"},{\"term\":\"check-out counter\",\"vi\":\"quầy thanh toán\",\"type\":\"collocation\",\"pronunciation\":\"/ˈʧɛkˌaʊt ˈkaʊntər/\",\"example\":\"Please go to the check-out counter to pay for your items.\"}]}";
+    /**
+     * Xử lý khi quá trình tạo bài học thất bại và bắn sự kiện thông báo.
+     */
+    private void handleGenerationFailure(Lesson lesson, Integer userId, String errorMessage) {
+        if (lesson != null && lessonRepository.existsById(lesson.getId())) {
+            lessonRepository.delete(lesson);
+        }
+        eventPublisher.publishEvent(new LessonGenerationCompletionEvent(
+                this,
+                userId,
+                lesson != null ? lesson.getId() : -1, // Dùng -1 nếu lesson không tồn tại
+                null,
+                false,
+                errorMessage
+        ));
+    }
+
+    /**
+     * Chuyển đổi lỗi từ GeminiApiException thành một thông điệp thân thiện hơn cho người dùng.
+     */
+    private String formatGeminiError(GeminiApiException e) {
+        String baseMessage = "Lỗi từ AI: ";
+        if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            if (e.getApiErrorMessage().toLowerCase().contains("api key not valid")) {
+                return baseMessage + "API Key không hợp lệ. Vui lòng kiểm tra lại cấu hình.";
+            }
+            return baseMessage + "Yêu cầu không hợp lệ. " + e.getApiErrorMessage();
+        }
+        if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) { // 429
+            return baseMessage + "Vượt quá giới hạn yêu cầu (Too Many Requests). Vui lòng thử lại sau.";
+        }
+        return baseMessage + e.getApiErrorMessage();
     }
 }
