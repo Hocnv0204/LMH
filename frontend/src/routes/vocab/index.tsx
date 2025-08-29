@@ -103,12 +103,12 @@ function VocabPage() {
           switch (sortKey) {
             case 'new':
             case 'old':
-              return 'id' // Backend sẽ sort theo id
+              return 'createdAt' // Backend sẽ sort theo createdAt
             case 'az':
             case 'za':
               return 'term' // Backend sẽ sort theo term
             default:
-              return 'id'
+              return 'createdAt'
           }
         }
 
@@ -125,7 +125,7 @@ function VocabPage() {
         let sortedItems = response.content || []
 
         // Nếu cần reverse order ở frontend
-        if (sortBy === 'old' || sortBy === 'za') {
+        if (sortBy === 'new' || sortBy === 'za') {
           sortedItems = [...sortedItems].reverse()
         }
 

@@ -59,7 +59,7 @@ cloudinary:
 
 jwt:
   signerKey: "z8q/gnCQ3bJb4RWbC36UuznGJ0QNpnn1NSJuYO+nU0QWHPtgJE0y6BO3L2ZNZXnB"
-  valid-duration: 900
+  valid-duration: 90000
   refreshable-duration: 604800
 
 gemini:

@@ -71,10 +71,11 @@ public class VocabController {
     public ResponseEntity<ApiResponse<?>>getListVocab(
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "asc") String order ,
             @PathVariable Integer userId)
     {
-        Pageable pageable = PageableUtils.createPageable(size , page , sortBy) ;
+        Pageable pageable = PageableUtils.pageable(size , page , sortBy , order) ;
         Page<VocabularyDTO> response = vocabService.getListVocab(userId , pageable) ;
         return ResponseEntity.ok().body(
                 ApiResponse.builder()

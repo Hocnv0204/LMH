@@ -21,6 +21,7 @@ public class VocabMapper {
                 .type(vocab.getType())
                 .audioUrl(vocab.getAudioUrl())
                 .imageUrl(vocab.getImageUrl())
+                .createdAt(vocab.getCreatedAt())
                 .build() ;
         return dto ;
     }

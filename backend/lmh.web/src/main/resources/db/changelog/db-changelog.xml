@@ -31,9 +31,12 @@
     <changeSet id="11_8_add_apikey_column_user.sql" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
         <sqlFile path="db/changelog/11_8_add_apikey_column_user.sql"/>
     </changeSet>
-
     <changeSet id="11_8_add_createdat_column_history.sql" author="Loc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
-        <sqlFile path="db/changelog/11_8_add_createdat_column_history.sql"/>
+    <sqlFile path="db/changelog/11_8_add_createdat_column_history.sql"/>
     </changeSet>
+    <changeSet id="009_add_column_created_at_vocab.sql" author="Hoc" dbms="postgresql" onValidationFail="HALT" failOnError="true">
+        <sqlFile path="db/changelog/009_add_column_created_at_vocab.sql"/>
+    </changeSet>
+
 
 </databaseChangeLog>
