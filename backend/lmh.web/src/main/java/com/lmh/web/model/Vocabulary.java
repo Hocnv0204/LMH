@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "vocabulary")
 @Getter
@@ -36,6 +38,8 @@ public class Vocabulary {
     @JoinColumn(name = "collection_id")
     private CollectionVoca collection;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt ;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -29,6 +29,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -135,6 +136,7 @@ public class VocabServiceImpl implements VocabService {
             }
         }
         vocabulary.setImageUrl(imageUrl);
+        vocabulary.setCreatedAt(LocalDateTime.now());
         Vocabulary savedVocabulary = vocabularyRepository.save(vocabulary);
         FlashCard flashCard = FlashCard.builder()
                 .imageUrl(imageUrl)
