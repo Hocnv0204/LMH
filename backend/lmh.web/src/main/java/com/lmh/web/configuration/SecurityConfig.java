@@ -44,15 +44,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/api/auth/**").permitAll() //Cho phép tất cả
-                                .requestMatchers(HttpMethod.GET, "/user/languages").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user/topics").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user/levels").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user/lessons").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user/lessons/*").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user/leader_board").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/sse/subscribe").permitAll()
-                                .anyRequest().authenticated() // yêu cầu đăng nhập
+//                                .requestMatchers("/api/auth/**").permitAll() //Cho phép tất cả
+//                                .requestMatchers(HttpMethod.GET, "/user/languages").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/user/topics").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/user/levels").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/user/lessons").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/user/lessons/*").permitAll()
+//                                .anyRequest().authenticated() // yêu cầu đăng nhập
+                                .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login

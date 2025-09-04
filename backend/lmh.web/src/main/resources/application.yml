@@ -74,6 +74,8 @@ app:
   verification:
     token:
       expiry: 86400000
+  timezone: Asia/Ho_Chi_Minh
+
 server:
   port: 8081
 
