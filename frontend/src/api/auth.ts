@@ -273,7 +273,6 @@ export const authService = {
 
       // Decode JWT token (matching backend structure)
       const payload = JSON.parse(atob(token.split('.')[1]))
-      console.log('Decoded token payload:', payload)
 
       return {
         username: payload.sub,

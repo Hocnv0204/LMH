@@ -530,18 +530,23 @@ export default function LessonPracticePage({
           )}
         </div>
 
-        {/* Vocabulary Display - Show card when vocabulary panel is open */}
-        {showVocabulary && (
-          <Card className='mb-6'>
-            <CardHeader className='flex flex-row items-center justify-between'>
-              <CardTitle className='text-lg'>Từ vựng gợi ý</CardTitle>
-              <Button variant='ghost' size='sm' onClick={toggleVocabulary}>
-                <X className='h-4 w-4' />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {suggestedVocabulary.length > 0 ? (
-                <div className='grid gap-3'>
+        {/* Vocabulary Modal */}
+        <Dialog open={showVocabulary} onOpenChange={toggleVocabulary}>
+          <DialogContent className='max-h-[80vh] w-[95vw] max-w-screen-2xl'>
+            <DialogHeader>
+              <DialogTitle className='flex items-center gap-2'>
+                <BookOpen className='h-5 w-5' />
+                Từ vựng gợi ý
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className='max-h-[60vh] pr-2'>
+              {isLoadingVocabulary ? (
+                <div className='py-10 text-center'>
+                  <Loader2 className='mx-auto mb-3 h-10 w-10 animate-spin' />
+                  <p className='text-muted-foreground'>Đang tải từ vựng...</p>
+                </div>
+              ) : suggestedVocabulary.length > 0 ? (
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                   {suggestedVocabulary.map((vocab) => (
                     <div key={vocab.id} className='rounded-lg border p-3'>
                       <div className='flex items-start justify-between'>
@@ -578,7 +583,7 @@ export default function LessonPracticePage({
                     variant='outline'
                     size='sm'
                     className='mt-3'
-                    onClick={fetchSuggestedVocabulary}
+                    onClick={() => { fetchSuggestedVocabulary(); toggleVocabulary(); }}
                     disabled={isLoadingVocabulary}
                   >
                     {isLoadingVocabulary ? (
@@ -590,9 +595,9 @@ export default function LessonPracticePage({
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        )}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Dialog open={showHistory} onOpenChange={toggleHistory}>

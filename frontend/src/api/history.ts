@@ -1,4 +1,4 @@
-import { buildApiUrl } from '@/config/api';
+import { fetchApi } from '@/api/api';
 
 export interface HistoryResponse {
   id: number;
@@ -33,20 +33,10 @@ export const historyApi = {
       sortBy: 'id'
     });
 
-    const url = buildApiUrl(`/user/histories/${username}?${queryParams.toString()}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch history: ${response.statusText}`);
-    }
-
-    return response.json();
+    return fetchApi<{ data: { content: HistoryResponse[] } }>(
+      `/user/histories/${username}?${queryParams.toString()}`,
+      { method: 'GET' }
+    );
   },
 
   getHistoryByUserAndLesson: async (username: string, lessonId: number, page = 0, size = 100): Promise<{ data: { content: HistoryResponse[] } }> => {
@@ -56,20 +46,10 @@ export const historyApi = {
       sortBy: 'id'
     });
 
-    const url = buildApiUrl(`/user/histories/${username}/${lessonId}?${queryParams.toString()}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch history: ${response.statusText}`);
-    }
-
-    return response.json();
+    return fetchApi<{ data: { content: HistoryResponse[] } }>(
+      `/user/histories/${username}/${lessonId}?${queryParams.toString()}`,
+      { method: 'GET' }
+    );
   }
 };
 
