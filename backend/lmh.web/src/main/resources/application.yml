@@ -9,6 +9,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
   jpa:
     hibernate:
       ddl-auto: none
@@ -16,6 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: Asia/Ho_Chi_Minh
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
