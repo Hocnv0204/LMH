@@ -31,6 +31,7 @@ Dự án được phát triển **full-stack** với **Spring Boot + React + Pos
 
 ---
 ## Cấu trúc thư mục rút gọn
+```
 LMH/
 ├── backend/
 │ ├── docker-compose.yaml # PostgreSQL & Redis cho môi trường phát triển
@@ -52,6 +53,7 @@ LMH/
 │ └── assets/ # Hình ảnh, icon, style, config UI
 │
 └── image/ # Ảnh minh họa giao diện dùng trong README
+```
 ---
 ## ⚙️ Công nghệ chính
 
