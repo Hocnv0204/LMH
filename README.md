@@ -31,22 +31,27 @@ Dự án được phát triển **full-stack** với **Spring Boot + React + Pos
 
 ---
 ## Cấu trúc thư mục rút gọn
-backend/
-  docker-compose.yaml           # PostgreSQL, Redis cho dev
-  lmh.web/
-    pom.xml                     # Maven, Spring Boot
-    src/main/java/com/...       # Source API
-    src/main/resources/
-      application.yml           # Cấu hình (không commit secrets khi production)
-      db/changelog/...          # Liquibase migrations
-
-frontend/
-  package.json                  # Scripts Vite/TS/ESLint
-  src/
-    routes/                     # TanStack Router (landing, auth, user, admin,...)
-    features/                   # Module tính năng (quiz, user-profile, admin,...)
-    api/                        # API clients (auth, quiz, lesson, gemini,...)
-    components/                 # UI components (shadcn/radix based)
+LMH/
+├── backend/
+│ ├── docker-compose.yaml # PostgreSQL & Redis cho môi trường phát triển
+│ └── lmh.web/ # Spring Boot Application (Backend)
+│ ├── pom.xml # Cấu hình Maven & dependencies
+│ └── src/
+│ ├── main/java/com/... # Code nguồn (Controller, Service, Repository)
+│ └── main/resources/
+│ ├── application.yml # Cấu hình (DB, Redis, Mail, JWT,...)
+│ └── db/changelog/ # Quản lý migration bằng Liquibase
+│
+├── frontend/
+│ ├── package.json # Scripts & dependencies cho React/Vite
+│ └── src/
+│ ├── routes/ # Routing (landing, auth, user, admin,...)
+│ ├── features/ # Module tính năng (quiz, profile, admin,...)
+│ ├── api/ # API clients (auth, quiz, lesson, gemini,...)
+│ ├── components/ # UI components (shadcn/radix-based)
+│ └── assets/ # Hình ảnh, icon, style, config UI
+│
+└── image/ # Ảnh minh họa giao diện dùng trong README
 ---
 ## ⚙️ Công nghệ chính
 
